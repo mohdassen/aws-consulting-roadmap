@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCA & PDPL Cloud Compliance Checklist — Saudi Arabia</title>
+<style>
+  :root {
+    --bg:#07090f; --surface:#0e1219; --surface2:#141820;
+    --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12);
+    --text:#e8edf5; --muted:#6b7a94;
+    --green:#34d399; --red:#f87171; --gold:#f59e0b;
+    --blue:#60a5fa; --accent:#c084fc; --accent2:#818cf8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+
+  /* HEADER */
+  .header{background:linear-gradient(135deg,#080a0f,#0d1018,#0a0e18);border-bottom:1px solid var(--border);padding:36px 24px 30px;text-align:center;position:relative;overflow:hidden;}
+  .header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(248,113,113,0.09) 0%,transparent 65%);}
+  .header-badge{display:inline-block;font-size:0.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--red);font-weight:700;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);padding:4px 14px;border-radius:20px;margin-bottom:14px;}
+  .header h1{font-family:Georgia,serif;font-size:1.8rem;color:var(--text);margin-bottom:8px;line-height:1.2;}
+  .header h1 span{color:var(--red);font-style:italic;}
+  .header-sub{font-size:0.75rem;color:var(--muted);max-width:540px;margin:0 auto 20px;line-height:1.6;}
+
+  /* SCORE BANNER */
+  .score-banner{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;padding:16px 24px;background:var(--surface);border-bottom:1px solid var(--border);}
+  .score-item{text-align:center;}
+  .score-num{font-family:Georgia,serif;font-size:1.6rem;font-weight:700;line-height:1;}
+  .score-label{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+  .s-total{color:var(--accent);}
+  .s-nca{color:var(--red);}
+  .s-pdpl{color:var(--gold);}
+  .s-ndmo{color:var(--blue);}
+  .s-ops{color:var(--green);}
+
+  /* FRAMEWORK TABS */
+  .fw-tabs{display:flex;overflow-x:auto;scrollbar-width:none;background:var(--surface);border-bottom:1px solid var(--border);}
+  .fw-tabs::-webkit-scrollbar{display:none;}
+  .fw-tab{flex:1;min-width:140px;padding:14px 10px;text-align:center;cursor:pointer;font-size:0.7rem;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;}
+  .fw-tab:hover{color:var(--text);}
+  .fw-tab.t-nca.active{color:var(--red);border-bottom-color:var(--red);}
+  .fw-tab.t-pdpl.active{color:var(--gold);border-bottom-color:var(--gold);}
+  .fw-tab.t-ndmo.active{color:var(--blue);border-bottom-color:var(--blue);}
+  .fw-tab.t-ops.active{color:var(--green);border-bottom-color:var(--green);}
+  .fw-tab .tab-icon{display:block;font-size:1.1rem;margin-bottom:3px;}
+
+  /* LAYOUT */
+  .layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 220px);}
+  .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:14px 0;overflow-y:auto;}
+  .sb-label{font-size:0.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;padding:10px 16px 5px;}
+  .sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;font-size:0.7rem;color:var(--muted);transition:all 0.15s;border-left:2px solid transparent;}
+  .sb-item:hover{color:var(--text);background:rgba(255,255,255,0.03);}
+  .sb-item.active{color:var(--text);background:rgba(255,255,255,0.04);border-left-color:currentColor;}
+  .sb-nca.active{color:var(--red);}
+  .sb-pdpl.active{color:var(--gold);}
+  .sb-ndmo.active{color:var(--blue);}
+  .sb-ops.active{color:var(--green);}
+  .sb-prog{font-size:0.58rem;color:var(--muted);margin-left:auto;}
+
+  /* CONTENT */
+  .content{padding:24px;overflow-y:auto;max-height:calc(100vh - 220px);}
+  .fw-panel{display:none;}
+  .fw-panel.active{display:block;animation:fadeUp 0.2s ease;}
+  .section-panel{display:none;}
+  .section-panel.active{display:block;animation:fadeUp 0.2s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  /* SECTION HEAD */
+  .s-head{margin-bottom:20px;}
+  .s-ey{font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:5px;}
+  .ey-nca{color:var(--red);}
+  .ey-pdpl{color:var(--gold);}
+  .ey-ndmo{color:var(--blue);}
+  .ey-ops{color:var(--green);}
+  .s-title{font-family:Georgia,serif;font-size:1.25rem;color:var(--text);margin-bottom:5px;}
+  .s-desc{font-size:0.73rem;color:var(--muted);line-height:1.65;}
+
+  /* ALERT */
+  .alert{border-radius:10px;padding:11px 15px;margin-bottom:14px;font-size:0.7rem;line-height:1.6;display:flex;gap:9px;}
+  .a-red{background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.2);color:#fca5a5;}
+  .a-gold{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);color:#fbbf24;}
+  .a-blue{background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.2);color:var(--blue);}
+  .a-green{background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.2);color:var(--green);}
+
+  /* CHECKLIST */
+  .checklist-group{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:14px;overflow:hidden;}
+  .cg-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .cg-title{font-size:0.8rem;font-weight:700;color:var(--text);}
+  .cg-prog{font-size:0.62rem;color:var(--muted);background:rgba(255,255,255,0.04);padding:3px 10px;border-radius:10px;}
+  .cg-prog-bar{height:3px;background:rgba(255,255,255,0.05);margin:0;}
+  .cg-prog-fill{height:100%;border-radius:0;transition:width 0.4s ease;}
+
+  .checklist{list-style:none;}
+  .cl-item{display:flex;gap:12px;align-items:flex-start;padding:11px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;}
+  .cl-item:last-child{border-bottom:none;}
+  .cl-item:hover{background:rgba(255,255,255,0.02);}
+  .cl-box{width:18px;height:18px;border-radius:5px;border:1px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.65rem;transition:all 0.2s;margin-top:1px;}
+  .cl-item.done .cl-box{background:var(--green);border-color:var(--green);color:#0a0e1a;font-weight:700;}
+  .cl-item.na .cl-box{background:rgba(107,122,148,0.2);border-color:var(--muted);color:var(--muted);}
+  .cl-body{}
+  .cl-ctrl{font-size:0.62rem;font-weight:700;letter-spacing:0.5px;margin-bottom:3px;}
+  .ctrl-nca{color:var(--red);}
+  .ctrl-pdpl{color:var(--gold);}
+  .ctrl-ndmo{color:var(--blue);}
+  .ctrl-ops{color:var(--green);}
+  .cl-title{font-size:0.76rem;color:var(--text);margin-bottom:3px;line-height:1.4;}
+  .cl-desc{font-size:0.67rem;color:var(--muted);line-height:1.55;}
+  .cl-meta{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+  .cl-tag{font-size:0.57rem;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.05);color:var(--muted);}
+  .cl-actions{display:flex;gap:6px;margin-top:6px;}
+  .cl-btn{font-size:0.6rem;padding:3px 9px;border-radius:5px;border:none;cursor:pointer;font-family:inherit;font-weight:600;transition:opacity 0.2s;}
+  .btn-done{background:rgba(52,211,153,0.15);color:var(--green);}
+  .btn-na{background:rgba(107,122,148,0.12);color:var(--muted);}
+  .btn-done:hover,.btn-na:hover{opacity:0.8;}
+
+  /* TABLE */
+  .tbl{width:100%;border-collapse:collapse;font-size:0.7rem;margin-bottom:14px;}
+  .tbl th{background:rgba(255,255,255,0.04);color:var(--muted);font-size:0.59rem;text-transform:uppercase;letter-spacing:1px;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);}
+  .tbl td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;line-height:1.5;}
+  .tbl tr:last-child td{border-bottom:none;}
+  .badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:0.58rem;font-weight:700;}
+  .b-red{background:rgba(248,113,113,0.12);color:var(--red);}
+  .b-gold{background:rgba(245,158,11,0.12);color:var(--gold);}
+  .b-green{background:rgba(52,211,153,0.12);color:var(--green);}
+  .b-blue{background:rgba(96,165,250,0.12);color:var(--blue);}
+
+  /* EXPORT */
+  .export-bar{background:var(--surface);border-top:1px solid var(--border);padding:14px 24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .export-label{font-size:0.7rem;color:var(--muted);flex:1;}
+  .exp-btn{padding:8px 16px;border-radius:8px;font-size:0.7rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all 0.2s;}
+  .exp-primary{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#0a0e1a;}
+  .exp-ghost{background:rgba(255,255,255,0.05);border:1px solid var(--border2);color:var(--text);}
+
+  footer{border-top:1px solid var(--border);text-align:center;padding:18px;font-size:0.62rem;color:var(--muted);}
+
+  @media(max-width:680px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-badge">🇸🇦 Saudi Arabia Cloud Compliance</div>
+  <h1>NCA & PDPL <span>Compliance Checklist</span></h1>
+  <p class="header-sub">A comprehensive, interactive compliance checklist mapping AWS controls to Saudi Arabia's NCA Cybersecurity Controls (CCC), Personal Data Protection Law (PDPL), NDMO Cloud Policy, and Cloud Operations standards.</p>
+</div>
+
+<!-- SCORE BANNER -->
+<div class="score-banner">
+  <div class="score-item"><div class="score-num s-total" id="sc-total">0%</div><div class="score-label">Overall Score</div></div>
+  <div class="score-item"><div class="score-num s-nca" id="sc-nca">0/0</div><div class="score-label">NCA Controls</div></div>
+  <div class="score-item"><div class="score-num s-pdpl" id="sc-pdpl">0/0</div><div class="score-label">PDPL Controls</div></div>
+  <div class="score-item"><div class="score-num s-ndmo" id="sc-ndmo">0/0</div><div class="score-label">NDMO Controls</div></div>
+  <div class="score-item"><div class="score-num s-ops" id="sc-ops">0/0</div><div class="score-label">Ops Controls</div></div>
+</div>
+
+<!-- FRAMEWORK TABS -->
+<div class="fw-tabs">
+  <div class="fw-tab t-nca active" id="tab-nca" onclick="switchFW('nca')"><span class="tab-icon">🔒</span>NCA CCC</div>
+  <div class="fw-tab t-pdpl" id="tab-pdpl" onclick="switchFW('pdpl')"><span class="tab-icon">🛡️</span>PDPL</div>
+  <div class="fw-tab t-ndmo" id="tab-ndmo" onclick="switchFW('ndmo')"><span class="tab-icon">📋</span>NDMO</div>
+  <div class="fw-tab t-ops" id="tab-ops" onclick="switchFW('ops')"><span class="tab-icon">⚙️</span>Cloud Operations</div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <!-- NCA -->
+    <div id="sb-nca">
+      <div class="sb-label">NCA Domains</div>
+      <div class="sb-item sb-nca active" onclick="switchSection('nca','iam')">IAM Controls <span class="sb-prog" id="sp-nca-iam">0/5</span></div>
+      <div class="sb-item sb-nca" onclick="switchSection('nca','data')">Data Security <span class="sb-prog" id="sp-nca-data">0/5</span></div>
+      <div class="sb-item sb-nca" onclick="switchSection('nca','network')">Network Security <span class="sb-prog" id="sp-nca-network">0/4</span></div>
+      <div class="sb-item sb-nca" onclick="switchSection('nca','monitor')">Monitoring & Audit <span class="sb-prog" id="sp-nca-monitor">0/5</span></div>
+      <div class="sb-item sb-nca" onclick="switchSection('nca','incident')">Incident Response <span class="sb-prog" id="sp-nca-incident">0/3</span></div>
+    </div>
+    <!-- PDPL -->
+    <div id="sb-pdpl" style="display:none">
+      <div class="sb-label">PDPL Articles</div>
+      <div class="sb-item sb-pdpl active" onclick="switchSection('pdpl','residency')">Data Residency <span class="sb-prog" id="sp-pdpl-residency">0/4</span></div>
+      <div class="sb-item sb-pdpl" onclick="switchSection('pdpl','consent')">Consent & Rights <span class="sb-prog" id="sp-pdpl-consent">0/4</span></div>
+      <div class="sb-item sb-pdpl" onclick="switchSection('pdpl','protection')">Data Protection <span class="sb-prog" id="sp-pdpl-protection">0/5</span></div>
+      <div class="sb-item sb-pdpl" onclick="switchSection('pdpl','transfer')">Cross-Border Transfer <span class="sb-prog" id="sp-pdpl-transfer">0/3</span></div>
+    </div>
+    <!-- NDMO -->
+    <div id="sb-ndmo" style="display:none">
+      <div class="sb-label">NDMO Domains</div>
+      <div class="sb-item sb-ndmo active" onclick="switchSection('ndmo','classify')">Data Classification <span class="sb-prog" id="sp-ndmo-classify">0/4</span></div>
+      <div class="sb-item sb-ndmo" onclick="switchSection('ndmo','model')">Deployment Model <span class="sb-prog" id="sp-ndmo-model">0/3</span></div>
+      <div class="sb-item sb-ndmo" onclick="switchSection('ndmo','gov')">Data Governance <span class="sb-prog" id="sp-ndmo-gov">0/4</span></div>
+    </div>
+    <!-- OPS -->
+    <div id="sb-ops" style="display:none">
+      <div class="sb-label">Operations</div>
+      <div class="sb-item sb-ops active" onclick="switchSection('ops','config')">Config & Hardening <span class="sb-prog" id="sp-ops-config">0/5</span></div>
+      <div class="sb-item sb-ops" onclick="switchSection('ops','patch')">Patch & Vuln Mgmt <span class="sb-prog" id="sp-ops-patch">0/4</span></div>
+      <div class="sb-item sb-ops" onclick="switchSection('ops','backup')">Backup & Recovery <span class="sb-prog" id="sp-ops-backup">0/4</span></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ═══════════ NCA ═══════════ -->
+    <div class="fw-panel active" id="fw-nca">
+
+      <!-- NCA IAM -->
+      <div class="section-panel active" id="nca-iam">
+        <div class="s-head">
+          <div class="s-ey ey-nca">NCA CCC · Access Control Domain</div>
+          <div class="s-title">Identity & Access Management Controls</div>
+          <div class="s-desc">NCA Cybersecurity Controls require strict access management aligned with least privilege. All controls must be documented and demonstrable during NCA audits.</div>
+        </div>
+        <div class="alert a-red">🔒 <span><strong>NCA CCC Reference:</strong> These controls map to NCA CCC Domain 3 — Access Control. Failure to implement these can result in non-compliance findings during official NCA assessments.</span></div>
+        <div class="checklist-group" id="cg-nca-iam">
+          <div class="cg-header"><div class="cg-title">🔐 IAM Controls</div><div class="cg-prog" id="cp-nca-iam">0 / 5 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-nca-iam" style="width:0%;background:var(--red);"></div></div>
+          <ul class="checklist" id="cl-nca-iam">
+            <li class="cl-item" onclick="toggleItem(this,'nca','iam')">
+              <div class="cl-box"></div>
+              <div class="cl-body">
+                <div class="cl-ctrl ctrl-nca">NCA-IAM-01</div>
+                <div class="cl-title">Root Account MFA & Restricted Usage</div>
+                <div class="cl-desc">AWS root account must have hardware or virtual MFA enabled. Root credentials must be stored in a secure vault. Root account must not be used for day-to-day operations. Documented root usage policy must exist.</div>
+                <div class="cl-meta"><span class="cl-tag">AWS Root</span><span class="cl-tag">MFA</span><span class="cl-tag">IAM Policy</span></div>
+                <div class="cl-actions">
+                  <button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button>
+                  <button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button>
+                </div>
+              </div>
+            </li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','iam')">
+              <div class="cl-box"></div>
+              <div class="cl-body">
+                <div class="cl-ctrl ctrl-nca">NCA-IAM-02</div>
+                <div class="cl-title">Least Privilege Access Policy</div>
+                <div class="cl-desc">All IAM roles and users must follow least privilege. No wildcard (*) actions in production policies. IAM Access Analyzer must be enabled to identify overly permissive policies. Quarterly access reviews must be conducted and documented.</div>
+                <div class="cl-meta"><span class="cl-tag">IAM Policies</span><span class="cl-tag">Access Analyzer</span><span class="cl-tag">Quarterly Review</span></div>
+                <div class="cl-actions">
+                  <button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button>
+                  <button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button>
+                </div>
+              </div>
+            </li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','iam')">
+              <div class="cl-box"></div>
+              <div class="cl-body">
+                <div class="cl-ctrl ctrl-nca">NCA-IAM-03</div>
+                <div class="cl-title">MFA Enforced for All Human Users</div>
+                <div class="cl-desc">MFA must be enforced via IAM policy (deny all actions if MFA not present) for all human IAM users. AWS IAM Identity Center must require MFA. Hardware MFA tokens required for privileged admin accounts. Document MFA enforcement policy.</div>
+                <div class="cl-meta"><span class="cl-tag">MFA Policy</span><span class="cl-tag">IAM Identity Center</span><span class="cl-tag">Privileged Access</span></div>
+                <div class="cl-actions">
+                  <button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button>
+                  <button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button>
+                </div>
+              </div>
+            </li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','iam')">
+              <div class="cl-box"></div>
+              <div class="cl-body">
+                <div class="cl-ctrl ctrl-nca">NCA-IAM-04</div>
+                <div class="cl-title">No Long-Term Access Keys</div>
+                <div class="cl-desc">Access keys must not be used for EC2, Lambda, or ECS workloads — IAM roles must be used instead. Any remaining access keys must be rotated every 90 days maximum. AWS Config rule iam-access-keys-rotated must be active and reporting green.</div>
+                <div class="cl-meta"><span class="cl-tag">Access Keys</span><span class="cl-tag">IAM Roles</span><span class="cl-tag">AWS Config</span></div>
+                <div class="cl-actions">
+                  <button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button>
+                  <button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button>
+                </div>
+              </div>
+            </li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','iam')">
+              <div class="cl-box"></div>
+              <div class="cl-body">
+                <div class="cl-ctrl ctrl-nca">NCA-IAM-05</div>
+                <div class="cl-title">Service Control Policies (SCPs) Enforced</div>
+                <div class="cl-desc">AWS Organizations SCPs must enforce: deny use of non-approved regions, deny disabling CloudTrail or GuardDuty, deny creation of public S3 buckets, deny IAM changes without MFA. SCPs must be documented and reviewed semi-annually.</div>
+                <div class="cl-meta"><span class="cl-tag">AWS Organizations</span><span class="cl-tag">SCPs</span><span class="cl-tag">Preventive Controls</span></div>
+                <div class="cl-actions">
+                  <button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button>
+                  <button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- NCA DATA -->
+      <div class="section-panel" id="nca-data">
+        <div class="s-head">
+          <div class="s-ey ey-nca">NCA CCC · Data Security Domain</div>
+          <div class="s-title">Data Security Controls</div>
+          <div class="s-desc">NCA requires protection of data at rest and in transit with documented encryption standards and key management procedures.</div>
+        </div>
+        <div class="checklist-group" id="cg-nca-data">
+          <div class="cg-header"><div class="cg-title">🗄️ Data Security Controls</div><div class="cg-prog" id="cp-nca-data">0 / 5 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-nca-data" style="width:0%;background:var(--red);"></div></div>
+          <ul class="checklist" id="cl-nca-data">
+            <li class="cl-item" onclick="toggleItem(this,'nca','data')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-DAT-01</div><div class="cl-title">Encryption at Rest — All Storage Services</div><div class="cl-desc">S3 buckets: SSE-KMS enabled by default. EBS volumes: encrypted using KMS CMK. RDS instances: encryption enabled at creation. ElastiCache: encryption at rest enabled. AWS Config rule: encrypted-volumes must report compliant.</div><div class="cl-meta"><span class="cl-tag">KMS</span><span class="cl-tag">S3 SSE</span><span class="cl-tag">EBS Encryption</span><span class="cl-tag">RDS Encryption</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','data')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-DAT-02</div><div class="cl-title">Encryption in Transit — TLS 1.2+ Enforced</div><div class="cl-desc">All ALBs: HTTPS listeners only, HTTP redirects to HTTPS. API Gateway: TLS 1.2 minimum policy. S3 bucket policies: deny non-HTTPS access (aws:SecureTransport condition). RDS: require_ssl parameter enabled. Document TLS policy version standards.</div><div class="cl-meta"><span class="cl-tag">TLS 1.2+</span><span class="cl-tag">ACM</span><span class="cl-tag">HTTPS Enforcement</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','data')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-DAT-03</div><div class="cl-title">AWS KMS Key Management Policy</div><div class="cl-desc">Customer Managed Keys (CMKs) must be used for sensitive data. Key rotation must be enabled (annual automatic rotation). Key policies must follow least privilege. Key usage must be auditable via CloudTrail. Key administrators and key users must be separate roles.</div><div class="cl-meta"><span class="cl-tag">KMS CMK</span><span class="cl-tag">Key Rotation</span><span class="cl-tag">Key Policy</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','data')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-DAT-04</div><div class="cl-title">S3 Block Public Access — Account Level</div><div class="cl-desc">Block Public Access must be enabled at the account level AND each bucket level. AWS Config rule s3-bucket-public-read-prohibited and s3-bucket-public-write-prohibited must be active. Results must show 100% compliant. Any exceptions require documented business justification and CISO approval.</div><div class="cl-meta"><span class="cl-tag">S3 BPA</span><span class="cl-tag">AWS Config</span><span class="cl-tag">Account Level</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','data')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-DAT-05</div><div class="cl-title">Secrets & Credentials in AWS Secrets Manager</div><div class="cl-desc">All database passwords, API keys, certificates, and service credentials must be stored in AWS Secrets Manager — never in code, environment variables, or SSM Parameter Store (unencrypted). Automatic rotation must be enabled where supported. Secret access must be audited via CloudTrail.</div><div class="cl-meta"><span class="cl-tag">Secrets Manager</span><span class="cl-tag">Rotation</span><span class="cl-tag">No Plaintext Secrets</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- NCA NETWORK -->
+      <div class="section-panel" id="nca-network">
+        <div class="s-head">
+          <div class="s-ey ey-nca">NCA CCC · Network Security Domain</div>
+          <div class="s-title">Network Security Controls</div>
+          <div class="s-desc">Network segmentation and perimeter controls are mandatory NCA requirements for all cloud-hosted systems processing government or sensitive data.</div>
+        </div>
+        <div class="checklist-group" id="cg-nca-network">
+          <div class="cg-header"><div class="cg-title">🌐 Network Controls</div><div class="cg-prog" id="cp-nca-network">0 / 4 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-nca-network" style="width:0%;background:var(--red);"></div></div>
+          <ul class="checklist" id="cl-nca-network">
+            <li class="cl-item" onclick="toggleItem(this,'nca','network')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-NET-01</div><div class="cl-title">VPC Network Segmentation (3-Tier)</div><div class="cl-desc">All workloads must be deployed in a VPC with clear network segmentation: Public tier (load balancers only), Private tier (application servers), Data tier (databases, caches). No database or application instances should have public IP addresses. Network diagrams must be documented and current.</div><div class="cl-meta"><span class="cl-tag">VPC</span><span class="cl-tag">Subnets</span><span class="cl-tag">3-Tier Architecture</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','network')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-NET-02</div><div class="cl-title">AWS WAF Deployed on Public Endpoints</div><div class="cl-desc">AWS WAF must be deployed in front of all internet-facing ALBs, CloudFront distributions, and API Gateways. AWS Managed Rule Groups (Core Rule Set, Known Bad Inputs) must be enabled. Rate limiting rules must be configured. WAF logs must be shipped to S3 and retained for minimum 1 year.</div><div class="cl-meta"><span class="cl-tag">WAF</span><span class="cl-tag">Managed Rules</span><span class="cl-tag">Rate Limiting</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','network')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-NET-03</div><div class="cl-title">VPC Flow Logs Enabled</div><div class="cl-desc">VPC Flow Logs must be enabled for all VPCs, capturing ACCEPT and REJECT traffic. Logs must be delivered to CloudWatch Logs and/or S3. Retention: minimum 90 days hot storage, 1 year archive. Flow logs must be monitored for anomalies and unauthorized access attempts.</div><div class="cl-meta"><span class="cl-tag">VPC Flow Logs</span><span class="cl-tag">CloudWatch</span><span class="cl-tag">1-Year Retention</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','network')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-NET-04</div><div class="cl-title">No Direct SSH/RDP Access to Production</div><div class="cl-desc">Port 22 (SSH) and 3389 (RDP) must not be open to 0.0.0.0/0 on any production Security Group. All administrative access must use AWS Systems Manager Session Manager (no open ports required, full audit trail). This must be verified via AWS Config rule restricted-ssh.</div><div class="cl-meta"><span class="cl-tag">Session Manager</span><span class="cl-tag">Security Groups</span><span class="cl-tag">AWS Config</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- NCA MONITORING -->
+      <div class="section-panel" id="nca-monitor">
+        <div class="s-head">
+          <div class="s-ey ey-nca">NCA CCC · Monitoring Domain</div>
+          <div class="s-title">Monitoring & Audit Controls</div>
+          <div class="s-desc">Comprehensive audit logging and continuous monitoring are mandatory. NCA auditors will request evidence of log retention, monitoring coverage, and alert response times.</div>
+        </div>
+        <div class="checklist-group" id="cg-nca-monitor">
+          <div class="cg-header"><div class="cg-title">📊 Monitoring & Audit Controls</div><div class="cg-prog" id="cp-nca-monitor">0 / 5 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-nca-monitor" style="width:0%;background:var(--red);"></div></div>
+          <ul class="checklist" id="cl-nca-monitor">
+            <li class="cl-item" onclick="toggleItem(this,'nca','monitor')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-MON-01</div><div class="cl-title">AWS CloudTrail Multi-Region Trail</div><div class="cl-desc">A multi-region CloudTrail trail must be active and logging all management and data events across all AWS accounts. Log file validation must be enabled to detect tampering. Logs delivered to a dedicated S3 bucket with MFA Delete enabled. CloudTrail must not be modifiable by non-security-admin roles.</div><div class="cl-meta"><span class="cl-tag">CloudTrail</span><span class="cl-tag">Multi-Region</span><span class="cl-tag">Log Integrity</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','monitor')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-MON-02</div><div class="cl-title">AWS GuardDuty Enabled All Accounts</div><div class="cl-desc">GuardDuty must be enabled in every AWS account and every region. GuardDuty findings must be centralized to a Security account using GuardDuty delegated administrator. All HIGH severity findings must trigger automated notification within 15 minutes. Finding closure must be documented.</div><div class="cl-meta"><span class="cl-tag">GuardDuty</span><span class="cl-tag">All Accounts</span><span class="cl-tag">All Regions</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','monitor')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-MON-03</div><div class="cl-title">AWS Security Hub Enabled & Configured</div><div class="cl-desc">Security Hub must be enabled with CIS AWS Foundations Benchmark standard active. Score must be above 80% compliance. Findings must be reviewed weekly minimum. Critical findings must be remediated within 24 hours. Security Hub findings must feed into an operational dashboard reviewed by security team daily.</div><div class="cl-meta"><span class="cl-tag">Security Hub</span><span class="cl-tag">CIS Benchmark</span><span class="cl-tag">80%+ Score</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','monitor')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-MON-04</div><div class="cl-title">AWS Config Rules — Continuous Compliance</div><div class="cl-desc">AWS Config must be enabled in all accounts and regions. Minimum required rules: encrypted-volumes, restricted-ssh, s3-bucket-public-read-prohibited, iam-root-access-key-check, cloudtrail-enabled, mfa-enabled-for-iam-console-access. Non-compliant resources must trigger auto-remediation or immediate notification.</div><div class="cl-meta"><span class="cl-tag">AWS Config</span><span class="cl-tag">Compliance Rules</span><span class="cl-tag">Auto Remediation</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','monitor')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-MON-05</div><div class="cl-title">Log Retention Policy — Minimum 1 Year</div><div class="cl-desc">All security-relevant logs (CloudTrail, VPC Flow, ALB Access, WAF, GuardDuty) must be retained for minimum 1 year: 90 days in CloudWatch Logs (hot), remaining in S3 (warm/cold). S3 lifecycle policies must automate tier transitions. Log deletion must require MFA and security-admin approval.</div><div class="cl-meta"><span class="cl-tag">1-Year Retention</span><span class="cl-tag">S3 Lifecycle</span><span class="cl-tag">CloudWatch Logs</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- NCA INCIDENT -->
+      <div class="section-panel" id="nca-incident">
+        <div class="s-head">
+          <div class="s-ey ey-nca">NCA CCC · Incident Response Domain</div>
+          <div class="s-title">Incident Response Controls</div>
+          <div class="s-desc">NCA requires a documented, tested incident response capability. Evidence of IR plan existence, testing frequency, and response times are reviewed during assessments.</div>
+        </div>
+        <div class="checklist-group" id="cg-nca-incident">
+          <div class="cg-header"><div class="cg-title">🚨 Incident Response Controls</div><div class="cg-prog" id="cp-nca-incident">0 / 3 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-nca-incident" style="width:0%;background:var(--red);"></div></div>
+          <ul class="checklist" id="cl-nca-incident">
+            <li class="cl-item" onclick="toggleItem(this,'nca','incident')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-INC-01</div><div class="cl-title">Documented Cloud Incident Response Plan</div><div class="cl-desc">A written Cloud Incident Response Plan (IRP) must exist and cover: classification levels (P1–P4), escalation paths, notification requirements (internal + NCA reporting), containment procedures, evidence preservation, and post-incident review process. Plan must be approved by CISO and reviewed annually.</div><div class="cl-meta"><span class="cl-tag">IRP Document</span><span class="cl-tag">Classification</span><span class="cl-tag">CISO Approved</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','incident')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-INC-02</div><div class="cl-title">Automated Incident Detection & Alerting</div><div class="cl-desc">GuardDuty HIGH findings must trigger automated SNS notifications to the security team within 15 minutes. EventBridge rules must auto-isolate compromised EC2 instances. A 24/7 on-call security rotation must be documented. Mean Time to Detect (MTTD) must be tracked and reported monthly.</div><div class="cl-meta"><span class="cl-tag">GuardDuty</span><span class="cl-tag">EventBridge</span><span class="cl-tag">24/7 On-Call</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'nca','incident')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-nca">NCA-INC-03</div><div class="cl-title">Annual Incident Response Testing (Tabletop)</div><div class="cl-desc">A full tabletop exercise or simulation of a security incident must be conducted annually. Scenarios must include: data breach, ransomware, account compromise, and insider threat. Results must be documented with lessons learned and improvement action items tracked to closure. Evidence must be available for NCA audit.</div><div class="cl-meta"><span class="cl-tag">Tabletop Exercise</span><span class="cl-tag">Annual</span><span class="cl-tag">Documentation</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- /fw-nca -->
+
+    <!-- ═══════════ PDPL ═══════════ -->
+    <div class="fw-panel" id="fw-pdpl">
+
+      <div class="section-panel active" id="pdpl-residency">
+        <div class="s-head">
+          <div class="s-ey ey-pdpl">PDPL · Data Residency</div>
+          <div class="s-title">Data Residency Controls</div>
+          <div class="s-desc">PDPL requires that personal data of Saudi residents be stored and processed within Saudi Arabia or approved jurisdictions. Non-compliance carries significant financial penalties.</div>
+        </div>
+        <div class="alert a-gold">🇸🇦 <span><strong>Primary Region:</strong> AWS Middle East (Bahrain) — me-south-1 is the primary compliant region for Saudi personal data. AWS UAE (ae-central-1) may be acceptable as secondary — confirm with SDAIA guidance and legal counsel for your specific data classification.</span></div>
+        <div class="checklist-group" id="cg-pdpl-residency">
+          <div class="cg-header"><div class="cg-title">📍 Data Residency Controls</div><div class="cg-prog" id="cp-pdpl-residency">0 / 4 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-pdpl-residency" style="width:0%;background:var(--gold);"></div></div>
+          <ul class="checklist" id="cl-pdpl-residency">
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','residency')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-RES-01</div><div class="cl-title">Personal Data Stored in Approved AWS Region</div><div class="cl-desc">All personal data as defined by PDPL (name, ID number, contact info, financial data, health data, location data) must be stored in AWS me-south-1 (Bahrain) or another SDAIA-approved region. Data mapping document must identify all services containing personal data and their regions. Verified by configuration review.</div><div class="cl-meta"><span class="cl-tag">me-south-1</span><span class="cl-tag">Data Mapping</span><span class="cl-tag">SDAIA Approved</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','residency')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-RES-02</div><div class="cl-title">SCP Preventing Data Replication to Non-Approved Regions</div><div class="cl-desc">AWS Organizations SCP must deny S3 replication, RDS snapshots, and DynamoDB global tables to non-approved regions. S3 bucket replication rules must be audited quarterly. AWS Config rule s3-bucket-replication-enabled must flag any unexpected replication configurations for immediate review.</div><div class="cl-meta"><span class="cl-tag">SCPs</span><span class="cl-tag">Region Restriction</span><span class="cl-tag">S3 Replication Control</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','residency')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-RES-03</div><div class="cl-title">Personal Data Inventory & Classification</div><div class="cl-desc">A complete inventory of all personal data assets must be maintained: what data, which systems, what classification level, retention period, legal basis for processing. Amazon Macie must be enabled on all S3 buckets containing personal data to automatically discover and classify sensitive data. Inventory reviewed quarterly.</div><div class="cl-meta"><span class="cl-tag">Amazon Macie</span><span class="cl-tag">Data Inventory</span><span class="cl-tag">Classification</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','residency')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-RES-04</div><div class="cl-title">Data Retention & Deletion Policy Enforced</div><div class="cl-desc">Documented retention periods must exist for all personal data categories. S3 Object Lock and lifecycle policies must enforce automated deletion at retention expiry. RDS automated backup retention must not exceed the defined period. Annual data purge must be documented and evidenced. Right to erasure requests must be processable within 30 days.</div><div class="cl-meta"><span class="cl-tag">S3 Object Lock</span><span class="cl-tag">Lifecycle Policies</span><span class="cl-tag">Right to Erasure</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-panel" id="pdpl-consent">
+        <div class="s-head"><div class="s-ey ey-pdpl">PDPL · Consent & Rights</div><div class="s-title">Consent & Data Subject Rights Controls</div><div class="s-desc">PDPL gives Saudi data subjects specific rights over their personal data. Technical controls must enable these rights to be fulfilled within defined timeframes.</div></div>
+        <div class="checklist-group" id="cg-pdpl-consent">
+          <div class="cg-header"><div class="cg-title">🤝 Consent & Rights Controls</div><div class="cg-prog" id="cp-pdpl-consent">0 / 4 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-pdpl-consent" style="width:0%;background:var(--gold);"></div></div>
+          <ul class="checklist" id="cl-pdpl-consent">
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','consent')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-CON-01</div><div class="cl-title">Consent Management System Implemented</div><div class="cl-desc">A technical system for capturing, storing, and proving user consent must be implemented. Consent must be explicit, specific, informed, and withdrawable. Consent records must be stored durably (S3 with versioning) with timestamps. Withdrawal of consent must trigger automated downstream data deletion workflows.</div><div class="cl-meta"><span class="cl-tag">Consent Records</span><span class="cl-tag">S3 Versioning</span><span class="cl-tag">Withdrawal Workflow</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','consent')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-CON-02</div><div class="cl-title">Data Subject Access Request (DSAR) Process</div><div class="cl-desc">A documented and tested process for handling Data Subject Access Requests must exist. DSARs must be fulfilled within 30 days. Technical capability to export all personal data for a specific individual must be implemented and tested. Process must be documented in the Privacy Notice.</div><div class="cl-meta"><span class="cl-tag">DSAR Process</span><span class="cl-tag">30-Day SLA</span><span class="cl-tag">Data Export</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','consent')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-CON-03</div><div class="cl-title">Privacy Notice Published & Current</div><div class="cl-desc">A PDPL-compliant Privacy Notice must be published and accessible. It must state: what data is collected, legal basis, purpose, retention period, third-party sharing, data subject rights, and contact for requests. Notice must be reviewed annually and updated within 30 days of material changes to data processing.</div><div class="cl-meta"><span class="cl-tag">Privacy Notice</span><span class="cl-tag">Legal Basis</span><span class="cl-tag">Annual Review</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','consent')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-CON-04</div><div class="cl-title">Data Breach Notification Process</div><div class="cl-desc">A documented data breach notification process must exist. SDAIA must be notified within 72 hours of discovering a personal data breach. Affected data subjects must be notified without undue delay when breach is high-risk. GuardDuty + Macie findings must feed into breach detection workflows with automated escalation.</div><div class="cl-meta"><span class="cl-tag">72-Hour Notification</span><span class="cl-tag">SDAIA</span><span class="cl-tag">Breach Detection</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-panel" id="pdpl-protection">
+        <div class="s-head"><div class="s-ey ey-pdpl">PDPL · Data Protection</div><div class="s-title">Technical Data Protection Controls</div><div class="s-desc">PDPL requires appropriate technical and organizational measures to protect personal data — these are the specific AWS technical controls that demonstrate compliance.</div></div>
+        <div class="checklist-group" id="cg-pdpl-protection">
+          <div class="cg-header"><div class="cg-title">🔒 Data Protection Controls</div><div class="cg-prog" id="cp-pdpl-protection">0 / 5 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-pdpl-protection" style="width:0%;background:var(--gold);"></div></div>
+          <ul class="checklist" id="cl-pdpl-protection">
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','protection')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-PRO-01</div><div class="cl-title">Amazon Macie for Personal Data Discovery</div><div class="cl-desc">Amazon Macie must be enabled on all S3 buckets that may contain personal data. Macie findings must be reviewed weekly. Any new S3 buckets must be automatically enrolled in Macie scanning via automation. Macie findings that identify unprotected personal data must trigger immediate remediation workflow.</div><div class="cl-meta"><span class="cl-tag">Amazon Macie</span><span class="cl-tag">S3 Scanning</span><span class="cl-tag">Auto Enrollment</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','protection')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-PRO-02</div><div class="cl-title">Pseudonymization / Anonymization for Non-Production</div><div class="cl-desc">Personal data must never be copied to dev or test environments without anonymization or pseudonymization. A documented data masking process must exist. Production database dumps must be scrubbed before use in lower environments. This must be enforced technically — not just by policy.</div><div class="cl-meta"><span class="cl-tag">Data Masking</span><span class="cl-tag">Anonymization</span><span class="cl-tag">Non-Prod Control</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','protection')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-PRO-03</div><div class="cl-title">Data Access Logging for Personal Data Stores</div><div class="cl-desc">All access to systems containing personal data must be logged. RDS: enable Enhanced Monitoring + audit log. DynamoDB: enable CloudTrail data events. S3: enable server access logging + CloudTrail data events. Logs must be retained 1 year and reviewed for anomalous access patterns.</div><div class="cl-meta"><span class="cl-tag">RDS Audit Logs</span><span class="cl-tag">CloudTrail Data Events</span><span class="cl-tag">S3 Access Logs</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','protection')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-PRO-04</div><div class="cl-title">Privacy Impact Assessment (PIA) for New Systems</div><div class="cl-desc">A Privacy Impact Assessment must be completed before deploying any new system that processes personal data. PIA must assess: data flows, risks, controls, legal basis. PIAs must be documented, approved by DPO/Legal, and stored. AWS Well-Architected security review must be linked to PIA for cloud workloads.</div><div class="cl-meta"><span class="cl-tag">PIA Process</span><span class="cl-tag">DPO Approval</span><span class="cl-tag">WAF Security Review</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','protection')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-PRO-05</div><div class="cl-title">Third-Party Processor Agreements (DPAs)</div><div class="cl-desc">Data Processing Agreements must be in place with all third-party processors of personal data, including AWS (via AWS DPA), SaaS providers, analytics tools, and support vendors. DPAs must be reviewed annually. A register of all processors must be maintained. AWS Artifact provides AWS compliance documents on demand.</div><div class="cl-meta"><span class="cl-tag">AWS DPA</span><span class="cl-tag">AWS Artifact</span><span class="cl-tag">Processor Register</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-panel" id="pdpl-transfer">
+        <div class="s-head"><div class="s-ey ey-pdpl">PDPL · Cross-Border Transfer</div><div class="s-title">Cross-Border Data Transfer Controls</div><div class="s-desc">PDPL restricts transfer of personal data outside Saudi Arabia. Where cross-border transfers are necessary, specific conditions and safeguards must be in place.</div></div>
+        <div class="checklist-group" id="cg-pdpl-transfer">
+          <div class="cg-header"><div class="cg-title">🌍 Cross-Border Transfer Controls</div><div class="cg-prog" id="cp-pdpl-transfer">0 / 3 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-pdpl-transfer" style="width:0%;background:var(--gold);"></div></div>
+          <ul class="checklist" id="cl-pdpl-transfer">
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','transfer')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-TRN-01</div><div class="cl-title">Cross-Border Transfer Register & Legal Basis</div><div class="cl-desc">All cross-border personal data transfers must be documented in a transfer register: destination country, data categories, legal basis, safeguards in place. Legal basis options: SDAIA adequacy decision, appropriate safeguards (Standard Contractual Clauses equivalent), or explicit consent. Register reviewed quarterly by DPO.</div><div class="cl-meta"><span class="cl-tag">Transfer Register</span><span class="cl-tag">Legal Basis</span><span class="cl-tag">SCCs</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','transfer')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-TRN-02</div><div class="cl-title">VPC Endpoints to Prevent Unintended Data Transfer</div><div class="cl-desc">VPC Endpoints (Gateway and Interface) must be used for all AWS service access to ensure data does not traverse the public internet and stays within the AWS backbone. S3 bucket policies must include condition: aws:sourceVpce to restrict access to approved VPC endpoints only, preventing unauthorized data movement.</div><div class="cl-meta"><span class="cl-tag">VPC Endpoints</span><span class="cl-tag">PrivateLink</span><span class="cl-tag">Bucket Policy Conditions</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'pdpl','transfer')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-pdpl">PDPL-TRN-03</div><div class="cl-title">AWS CloudFront Origin Shield in Approved Region</div><div class="cl-desc">If CloudFront is used to serve content that includes personal data, Origin Shield must be configured to use a location in or nearest to Saudi Arabia. Cache behaviors must be reviewed to ensure personal data is not cached at unapproved edge locations. Signed URLs/cookies must be used for private personal content.</div><div class="cl-meta"><span class="cl-tag">CloudFront</span><span class="cl-tag">Origin Shield</span><span class="cl-tag">Signed URLs</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- /fw-pdpl -->
+
+    <!-- ═══════════ NDMO ═══════════ -->
+    <div class="fw-panel" id="fw-ndmo">
+      <div class="section-panel active" id="ndmo-classify">
+        <div class="s-head"><div class="s-ey ey-ndmo">NDMO · Data Classification</div><div class="s-title">Government Data Classification Controls</div><div class="s-desc">NDMO defines government data classification levels. Cloud architecture must enforce controls appropriate to each classification level.</div></div>
+        <div class="card" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;">
+          <div class="card-title" style="font-size:0.8rem;font-weight:700;color:var(--text);margin-bottom:10px;">📊 NDMO Data Classification Levels & AWS Controls</div>
+          <table class="tbl">
+            <thead><tr><th>Level</th><th>Description</th><th>Required AWS Controls</th><th>Cloud Model</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge b-green">Public</span></td><td>Non-sensitive, publicly available data</td><td>Basic encryption, public S3 (if intentional)</td><td>Public Cloud ✅</td></tr>
+              <tr><td><span class="badge b-blue">Internal</span></td><td>Internal use, low sensitivity</td><td>KMS encryption, private subnets, access control</td><td>Public Cloud ✅</td></tr>
+              <tr><td><span class="badge b-gold">Confidential</span></td><td>Sensitive business/government data</td><td>CMK encryption, MFA, audit logging, VPC isolation</td><td>Public Cloud (KSA region) ✅</td></tr>
+              <tr><td><span class="badge b-red">Restricted</span></td><td>Highly sensitive, national security</td><td>Dedicated tenancy, CMK, HSM, enhanced monitoring</td><td>Private/Gov Cloud only</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="checklist-group" id="cg-ndmo-classify">
+          <div class="cg-header"><div class="cg-title">📋 Classification Controls</div><div class="cg-prog" id="cp-ndmo-classify">0 / 4 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-ndmo-classify" style="width:0%;background:var(--blue);"></div></div>
+          <ul class="checklist" id="cl-ndmo-classify">
+            <li class="cl-item" onclick="toggleItem(this,'ndmo','classify')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ndmo">NDMO-CLS-01</div><div class="cl-title">Data Classification Tags on All Resources</div><div class="cl-desc">All AWS resources containing data must have a DataClassification tag (Public / Internal / Confidential / Restricted). SCPs must enforce different controls per classification level. AWS Config must flag resources without classification tags. Tag policies must enforce valid values only.</div><div class="cl-meta"><span class="cl-tag">Classification Tags</span><span class="cl-tag">Tag Policies</span><span class="cl-tag">SCPs</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ndmo','classify')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ndmo">NDMO-CLS-02</div><div class="cl-title">Confidential Data — CMK Encryption Required</div><div class="cl-desc">All data classified as Confidential or Restricted must be encrypted with Customer Managed Keys (CMK) — not AWS managed keys. Key policies must restrict key usage to approved roles. Key usage must be logged and auditable. Annual key review must be conducted.</div><div class="cl-meta"><span class="cl-tag">CMK</span><span class="cl-tag">KMS Key Policy</span><span class="cl-tag">Annual Review</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ndmo','classify')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ndmo">NDMO-CLS-03</div><div class="cl-title">Restricted Data — Dedicated Tenancy Assessment</div><div class="cl-desc">Any data classified as Restricted must be assessed for whether dedicated tenancy (Dedicated Hosts or Dedicated Instances) is required. Assessment must be documented with CISO sign-off. If dedicated tenancy is required, it must be enforced via IAM policy condition ec2:Tenancy.</div><div class="cl-meta"><span class="cl-tag">Dedicated Hosts</span><span class="cl-tag">Tenancy Policy</span><span class="cl-tag">CISO Sign-off</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ndmo','classify')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ndmo">NDMO-CLS-04</div><div class="cl-title">Annual Data Classification Review</div><div class="cl-desc">All data classification assignments must be reviewed annually for accuracy. New data assets must be classified within 30 days of creation. Classification changes must go through a formal change management process. Classification register must be maintained and accessible to auditors.</div><div class="cl-meta"><span class="cl-tag">Annual Review</span><span class="cl-tag">30-Day Window</span><span class="cl-tag">Change Management</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-panel" id="ndmo-model">
+        <div class="s-head"><div class="s-ey ey-ndmo">NDMO · Deployment Model</div><div class="s-title">Cloud Deployment Model Controls</div><div class="s-desc">NDMO defines approved cloud deployment models for government data. The deployment model must match the data classification level.</div></div>
+        <div class="checklist-group" id="cg-ndmo-model">
+          <div class="cg-header"><div class="cg-title">☁️ Deployment Model Controls</div><div class="cg-prog" id="cp-ndmo-model">0 / 3 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-ndmo-model" style="width:0%;background:var(--blue);"></div></div>
+          <ul class="checklist" id="cl-ndmo-model">
+            <li class="cl-item" onclick="toggleItem(this,'ndmo','model')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ndmo">NDMO-MOD-01</div><div class="cl-title">Cloud Deployment Model Document</div><div class="cl-desc">A documented Cloud Deployment Model policy must define which cloud model (public, private, hybrid, community) is approved for each data classification level. Policy must be approved by the Data Governance Committee and reviewed annually. AWS Shared Responsibility Model must be documented and understood.</div><div class="cl-meta"><span class="cl-tag">Deployment Policy</span><span class="cl-tag">DGC Approval</span><span class="cl-tag">Shared Responsibility</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ndmo','model')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ndmo">NDMO-MOD-02</div><div class="cl-title">Digital Government Standard 5.13.2 Milestones</div><div class="cl-desc">Progress against DGA Standard 5.13.2 cloud adoption milestones must be tracked and reported. Current milestone status must be documented. Roadmap to next milestone must exist. Evidence of milestone achievement must be maintained for DGA reporting. Annual report submission to DGA must be completed.</div><div class="cl-meta"><span class="cl-tag">DGA Standard</span><span class="cl-tag">Milestone Tracking</span><span class="cl-tag">Annual Report</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ndmo','model')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ndmo">NDMO-MOD-03</div><div class="cl-title">Cloud Service Provider Risk Assessment</div><div class="cl-desc">A formal risk assessment of AWS as a cloud service provider must be conducted and documented. Assessment must cover: data sovereignty, service reliability, security certifications (ISO 27001, SOC 2, PCI DSS), exit strategy, and lock-in risk. AWS Artifact must be used to retrieve AWS compliance reports. Assessment renewed every 2 years.</div><div class="cl-meta"><span class="cl-tag">CSP Risk Assessment</span><span class="cl-tag">AWS Artifact</span><span class="cl-tag">Exit Strategy</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-panel" id="ndmo-gov">
+        <div class="s-head"><div class="s-ey ey-ndmo">NDMO · Data Governance</div><div class="s-title">Data Governance Controls</div><div class="s-desc">NDMO requires formal data governance structures to manage government data across its lifecycle in cloud environments.</div></div>
+        <div class="checklist-group" id="cg-ndmo-gov">
+          <div class="cg-header"><div class="cg-title">🏛️ Data Governance Controls</div><div class="cg-prog" id="cp-ndmo-gov">0 / 4 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-ndmo-gov" style="width:0%;background:var(--blue);"></div></div>
+          <ul class="checklist" id="cl-ndmo-gov">
+            <li class="cl-item" onclick="toggleItem(this,'ndmo','gov')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ndmo">NDMO-GOV-01</div><div class="cl-title">Data Steward Assignments</div><div class="cl-desc">Named data stewards must be assigned for all critical data domains in the cloud environment. Steward responsibilities must be documented: classification decisions, quality oversight, access approvals, retention decisions. Steward assignments must be tracked and updated on personnel changes.</div><div class="cl-meta"><span class="cl-tag">Data Stewards</span><span class="cl-tag">Responsibilities</span><span class="cl-tag">Documented</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ndmo','gov')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ndmo">NDMO-GOV-02</div><div class="cl-title">AWS Lake Formation for Data Catalog</div><div class="cl-desc">AWS Glue Data Catalog or Lake Formation must be implemented to catalog all data assets in the cloud. Catalog must include: data location, schema, classification, owner, sensitivity level. Data lineage must be trackable. Catalog must be searchable and accessible to authorized data stewards.</div><div class="cl-meta"><span class="cl-tag">AWS Glue</span><span class="cl-tag">Lake Formation</span><span class="cl-tag">Data Catalog</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ndmo','gov')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ndmo">NDMO-GOV-03</div><div class="cl-title">Data Quality Standards & Monitoring</div><div class="cl-desc">Data quality standards must be defined for critical data domains: completeness, accuracy, consistency, timeliness, uniqueness. AWS Glue DataBrew or custom Lambda functions must monitor quality metrics. Quality dashboards must be reviewed by data stewards monthly. Quality issues must be tracked to resolution.</div><div class="cl-meta"><span class="cl-tag">Data Quality</span><span class="cl-tag">Glue DataBrew</span><span class="cl-tag">Monthly Review</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ndmo','gov')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ndmo">NDMO-GOV-04</div><div class="cl-title">Data Governance Committee (DGC) Charter</div><div class="cl-desc">A formal Data Governance Committee must exist with a documented charter: scope, membership, meeting cadence (minimum quarterly), decision authority, escalation path. DGC must approve: classification policies, sharing agreements, major architecture changes, data retention changes. Minutes must be recorded and retained 3 years.</div><div class="cl-meta"><span class="cl-tag">DGC Charter</span><span class="cl-tag">Quarterly Meetings</span><span class="cl-tag">Decision Authority</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- /fw-ndmo -->
+
+    <!-- ═══════════ OPS ═══════════ -->
+    <div class="fw-panel" id="fw-ops">
+      <div class="section-panel active" id="ops-config">
+        <div class="s-head"><div class="s-ey ey-ops">Cloud Operations · Hardening</div><div class="s-title">Configuration & Hardening Controls</div><div class="s-desc">Secure configuration baselines and continuous compliance checks are the foundation of cloud operational security.</div></div>
+        <div class="checklist-group" id="cg-ops-config">
+          <div class="cg-header"><div class="cg-title">⚙️ Config & Hardening Controls</div><div class="cg-prog" id="cp-ops-config">0 / 5 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-ops-config" style="width:0%;background:var(--green);"></div></div>
+          <ul class="checklist" id="cl-ops-config">
+            <li class="cl-item" onclick="toggleItem(this,'ops','config')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ops">OPS-CFG-01</div><div class="cl-title">CIS AWS Foundations Benchmark — 80%+ Score</div><div class="cl-desc">AWS Security Hub CIS AWS Foundations Benchmark v1.4 must be enabled and score must exceed 80%. All CRITICAL and HIGH findings must be remediated within defined SLAs (Critical: 24h, High: 7 days). Score must be tracked monthly and trending upward. Score must be reportable to auditors on demand.</div><div class="cl-meta"><span class="cl-tag">Security Hub</span><span class="cl-tag">CIS Benchmark</span><span class="cl-tag">80%+ Score</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ops','config')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ops">OPS-CFG-02</div><div class="cl-title">AWS Inspector for Vulnerability Scanning</div><div class="cl-desc">AWS Inspector must be enabled on all EC2 instances and Lambda functions. Inspector must scan for OS vulnerabilities and software composition vulnerabilities. Critical CVEs must be remediated within 72 hours. High CVEs within 7 days. Inspector findings must integrate with Security Hub for centralized tracking.</div><div class="cl-meta"><span class="cl-tag">AWS Inspector</span><span class="cl-tag">CVE Scanning</span><span class="cl-tag">72h Critical SLA</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ops','config')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ops">OPS-CFG-03</div><div class="cl-title">Infrastructure as Code — All Production Resources</div><div class="cl-desc">100% of production infrastructure must be defined in CloudFormation, CDK, or Terraform. No manual console changes permitted in production. AWS Config drift detection must alert on any unmanaged resource changes. CloudFormation stack policies must prevent destructive updates without explicit override.</div><div class="cl-meta"><span class="cl-tag">CloudFormation</span><span class="cl-tag">CDK</span><span class="cl-tag">Drift Detection</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ops','config')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ops">OPS-CFG-04</div><div class="cl-title">EC2 Image Builder — Hardened AMIs</div><div class="cl-desc">All EC2 instances must launch from hardened AMIs created by EC2 Image Builder. AMI pipeline must apply CIS benchmark hardening, install required agents (SSM, CloudWatch), and disable unnecessary services. AMIs must be rebuilt monthly to include latest patches. Old AMIs must be deregistered after replacement.</div><div class="cl-meta"><span class="cl-tag">EC2 Image Builder</span><span class="cl-tag">Hardened AMIs</span><span class="cl-tag">Monthly Rebuild</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ops','config')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ops">OPS-CFG-05</div><div class="cl-title">AWS Config Conformance Packs Deployed</div><div class="cl-desc">AWS Config Conformance Packs must be deployed across all accounts. Minimum required: Operational Best Practices for NCA, Operational Best Practices for Security. Custom conformance pack for organization-specific controls must be maintained. Conformance pack compliance reports must be reviewed monthly.</div><div class="cl-meta"><span class="cl-tag">Conformance Packs</span><span class="cl-tag">All Accounts</span><span class="cl-tag">Monthly Review</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-panel" id="ops-patch">
+        <div class="s-head"><div class="s-ey ey-ops">Cloud Operations · Patching</div><div class="s-title">Patch & Vulnerability Management</div><div class="s-desc">Unpatched systems are the #2 cause of cloud security breaches after IAM misconfiguration. Automated, enforced patching is non-negotiable.</div></div>
+        <div class="checklist-group" id="cg-ops-patch">
+          <div class="cg-header"><div class="cg-title">🔧 Patch & Vuln Controls</div><div class="cg-prog" id="cp-ops-patch">0 / 4 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-ops-patch" style="width:0%;background:var(--green);"></div></div>
+          <ul class="checklist" id="cl-ops-patch">
+            <li class="cl-item" onclick="toggleItem(this,'ops','patch')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ops">OPS-PAT-01</div><div class="cl-title">SSM Patch Manager — Automated Patching</div><div class="cl-desc">AWS Systems Manager Patch Manager must be configured for all EC2 instances. Patch baselines must be defined per OS with Critical patches auto-approved after 3 days. Maintenance windows must be defined per environment (prod: weekend, non-prod: weeknight). Patch compliance reports must be reviewed weekly.</div><div class="cl-meta"><span class="cl-tag">SSM Patch Manager</span><span class="cl-tag">Patch Baselines</span><span class="cl-tag">Maintenance Windows</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ops','patch')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ops">OPS-PAT-02</div><div class="cl-title">Patch Compliance Targets — 95%+ within 30 Days</div><div class="cl-desc">Patch compliance target: 100% Critical patches within 7 days, 95% Important patches within 30 days. Compliance must be measured via SSM Patch Manager dashboards. Non-compliant instances must be escalated after 7 days. Exceptions must be formally approved with compensating controls documented.</div><div class="cl-meta"><span class="cl-tag">95% Target</span><span class="cl-tag">7-Day Critical</span><span class="cl-tag">Exception Process</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ops','patch')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ops">OPS-PAT-03</div><div class="cl-title">Container Image Scanning in CI/CD Pipeline</div><div class="cl-desc">Amazon ECR image scanning must be enabled (enhanced scanning with Inspector). CI/CD pipelines must fail builds that include container images with Critical CVEs. Images must be rescanned weekly even without code changes. Base images must be rebuilt monthly from official sources.</div><div class="cl-meta"><span class="cl-tag">ECR Scanning</span><span class="cl-tag">Inspector</span><span class="cl-tag">CI/CD Gate</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ops','patch')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ops">OPS-PAT-04</div><div class="cl-title">RDS Auto Minor Version Upgrade Enabled</div><div class="cl-desc">RDS instances must have auto minor version upgrade enabled to receive security patches automatically during maintenance windows. Major version upgrade plan must be maintained for all RDS instances — no instance should run on an end-of-life engine version. Upgrade plan reviewed semi-annually.</div><div class="cl-meta"><span class="cl-tag">RDS Auto Upgrade</span><span class="cl-tag">Maintenance Windows</span><span class="cl-tag">EOL Planning</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-panel" id="ops-backup">
+        <div class="s-head"><div class="s-ey ey-ops">Cloud Operations · Backup</div><div class="s-title">Backup & Recovery Controls</div><div class="s-desc">Documented, automated, and tested backup procedures are required by NCA, PDPL, and NDMO for all systems processing government or personal data.</div></div>
+        <div class="checklist-group" id="cg-ops-backup">
+          <div class="cg-header"><div class="cg-title">💾 Backup & Recovery Controls</div><div class="cg-prog" id="cp-ops-backup">0 / 4 complete</div></div>
+          <div class="cg-prog-bar"><div class="cg-prog-fill" id="cpf-ops-backup" style="width:0%;background:var(--green);"></div></div>
+          <ul class="checklist" id="cl-ops-backup">
+            <li class="cl-item" onclick="toggleItem(this,'ops','backup')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ops">OPS-BAK-01</div><div class="cl-title">AWS Backup — Centralized Backup Policy</div><div class="cl-desc">AWS Backup must be configured with backup plans covering all critical resources: RDS, EC2, EFS, DynamoDB, S3. Backup frequency must match RPO targets. Backup retention must meet regulatory minimums (NCA: 1 year for audit logs, PDPL: aligned with data retention policy). Cross-region backup copies must exist for critical systems.</div><div class="cl-meta"><span class="cl-tag">AWS Backup</span><span class="cl-tag">Cross-Region Copy</span><span class="cl-tag">RPO Aligned</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ops','backup')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ops">OPS-BAK-02</div><div class="cl-title">Backup Encryption with CMK</div><div class="cl-desc">All backups must be encrypted using Customer Managed KMS keys — not default AWS Backup keys. Backup vault access policies must restrict who can delete backups. Vault Lock must be enabled for audit/compliance backups to make them immutable. Cross-account backup copies add additional protection against ransomware.</div><div class="cl-meta"><span class="cl-tag">Backup Encryption</span><span class="cl-tag">Vault Lock</span><span class="cl-tag">Cross-Account</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ops','backup')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ops">OPS-BAK-03</div><div class="cl-title">Quarterly Backup Restoration Testing</div><div class="cl-desc">Backup restoration must be tested quarterly for all critical systems. Tests must verify: restoration completes within RTO target, restored data is consistent and complete, restored system is functional. Test results must be documented with date, system, RTO achieved, and any issues. Evidence required for NCA/NDMO audit.</div><div class="cl-meta"><span class="cl-tag">Quarterly Testing</span><span class="cl-tag">RTO Verification</span><span class="cl-tag">Documented Evidence</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+            <li class="cl-item" onclick="toggleItem(this,'ops','backup')"><div class="cl-box"></div><div class="cl-body"><div class="cl-ctrl ctrl-ops">OPS-BAK-04</div><div class="cl-title">RTO & RPO Targets Documented & Met</div><div class="cl-desc">Formal RTO and RPO targets must be defined, approved, and documented for all production systems. Targets must be tested annually at minimum via DR exercise. Actual recovery times from any incidents or tests must be logged. Systems failing to meet targets must have improvement plans. RTO/RPO must be reviewed when systems change.</div><div class="cl-meta"><span class="cl-tag">RTO/RPO</span><span class="cl-tag">DR Exercise</span><span class="cl-tag">Annual Testing</span></div><div class="cl-actions"><button class="cl-btn btn-done" onclick="event.stopPropagation();markDone(this)">✓ Mark Done</button><button class="cl-btn btn-na" onclick="event.stopPropagation();markNA(this)">N/A</button></div></div></li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- /fw-ops -->
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<!-- EXPORT BAR -->
+<div class="export-bar">
+  <div class="export-label" id="export-summary">Complete the checklist above to generate your compliance score report.</div>
+  <button class="exp-btn exp-primary" onclick="generateReport()">📄 Generate Compliance Report</button>
+  <button class="exp-btn exp-ghost" onclick="window.print()">🖨️ Print Checklist</button>
+</div>
+
+<footer>🇸🇦 Saudi Arabia Cloud Compliance Reference · NCA CCC · PDPL · NDMO · Cloud Operations · For Advisory Use</footer>
+
+<script>
+  // State tracking
+  const state = {
+    nca:  { iam:{done:0,na:0,total:5}, data:{done:0,na:0,total:5}, network:{done:0,na:0,total:4}, monitor:{done:0,na:0,total:5}, incident:{done:0,na:0,total:3} },
+    pdpl: { residency:{done:0,na:0,total:4}, consent:{done:0,na:0,total:4}, protection:{done:0,na:0,total:5}, transfer:{done:0,na:0,total:3} },
+    ndmo: { classify:{done:0,na:0,total:4}, model:{done:0,na:0,total:3}, gov:{done:0,na:0,total:4} },
+    ops:  { config:{done:0,na:0,total:5}, patch:{done:0,na:0,total:4}, backup:{done:0,na:0,total:4} }
+  };
+
+  function toggleItem(li, fw, section) {
+    if (li.classList.contains('done') || li.classList.contains('na')) return;
+    li.classList.add('done');
+    li.querySelector('.cl-box').textContent = '✓';
+    state[fw][section].done++;
+    updateProgress(fw, section);
+    updateScoreBanner();
+  }
+  function markDone(btn) {
+    const li = btn.closest('.cl-item');
+    const parts = li.closest('.checklist').id.split('-');
+    const fw = parts[1], section = parts[2];
+    if (li.classList.contains('done')) return;
+    if (li.classList.contains('na')) { li.classList.remove('na'); li.querySelector('.cl-box').textContent = ''; }
+    li.classList.add('done'); li.querySelector('.cl-box').textContent = '✓';
+    state[fw][section].done++;
+    updateProgress(fw, section); updateScoreBanner();
+  }
+  function markNA(btn) {
+    const li = btn.closest('.cl-item');
+    const parts = li.closest('.checklist').id.split('-');
+    const fw = parts[1], section = parts[2];
+    if (li.classList.contains('done')) { li.classList.remove('done'); state[fw][section].done--; }
+    if (li.classList.contains('na')) { li.classList.remove('na'); li.querySelector('.cl-box').textContent = ''; state[fw][section].na--; updateProgress(fw,section); updateScoreBanner(); return; }
+    li.classList.add('na'); li.querySelector('.cl-box').textContent = '—';
+    state[fw][section].na++;
+    updateProgress(fw, section); updateScoreBanner();
+  }
+  function updateProgress(fw, section) {
+    const s = state[fw][section];
+    const applicable = s.total - s.na;
+    const pct = applicable > 0 ? Math.round((s.done / applicable) * 100) : 100;
+    const cp = document.getElementById('cp-' + fw + '-' + section);
+    const cpf = document.getElementById('cpf-' + fw + '-' + section);
+    const sp = document.getElementById('sp-' + fw + '-' + section);
+    if (cp) cp.textContent = s.done + ' / ' + applicable + ' complete';
+    if (cpf) cpf.style.width = pct + '%';
+    if (sp) sp.textContent = s.done + '/' + applicable;
+  }
+  function updateScoreBanner() {
+    const totals = { nca:{done:0,total:0}, pdpl:{done:0,total:0}, ndmo:{done:0,total:0}, ops:{done:0,total:0} };
+    ['nca','pdpl','ndmo','ops'].forEach(fw => {
+      Object.values(state[fw]).forEach(s => {
+        const applicable = s.total - s.na;
+        totals[fw].done += s.done;
+        totals[fw].total += applicable;
+      });
+    });
+    let allDone = 0, allTotal = 0;
+    ['nca','pdpl','ndmo','ops'].forEach(fw => {
+      const pct = totals[fw].total > 0 ? Math.round((totals[fw].done / totals[fw].total) * 100) : 0;
+      document.getElementById('sc-' + fw).textContent = totals[fw].done + '/' + totals[fw].total;
+      allDone += totals[fw].done; allTotal += totals[fw].total;
+    });
+    const overall = allTotal > 0 ? Math.round((allDone / allTotal) * 100) : 0;
+    document.getElementById('sc-total').textContent = overall + '%';
+    document.getElementById('export-summary').textContent =
+      overall + '% overall compliance · ' + allDone + ' of ' + allTotal + ' controls implemented · ' + (allTotal - allDone) + ' remaining';
+  }
+
+  function switchFW(fw) {
+    document.querySelectorAll('.fw-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('fw-' + fw).classList.add('active');
+    ['nca','pdpl','ndmo','ops'].forEach(f => {
+      const t = document.getElementById('tab-' + f);
+      t.classList.remove('active');
+      document.getElementById('sb-' + f).style.display = 'none';
+    });
+    document.getElementById('tab-' + fw).classList.add('active');
+    document.getElementById('sb-' + fw).style.display = 'block';
+    // Show first section
+    document.querySelectorAll('#fw-' + fw + ' .section-panel').forEach(p => p.classList.remove('active'));
+    document.querySelector('#fw-' + fw + ' .section-panel').classList.add('active');
+    document.querySelectorAll('#sb-' + fw + ' .sb-item').forEach((i,idx) => i.classList.toggle('active', idx===0));
+  }
+
+  function switchSection(fw, section) {
+    document.querySelectorAll('#fw-' + fw + ' .section-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(fw + '-' + section).classList.add('active');
+    document.querySelectorAll('#sb-' + fw + ' .sb-item').forEach(i => i.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+  }
+
+  function generateReport() {
+    const el = document.getElementById('sc-total');
+    const score = el.textContent;
+    alert('Compliance Report Summary\n\nOverall Score: ' + score +
+      '\nNCA CCC: ' + document.getElementById('sc-nca').textContent +
+      '\nPDPL: ' + document.getElementById('sc-pdpl').textContent +
+      '\nNDMO: ' + document.getElementById('sc-ndmo').textContent +
+      '\nCloud Operations: ' + document.getElementById('sc-ops').textContent +
+      '\n\nFor a full report, use the Print function to export this checklist.');
+  }
+</script>
+</body>
+</html>

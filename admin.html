@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
 <title>Site Admin — Mohammad Dassen Cloud Portfolio</title>
 <link rel="stylesheet" href="site.css">
 <style>
@@ -115,6 +116,21 @@
 </head>
 <body>
 
+<!-- ═══════════ ACCESS GATE ═══════════ -->
+<div class="gate-overlay" id="gate-overlay">
+  <div class="gate-card">
+    <div class="gate-icon">🔒</div>
+    <div class="gate-title">Admin Access</div>
+    <div class="gate-sub">This area manages your live site content.<br>Enter your passphrase to continue.</div>
+    <input type="password" class="gate-input" id="gate-pass" placeholder="• • • • • • • •" autocomplete="off" onkeydown="if(event.key==='Enter')tryUnlock()">
+    <button class="gate-btn" onclick="tryUnlock()">Unlock Admin Panel</button>
+    <div class="gate-error" id="gate-error"></div>
+    <a href="index.html" class="gate-back">← Back to Home</a>
+  </div>
+</div>
+
+<div id="admin-content" style="display:none;">
+
 <!-- TOPBAR -->
 <nav class="site-topbar">
   <div class="topbar-brand">☁️ MD Cloud</div>
@@ -123,7 +139,9 @@
     <a href="#" class="active">⚙️ Admin Panel</a>
   </div>
   <span id="save-indicator" class="save-indicator">✅ Saved</span>
+  <button onclick="lockAdmin()" style="margin-left:14px;font-size:0.62rem;padding:5px 12px;border-radius:6px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);color:#f87171;font-weight:700;cursor:pointer;white-space:nowrap;">🔒 Lock</button>
 </nav>
+
 
 <div class="admin-layout">
 
@@ -422,6 +440,8 @@
     <button class="btn-primary" onclick="closeModal()">OK — Continue Editing in Form</button>
   </div>
 </div>
+
+</div><!-- /admin-content -->
 
 <script src="site-config.js"></script>
 <script>
@@ -792,9 +812,47 @@
   function closeModal() { document.getElementById('modal').classList.remove('open'); }
 
   /* ──────────────────────────────────
+     ACCESS GATE
+     NOTE: This is a lightweight deterrent only — NOT real security.
+     GitHub Pages is static hosting; anyone can view source and bypass
+     client-side checks. Use this to keep casual visitors out, not to
+     protect truly sensitive data.
+  ────────────────────────────────── */
+  const ADMIN_PASSPHRASE = "cloud2026"; // ← CHANGE THIS to your own passphrase
+  const SESSION_KEY = "md_admin_unlocked";
+
+  function tryUnlock() {
+    const input = document.getElementById('gate-pass').value;
+    const err   = document.getElementById('gate-error');
+    if (input === ADMIN_PASSPHRASE) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      unlockUI();
+    } else {
+      err.textContent = '❌ Incorrect passphrase. Please try again.';
+      document.getElementById('gate-pass').value = '';
+      document.getElementById('gate-pass').focus();
+    }
+  }
+
+  function unlockUI() {
+    document.getElementById('gate-overlay').style.display = 'none';
+    document.getElementById('admin-content').style.display = 'block';
+    renderDashboard();
+  }
+
+  function lockAdmin() {
+    sessionStorage.removeItem(SESSION_KEY);
+    location.reload();
+  }
+
+  /* ──────────────────────────────────
      INIT
   ────────────────────────────────── */
-  renderDashboard();
+  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+    unlockUI();
+  } else {
+    document.getElementById('gate-pass').focus();
+  }
 </script>
 </body>
 </html>

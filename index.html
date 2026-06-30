@@ -125,8 +125,12 @@
       <div class="topbar-nav">
         ${navLinks.map(l=>`<a href="${l.href}" class="${l.active?'active':''}">${l.label}</a>`).join('')}
       </div>
-      <a href="admin.html" class="topbar-admin">⚙️ Admin</a>
+      <a href="admin.html" class="topbar-admin" id="admin-nav-link">⚙️ Admin</a>
     </nav>`;
+  // Admin link hidden from public nav by default — access admin.html directly via bookmark.
+  // Set SHOW_ADMIN_LINK to true below if you want it visible in the topbar.
+  const SHOW_ADMIN_LINK = false;
+  if (!SHOW_ADMIN_LINK) document.getElementById('admin-nav-link').style.display = 'none';
 
   /* ── HERO ── */
   document.getElementById('hero-role').textContent = C.owner.role;
@@ -199,13 +203,11 @@
   document.getElementById('contact-mount').innerHTML = `
     <a href="${C.owner.linkedin}" target="_blank" class="btn-primary">🔗 Connect on LinkedIn</a>
     <a href="mailto:${C.owner.email}" class="btn-ghost">✉️ Send Email</a>
-    <a href="https://aws.amazon.com/partners/" target="_blank" class="btn-ghost">☁️ AWS Partner Network</a>
-    <a href="admin.html" class="btn-ghost">⚙️ Manage Site</a>`;
+    <a href="https://aws.amazon.com/partners/" target="_blank" class="btn-ghost">☁️ AWS Partner Network</a>`;
 
   /* ── FOOTER ── */
   document.getElementById('footer-mount').innerHTML = `
-    <p>Built with purpose · <span>${C.owner.name}</span> · ${C.owner.title} · Riyadh, Saudi Arabia · Vision 2030 Aligned</p>
-    <p style="margin-top:6px;"><a href="admin.html">⚙️ Site Admin</a></p>`;
+    <p>Built with purpose · <span>${C.owner.name}</span> · ${C.owner.title} · Riyadh, Saudi Arabia · Vision 2030 Aligned</p>`;
 </script>
 </body>
 </html>

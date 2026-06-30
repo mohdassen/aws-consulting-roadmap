@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud Best Practices — Complete Professional Guide</title>
+<style>
+  :root {
+    --bg: #07090f;
+    --surface: #0e1219;
+    --surface2: #141820;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8edf5;
+    --muted: #6b7a94;
+    --accent: #c084fc;
+    --accent2: #818cf8;
+    --gold: #f59e0b;
+    --green: #34d399;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --orange: #fb923c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #080612, #0d1018, #0a0e18);
+    border-bottom: 1px solid var(--border); padding: 40px 24px 36px;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(192,132,252,0.10) 0%, transparent 65%);
+  }
+  .header-eyebrow {
+    font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin-bottom: 12px;
+    background: rgba(192,132,252,0.08); border: 1px solid rgba(192,132,252,0.2);
+    display: inline-block; padding: 4px 14px; border-radius: 20px;
+  }
+  .header h1 { font-family: Georgia, serif; font-size: 2rem; color: var(--text); margin-bottom: 8px; line-height: 1.2; }
+  .header h1 span { color: var(--accent); font-style: italic; }
+  .header-sub { font-size: 0.76rem; color: var(--muted); max-width: 560px; margin: 0 auto 24px; line-height: 1.6; }
+  .domain-pills { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .domain-pill {
+    font-size: 0.65rem; padding: 5px 14px; border-radius: 20px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; border: 1px solid;
+  }
+  .dp-purple { background: rgba(192,132,252,0.1); border-color: rgba(192,132,252,0.3); color: var(--accent); }
+  .dp-red    { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.3); color: var(--red); }
+  .dp-gold   { background: rgba(245,158,11,0.1);  border-color: rgba(245,158,11,0.3);  color: var(--gold); }
+  .dp-green  { background: rgba(52,211,153,0.1);  border-color: rgba(52,211,153,0.3);  color: var(--green); }
+  .domain-pill:hover { transform: translateY(-2px); opacity: 0.85; }
+
+  /* ── DOMAIN NAV ── */
+  .domain-nav {
+    display: flex; background: var(--surface); border-bottom: 1px solid var(--border);
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .domain-nav::-webkit-scrollbar { display: none; }
+  .dn-tab {
+    flex: 1; min-width: 160px; padding: 16px 12px; text-align: center;
+    cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s;
+    font-size: 0.72rem; font-weight: 600; color: var(--muted);
+  }
+  .dn-tab:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+  .dn-tab.active-arch  { color: var(--accent); border-bottom-color: var(--accent); }
+  .dn-tab.active-sec   { color: var(--red);    border-bottom-color: var(--red); }
+  .dn-tab.active-cost  { color: var(--gold);   border-bottom-color: var(--gold); }
+  .dn-tab.active-gov   { color: var(--green);  border-bottom-color: var(--green); }
+  .dn-icon { font-size: 1.2rem; display: block; margin-bottom: 4px; }
+
+  /* ── LAYOUT ── */
+  .layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 240px); }
+  .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 16px 0; overflow-y: auto; }
+  .sb-label { font-size: 0.56rem; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; padding: 12px 16px 6px; }
+  .sb-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+    cursor: pointer; font-size: 0.72rem; color: var(--muted); transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .sb-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .sb-item.sb-active { color: var(--text); background: rgba(255,255,255,0.04); border-left-color: currentColor; }
+  .sb-arch.sb-active  { color: var(--accent); }
+  .sb-sec.sb-active   { color: var(--red); }
+  .sb-cost.sb-active  { color: var(--gold); }
+  .sb-gov.sb-active   { color: var(--green); }
+  .sb-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── CONTENT ── */
+  .content { padding: 28px; overflow-y: auto; max-height: calc(100vh - 240px); }
+  .domain-panel { display: none; }
+  .domain-panel.active { display: block; animation: fadeUp 0.25s ease; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ── PRACTICE PANEL ── */
+  .practice-panel { display: none; }
+  .practice-panel.active { display: block; animation: fadeUp 0.25s ease; }
+
+  /* ── COMPONENTS ── */
+  .section-head { margin-bottom: 24px; }
+  .s-eyebrow { font-size: 0.58rem; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
+  .arch-ey { color: var(--accent); }
+  .sec-ey  { color: var(--red); }
+  .cost-ey { color: var(--gold); }
+  .gov-ey  { color: var(--green); }
+  .s-title { font-family: Georgia, serif; font-size: 1.35rem; color: var(--text); margin-bottom: 6px; }
+  .s-desc  { font-size: 0.74rem; color: var(--muted); line-height: 1.65; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 14px; }
+  .card-title { font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .card p { font-size: 0.73rem; color: var(--muted); line-height: 1.7; margin-bottom: 8px; }
+  .card p:last-child { margin-bottom: 0; }
+
+  .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+  .practice-card {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px; border-left: 3px solid;
+  }
+  .pc-arch { border-left-color: var(--accent); }
+  .pc-sec  { border-left-color: var(--red); }
+  .pc-cost { border-left-color: var(--gold); }
+  .pc-gov  { border-left-color: var(--green); }
+  .pc-num  { font-size: 0.58rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  .pc-arch .pc-num { color: var(--accent); }
+  .pc-sec  .pc-num { color: var(--red); }
+  .pc-cost .pc-num { color: var(--gold); }
+  .pc-gov  .pc-num { color: var(--green); }
+  .pc-title { font-size: 0.8rem; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+  .pc-desc  { font-size: 0.68rem; color: var(--muted); line-height: 1.6; }
+  .pc-tools { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .pc-tool  { font-size: 0.59rem; padding: 2px 7px; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--muted); }
+
+  /* ── DO / DON'T ── */
+  .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .do-box, .dont-box { border-radius: 12px; padding: 14px; }
+  .do-box   { background: rgba(52,211,153,0.05); border: 1px solid rgba(52,211,153,0.2); }
+  .dont-box { background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.2); }
+  .do-label   { font-size: 0.6rem; font-weight: 800; letter-spacing: 1.5px; color: var(--green); margin-bottom: 8px; }
+  .dont-label { font-size: 0.6rem; font-weight: 800; letter-spacing: 1.5px; color: var(--red);   margin-bottom: 8px; }
+  .do-item, .dont-item { font-size: 0.69rem; color: var(--muted); padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); line-height: 1.5; display: flex; gap: 7px; }
+  .do-item:last-child, .dont-item:last-child { border-bottom: none; }
+  .do-item::before   { content: '✓'; color: var(--green); flex-shrink: 0; font-weight: 700; }
+  .dont-item::before { content: '✗'; color: var(--red);   flex-shrink: 0; font-weight: 700; }
+
+  /* ── TABLE ── */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 0.7rem; margin-bottom: 14px; }
+  .tbl th { background: rgba(255,255,255,0.04); color: var(--muted); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; line-height: 1.5; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 0.58rem; font-weight: 700; }
+  .b-green  { background: rgba(52,211,153,0.12);  color: var(--green); }
+  .b-gold   { background: rgba(245,158,11,0.12);  color: var(--gold); }
+  .b-red    { background: rgba(248,113,113,0.12); color: var(--red); }
+  .b-blue   { background: rgba(96,165,250,0.12);  color: var(--blue); }
+  .b-purple { background: rgba(192,132,252,0.12); color: var(--accent); }
+
+  /* ── ALERT ── */
+  .alert { border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; font-size: 0.71rem; line-height: 1.6; display: flex; gap: 10px; }
+  .a-gold   { background: rgba(245,158,11,0.07);  border: 1px solid rgba(245,158,11,0.2);  color: #fbbf24; }
+  .a-green  { background: rgba(52,211,153,0.07);  border: 1px solid rgba(52,211,153,0.2);  color: var(--green); }
+  .a-blue   { background: rgba(96,165,250,0.07);  border: 1px solid rgba(96,165,250,0.2);  color: var(--blue); }
+  .a-purple { background: rgba(192,132,252,0.07); border: 1px solid rgba(192,132,252,0.2); color: var(--accent); }
+  .a-red    { background: rgba(248,113,113,0.07); border: 1px solid rgba(248,113,113,0.2); color: var(--red); }
+
+  /* ── PILLAR ── */
+  .pillar { display: flex; gap: 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; }
+  .p-num { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; flex-shrink: 0; font-family: Georgia, serif; }
+  .p-title { font-size: 0.8rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .p-desc  { font-size: 0.69rem; color: var(--muted); line-height: 1.65; }
+  .p-tags  { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+  .p-tag   { font-size: 0.57rem; padding: 2px 7px; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--muted); }
+
+  /* ── QUOTE ── */
+  .quote { border-left: 3px solid var(--accent); padding: 12px 16px; margin: 14px 0; background: rgba(192,132,252,0.05); border-radius: 0 10px 10px 0; }
+  .quote p { font-family: Georgia, serif; font-style: italic; font-size: 0.8rem; color: var(--text); line-height: 1.6; }
+  .quote-attr { font-size: 0.62rem; color: var(--accent); margin-top: 5px; font-weight: 600; }
+
+  /* ── CHECKLIST ── */
+  .checklist { list-style: none; }
+  .checklist li { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 0.71rem; color: var(--muted); cursor: pointer; transition: color 0.15s; }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li:hover { color: var(--text); }
+  .chk { width: 17px; height: 17px; border-radius: 4px; border: 1px solid var(--border2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; transition: all 0.2s; }
+  .checklist li.chked .chk { background: var(--green); border-color: var(--green); color: #0a0e1a; }
+  .checklist li.chked span { text-decoration: line-through; }
+
+  /* ── SCORE METER ── */
+  .score-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .score-row:last-child { border-bottom: none; }
+  .score-label { font-size: 0.7rem; color: var(--text); min-width: 180px; }
+  .score-track { flex: 1; height: 5px; background: rgba(255,255,255,0.06); border-radius: 5px; overflow: hidden; }
+  .score-fill  { height: 100%; border-radius: 5px; transition: width 0.8s ease; }
+  .score-pct   { font-size: 0.65rem; color: var(--muted); min-width: 32px; text-align: right; }
+
+  hr.div { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  /* ── FOOTER ── */
+  footer { border-top: 1px solid var(--border); text-align: center; padding: 20px; font-size: 0.64rem; color: var(--muted); }
+
+  @media (max-width: 700px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .practices-grid, .do-dont { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-eyebrow">☁️ Professional Reference Guide · AWS Best Practices</div>
+  <h1>Cloud <span>Best Practices</span> — Complete Guide</h1>
+  <p class="header-sub">A comprehensive, consultant-grade reference covering all four domains of cloud excellence — Architecture, Security, Cost, and Governance — from beginner principles to professional application.</p>
+  <div class="domain-pills">
+    <span class="domain-pill dp-purple" onclick="switchDomain('arch')">🏗️ Architecture & Design</span>
+    <span class="domain-pill dp-red"    onclick="switchDomain('sec')">🔐 Security & Compliance</span>
+    <span class="domain-pill dp-gold"   onclick="switchDomain('cost')">💰 Cost Optimization</span>
+    <span class="domain-pill dp-green"  onclick="switchDomain('gov')">⚙️ Governance & Operations</span>
+  </div>
+</div>
+
+<!-- DOMAIN NAV -->
+<div class="domain-nav">
+  <div class="dn-tab active-arch" id="tab-arch" onclick="switchDomain('arch')">
+    <span class="dn-icon">🏗️</span>Architecture & Design
+  </div>
+  <div class="dn-tab" id="tab-sec" onclick="switchDomain('sec')">
+    <span class="dn-icon">🔐</span>Security & Compliance
+  </div>
+  <div class="dn-tab" id="tab-cost" onclick="switchDomain('cost')">
+    <span class="dn-icon">💰</span>Cost Optimization
+  </div>
+  <div class="dn-tab" id="tab-gov" onclick="switchDomain('gov')">
+    <span class="dn-icon">⚙️</span>Governance & Operations
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- ARCH sidebar -->
+    <div id="sb-arch">
+      <div class="sb-label">Architecture</div>
+      <div class="sb-item sb-arch sb-active" onclick="showPractice('arch','design')"><div class="sb-dot" style="background:var(--accent)"></div>Design Principles</div>
+      <div class="sb-item sb-arch" onclick="showPractice('arch','ha')"><div class="sb-dot" style="background:var(--accent)"></div>High Availability</div>
+      <div class="sb-item sb-arch" onclick="showPractice('arch','scale')"><div class="sb-dot" style="background:var(--accent)"></div>Scalability</div>
+      <div class="sb-item sb-arch" onclick="showPractice('arch','network')"><div class="sb-dot" style="background:var(--accent)"></div>Networking</div>
+      <div class="sb-item sb-arch" onclick="showPractice('arch','storage')"><div class="sb-dot" style="background:var(--accent)"></div>Storage Strategy</div>
+      <div class="sb-item sb-arch" onclick="showPractice('arch','dr')"><div class="sb-dot" style="background:var(--accent)"></div>Disaster Recovery</div>
+    </div>
+
+    <!-- SEC sidebar -->
+    <div id="sb-sec" style="display:none">
+      <div class="sb-label">Security</div>
+      <div class="sb-item sb-sec sb-active" onclick="showPractice('sec','iam')"><div class="sb-dot" style="background:var(--red)"></div>Identity & Access</div>
+      <div class="sb-item sb-sec" onclick="showPractice('sec','data')"><div class="sb-dot" style="background:var(--red)"></div>Data Protection</div>
+      <div class="sb-item sb-sec" onclick="showPractice('sec','network')"><div class="sb-dot" style="background:var(--red)"></div>Network Security</div>
+      <div class="sb-item sb-sec" onclick="showPractice('sec','detect')"><div class="sb-dot" style="background:var(--red)"></div>Detection & Response</div>
+      <div class="sb-item sb-sec" onclick="showPractice('sec','ksa')"><div class="sb-dot" style="background:var(--red)"></div>Saudi Compliance (NCA/PDPL)</div>
+    </div>
+
+    <!-- COST sidebar -->
+    <div id="sb-cost" style="display:none">
+      <div class="sb-label">Cost Optimization</div>
+      <div class="sb-item sb-cost sb-active" onclick="showPractice('cost','visibility')"><div class="sb-dot" style="background:var(--gold)"></div>Cost Visibility</div>
+      <div class="sb-item sb-cost" onclick="showPractice('cost','rightsizing')"><div class="sb-dot" style="background:var(--gold)"></div>Rightsizing</div>
+      <div class="sb-item sb-cost" onclick="showPractice('cost','pricing')"><div class="sb-dot" style="background:var(--gold)"></div>Pricing Models</div>
+      <div class="sb-item sb-cost" onclick="showPractice('cost','waste')"><div class="sb-dot" style="background:var(--gold)"></div>Eliminate Waste</div>
+      <div class="sb-item sb-cost" onclick="showPractice('cost','finops')"><div class="sb-dot" style="background:var(--gold)"></div>FinOps Culture</div>
+    </div>
+
+    <!-- GOV sidebar -->
+    <div id="sb-gov" style="display:none">
+      <div class="sb-label">Governance</div>
+      <div class="sb-item sb-gov sb-active" onclick="showPractice('gov','accounts')"><div class="sb-dot" style="background:var(--green)"></div>Multi-Account Strategy</div>
+      <div class="sb-item sb-gov" onclick="showPractice('gov','policy')"><div class="sb-dot" style="background:var(--green)"></div>Policy & Standards</div>
+      <div class="sb-item sb-gov" onclick="showPractice('gov','tagging')"><div class="sb-dot" style="background:var(--green)"></div>Tagging Strategy</div>
+      <div class="sb-item sb-gov" onclick="showPractice('gov','ops')"><div class="sb-dot" style="background:var(--green)"></div>Cloud Operations</div>
+      <div class="sb-item sb-gov" onclick="showPractice('gov','maturity')"><div class="sb-dot" style="background:var(--green)"></div>Maturity Assessment</div>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ══════════════════════════════════ -->
+    <!-- ARCHITECTURE DOMAIN               -->
+    <!-- ══════════════════════════════════ -->
+    <div class="domain-panel active" id="domain-arch">
+
+      <!-- DESIGN PRINCIPLES -->
+      <div class="practice-panel active" id="arch-design">
+        <div class="section-head">
+          <div class="s-eyebrow arch-ey">Architecture · Core Principles</div>
+          <div class="s-title">Cloud Architecture Design Principles</div>
+          <div class="s-desc">The foundational thinking patterns that separate great cloud architectures from those that fail at scale, cost too much, or collapse under load.</div>
+        </div>
+
+        <div class="alert a-purple">🏗️ <span><strong>The AWS Well-Architected Framework</strong> defines 6 pillars of architectural excellence. Every best practice below maps to at least one pillar.</span></div>
+
+        <div class="practices-grid">
+          <div class="practice-card pc-arch">
+            <div class="pc-num">Principle 01</div>
+            <div class="pc-title">Design for Failure</div>
+            <div class="pc-desc">Assume every component will fail. Design systems where failure of any single component does not cause full system failure. Use redundancy, retries, and graceful degradation at every layer.</div>
+            <div class="pc-tools"><span class="pc-tool">Multi-AZ</span><span class="pc-tool">Auto Scaling</span><span class="pc-tool">Health Checks</span></div>
+          </div>
+          <div class="practice-card pc-arch">
+            <div class="pc-num">Principle 02</div>
+            <div class="pc-title">Decouple Components</div>
+            <div class="pc-desc">Replace tight dependencies with loose coupling using queues, event buses, and APIs. This prevents cascading failures and allows each component to scale independently.</div>
+            <div class="pc-tools"><span class="pc-tool">SQS</span><span class="pc-tool">SNS</span><span class="pc-tool">EventBridge</span><span class="pc-tool">API Gateway</span></div>
+          </div>
+          <div class="practice-card pc-arch">
+            <div class="pc-num">Principle 03</div>
+            <div class="pc-title">Scale Horizontally</div>
+            <div class="pc-desc">Prefer adding more small instances over upgrading to one large instance. Horizontal scaling is cheaper, more fault-tolerant, and avoids single points of failure.</div>
+            <div class="pc-tools"><span class="pc-tool">Auto Scaling Groups</span><span class="pc-tool">ECS</span><span class="pc-tool">Lambda</span></div>
+          </div>
+          <div class="practice-card pc-arch">
+            <div class="pc-num">Principle 04</div>
+            <div class="pc-title">Implement Elasticity</div>
+            <div class="pc-desc">Provision exactly the resources you need at each moment. Scale up for peak demand, scale down when demand drops. Never over-provision statically what can be provisioned dynamically.</div>
+            <div class="pc-tools"><span class="pc-tool">Auto Scaling</span><span class="pc-tool">Lambda</span><span class="pc-tool">Aurora Serverless</span></div>
+          </div>
+          <div class="practice-card pc-arch">
+            <div class="pc-num">Principle 05</div>
+            <div class="pc-title">Use Managed Services</div>
+            <div class="pc-desc">Offload undifferentiated heavy lifting to AWS managed services. Don't manage your own message queues, databases, or caches when AWS can do it better, cheaper, and with higher availability.</div>
+            <div class="pc-tools"><span class="pc-tool">RDS</span><span class="pc-tool">ElastiCache</span><span class="pc-tool">SQS</span><span class="pc-tool">MSK</span></div>
+          </div>
+          <div class="practice-card pc-arch">
+            <div class="pc-num">Principle 06</div>
+            <div class="pc-title">Everything as Code</div>
+            <div class="pc-desc">Define all infrastructure as code. Manual console changes are untrackable, non-repeatable, and dangerous. IaC enables version control, peer review, and disaster recovery of your infrastructure.</div>
+            <div class="pc-tools"><span class="pc-tool">CloudFormation</span><span class="pc-tool">CDK</span><span class="pc-tool">Terraform</span></div>
+          </div>
+        </div>
+
+        <div class="do-dont">
+          <div class="do-box">
+            <div class="do-label">✅ ALWAYS DO</div>
+            <div class="do-item">Deploy across minimum 2 Availability Zones</div>
+            <div class="do-item">Use load balancers in front of every compute tier</div>
+            <div class="do-item">Implement health checks on all services</div>
+            <div class="do-item">Use managed services over self-managed where possible</div>
+            <div class="do-item">Define and test your RTO and RPO targets</div>
+            <div class="do-item">Version-control all infrastructure as code</div>
+          </div>
+          <div class="dont-box">
+            <div class="dont-label">❌ NEVER DO</div>
+            <div class="dont-item">Deploy production workloads in a single AZ</div>
+            <div class="dont-item">Hardcode configuration values in application code</div>
+            <div class="dont-item">Allow direct SSH access to production servers</div>
+            <div class="dont-item">Over-provision "just in case" without auto-scaling</div>
+            <div class="dont-item">Skip testing disaster recovery procedures</div>
+            <div class="dont-item">Make manual changes to production environments</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HIGH AVAILABILITY -->
+      <div class="practice-panel" id="arch-ha">
+        <div class="section-head">
+          <div class="s-eyebrow arch-ey">Architecture · Reliability</div>
+          <div class="s-title">High Availability Best Practices</div>
+          <div class="s-desc">High availability (HA) means the system remains operational and accessible despite component failures. Target: 99.9% (8.7h downtime/yr), 99.99% (52min/yr), or 99.999% (5min/yr) — your architecture determines which is achievable.</div>
+        </div>
+        <div class="pillar" style="border-left:3px solid var(--accent)">
+          <div class="p-num" style="background:rgba(192,132,252,0.12);color:var(--accent)">1</div>
+          <div><div class="p-title">Multi-AZ Deployments</div><div class="p-desc">Deploy all stateful components (databases, caches) in Multi-AZ mode. AWS automatically handles failover. For RDS: enable Multi-AZ (synchronous replication, automatic failover in 60–120 seconds). For Aurora: built-in multi-AZ across 3 AZs by default.</div><div class="p-tags"><span class="p-tag">RDS Multi-AZ</span><span class="p-tag">Aurora</span><span class="p-tag">ElastiCache Multi-AZ</span></div></div>
+        </div>
+        <div class="pillar" style="border-left:3px solid var(--accent)">
+          <div class="p-num" style="background:rgba(192,132,252,0.12);color:var(--accent)">2</div>
+          <div><div class="p-title">Elastic Load Balancing</div><div class="p-desc">Always place a load balancer in front of compute tiers. ALB for HTTP/HTTPS (Layer 7), NLB for TCP/UDP (Layer 4), GLB for security appliances. Load balancers perform health checks and route traffic away from unhealthy instances automatically.</div><div class="p-tags"><span class="p-tag">ALB</span><span class="p-tag">NLB</span><span class="p-tag">Health Checks</span></div></div>
+        </div>
+        <div class="pillar" style="border-left:3px solid var(--accent)">
+          <div class="p-num" style="background:rgba(192,132,252,0.12);color:var(--accent)">3</div>
+          <div><div class="p-title">Auto Scaling Groups</div><div class="p-desc">Define minimum, desired, and maximum instance counts. Configure scaling policies based on CPU, memory, custom CloudWatch metrics, or predictive scaling. Always set a minimum of 2 instances across 2 AZs for any production workload.</div><div class="p-tags"><span class="p-tag">Auto Scaling</span><span class="p-tag">CloudWatch Alarms</span><span class="p-tag">Target Tracking</span></div></div>
+        </div>
+        <div class="pillar" style="border-left:3px solid var(--accent)">
+          <div class="p-num" style="background:rgba(192,132,252,0.12);color:var(--accent)">4</div>
+          <div><div class="p-title">Circuit Breaker Pattern</div><div class="p-desc">Implement circuit breakers between services to prevent cascading failures. When a downstream service fails, the circuit breaker "opens" and returns a fallback response instead of waiting for timeouts. Use AWS App Mesh or application-level libraries.</div><div class="p-tags"><span class="p-tag">App Mesh</span><span class="p-tag">Step Functions</span><span class="p-tag">Retry Logic</span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📊 Availability Targets — What Architecture Achieves Each</div>
+          <table class="tbl">
+            <thead><tr><th>SLA Target</th><th>Max Downtime / Year</th><th>Architecture Required</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge b-red">99.0%</span></td><td>87.6 hours</td><td>Single AZ, basic redundancy</td></tr>
+              <tr><td><span class="badge b-gold">99.9%</span></td><td>8.7 hours</td><td>Multi-AZ, Auto Scaling, health checks</td></tr>
+              <tr><td><span class="badge b-blue">99.95%</span></td><td>4.4 hours</td><td>Multi-AZ + Multi-Region read replicas</td></tr>
+              <tr><td><span class="badge b-green">99.99%</span></td><td>52 minutes</td><td>Active-Active Multi-Region with Route53 failover</td></tr>
+              <tr><td><span class="badge b-purple">99.999%</span></td><td>5 minutes</td><td>Active-Active + chaos engineering + full automation</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SCALABILITY -->
+      <div class="practice-panel" id="arch-scale">
+        <div class="section-head">
+          <div class="s-eyebrow arch-ey">Architecture · Performance</div>
+          <div class="s-title">Scalability Best Practices</div>
+          <div class="s-desc">Scalability means your system can handle growth — in users, data, or traffic — without redesign. Build for 10x your current load from day one.</div>
+        </div>
+        <div class="practices-grid">
+          <div class="practice-card pc-arch"><div class="pc-num">Practice 01</div><div class="pc-title">Cache Aggressively</div><div class="pc-desc">Implement caching at every layer: CloudFront (CDN), ElastiCache (application), DAX (DynamoDB). Caching reduces database load by 80–95% for read-heavy workloads.</div><div class="pc-tools"><span class="pc-tool">CloudFront</span><span class="pc-tool">ElastiCache Redis</span><span class="pc-tool">DAX</span></div></div>
+          <div class="practice-card pc-arch"><div class="pc-num">Practice 02</div><div class="pc-title">Database Read Replicas</div><div class="pc-desc">Offload read traffic to read replicas. RDS supports up to 5 replicas. Aurora supports up to 15. Direct all SELECT queries to replicas; writes go to primary. This multiplies your effective database throughput.</div><div class="pc-tools"><span class="pc-tool">RDS Replicas</span><span class="pc-tool">Aurora Global</span></div></div>
+          <div class="practice-card pc-arch"><div class="pc-num">Practice 03</div><div class="pc-title">Asynchronous Processing</div><div class="pc-desc">Move any non-real-time work to queues and process asynchronously. User doesn't wait; system handles load independently. Classic pattern: API → SQS → Lambda/Worker.</div><div class="pc-tools"><span class="pc-tool">SQS</span><span class="pc-tool">Lambda</span><span class="pc-tool">ECS Tasks</span></div></div>
+          <div class="practice-card pc-arch"><div class="pc-num">Practice 04</div><div class="pc-title">Content Delivery Network</div><div class="pc-desc">Serve static assets (images, JS, CSS) from CloudFront edge locations, not your origin servers. CloudFront has 450+ edge locations. This reduces latency by 60–80% and eliminates origin load for static content.</div><div class="pc-tools"><span class="pc-tool">CloudFront</span><span class="pc-tool">S3 Origin</span><span class="pc-tool">Lambda@Edge</span></div></div>
+        </div>
+      </div>
+
+      <!-- NETWORKING -->
+      <div class="practice-panel" id="arch-network">
+        <div class="section-head">
+          <div class="s-eyebrow arch-ey">Architecture · Networking</div>
+          <div class="s-title">VPC & Networking Best Practices</div>
+          <div class="s-desc">Your network design is your security perimeter and your performance foundation. Bad network design is almost impossible to fix later without significant disruption.</div>
+        </div>
+        <div class="practices-grid">
+          <div class="practice-card pc-arch"><div class="pc-num">Practice 01</div><div class="pc-title">Plan Your CIDR from Day One</div><div class="pc-desc">Design your IP addressing before creating any VPCs. Use non-overlapping CIDRs if you'll ever peer VPCs or connect to on-premises. Recommended: /16 per VPC, /24 per subnet. Changing later is extremely painful.</div><div class="pc-tools"><span class="pc-tool">VPC CIDR Planning</span><span class="pc-tool">RFC 1918</span></div></div>
+          <div class="practice-card pc-arch"><div class="pc-num">Practice 02</div><div class="pc-title">Public / Private / Data Subnet Tiers</div><div class="pc-desc">Three-tier subnet design: Public (load balancers, NAT gateways only), Private (application servers, Lambda), Data (databases, ElastiCache). Nothing that holds sensitive data should ever be in a public subnet.</div><div class="pc-tools"><span class="pc-tool">Public Subnets</span><span class="pc-tool">Private Subnets</span><span class="pc-tool">NAT Gateway</span></div></div>
+          <div class="practice-card pc-arch"><div class="pc-num">Practice 03</div><div class="pc-title">Use AWS PrivateLink for Service Access</div><div class="pc-desc">Access AWS services (S3, DynamoDB, SSM, etc.) via VPC Endpoints / PrivateLink rather than through the public internet. This keeps traffic on the AWS backbone, improves security, and reduces NAT gateway data costs.</div><div class="pc-tools"><span class="pc-tool">VPC Endpoints</span><span class="pc-tool">PrivateLink</span><span class="pc-tool">Gateway Endpoints</span></div></div>
+          <div class="practice-card pc-arch"><div class="pc-num">Practice 04</div><div class="pc-title">Transit Gateway for Multi-VPC</div><div class="pc-desc">When you have more than 3 VPCs, use Transit Gateway instead of VPC peering mesh. TGW simplifies routing, scales to thousands of VPCs, and supports routing policies between VPCs.</div><div class="pc-tools"><span class="pc-tool">Transit Gateway</span><span class="pc-tool">Route Tables</span><span class="pc-tool">VPC Peering</span></div></div>
+        </div>
+      </div>
+
+      <!-- STORAGE -->
+      <div class="practice-panel" id="arch-storage">
+        <div class="section-head">
+          <div class="s-eyebrow arch-ey">Architecture · Storage</div>
+          <div class="s-title">Storage Strategy Best Practices</div>
+          <div class="s-desc">Choosing the right storage type for each workload is one of the most impactful cost and performance decisions in cloud architecture.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">📦 Storage Selection Guide</div>
+          <table class="tbl">
+            <thead><tr><th>Use Case</th><th>Recommended Service</th><th>Why</th></tr></thead>
+            <tbody>
+              <tr><td>Static files, media, backups</td><td><span class="badge b-purple">S3</span></td><td>11 nines durability, lifecycle policies, intelligent tiering</td></tr>
+              <tr><td>EC2 boot volumes, databases</td><td><span class="badge b-blue">EBS gp3</span></td><td>Low latency block storage, independent IOPS/throughput control</td></tr>
+              <tr><td>Shared file system (multi-EC2)</td><td><span class="badge b-green">EFS</span></td><td>NFS-compatible, auto-scales, multi-AZ, serverless</td></tr>
+              <tr><td>High-performance HPC</td><td><span class="badge b-gold">FSx for Lustre</span></td><td>Millions of IOPS, tight S3 integration</td></tr>
+              <tr><td>Windows workloads</td><td><span class="badge b-blue">FSx for Windows</span></td><td>SMB protocol, Active Directory integration</td></tr>
+              <tr><td>Long-term archival</td><td><span class="badge b-red">S3 Glacier</span></td><td>Lowest cost, retrieval in minutes to hours</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="practices-grid">
+          <div class="practice-card pc-arch"><div class="pc-num">Practice 01</div><div class="pc-title">S3 Lifecycle Policies</div><div class="pc-desc">Automatically transition objects to cheaper storage classes as they age. Standard → Standard-IA (30 days) → Glacier Instant (90 days) → Glacier Deep Archive (180 days). This alone can reduce S3 costs by 60–80%.</div><div class="pc-tools"><span class="pc-tool">S3 Lifecycle</span><span class="pc-tool">Intelligent Tiering</span></div></div>
+          <div class="practice-card pc-arch"><div class="pc-num">Practice 02</div><div class="pc-title">Enable S3 Versioning & MFA Delete</div><div class="pc-desc">Always enable versioning on critical S3 buckets. Combine with MFA Delete to prevent accidental or malicious deletion of object versions. This is your last line of defense against ransomware in S3.</div><div class="pc-tools"><span class="pc-tool">S3 Versioning</span><span class="pc-tool">MFA Delete</span><span class="pc-tool">Object Lock</span></div></div>
+        </div>
+      </div>
+
+      <!-- DR -->
+      <div class="practice-panel" id="arch-dr">
+        <div class="section-head">
+          <div class="s-eyebrow arch-ey">Architecture · Resilience</div>
+          <div class="s-title">Disaster Recovery Best Practices</div>
+          <div class="s-desc">Disaster recovery (DR) is not optional — it is a business continuity requirement. Define RTO (Recovery Time Objective) and RPO (Recovery Point Objective) first, then choose the appropriate strategy.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">🔄 The 4 DR Strategies — Choose Based on RTO/RPO</div>
+          <table class="tbl">
+            <thead><tr><th>Strategy</th><th>RTO</th><th>RPO</th><th>Cost</th><th>How It Works</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Backup & Restore</strong></td><td>Hours</td><td>Hours</td><td><span class="badge b-green">Low</span></td><td>Regular backups to S3/AWS Backup. Restore from backup during disaster.</td></tr>
+              <tr><td><strong>Pilot Light</strong></td><td>10–30 min</td><td>Minutes</td><td><span class="badge b-blue">Medium</span></td><td>Core infrastructure pre-built in DR region, scaled down. Scale up on disaster.</td></tr>
+              <tr><td><strong>Warm Standby</strong></td><td>Minutes</td><td>Seconds</td><td><span class="badge b-gold">High</span></td><td>Scaled-down but functional environment in DR region, continuously running.</td></tr>
+              <tr><td><strong>Active-Active</strong></td><td>~0</td><td>~0</td><td><span class="badge b-red">Highest</span></td><td>Full production in 2+ regions simultaneously. Route53 routes traffic to healthy region.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert a-gold">⚡ <span><strong>Key Rule:</strong> Define RTO and RPO with the business first — never with IT first. A business might accept 4-hour RTO for a reporting system but require 15-minute RTO for a payment system. The DR strategy must match the business requirement, not the other way around.</span></div>
+      </div>
+
+    </div><!-- /domain-arch -->
+
+    <!-- ══════════════════════════════════ -->
+    <!-- SECURITY DOMAIN                   -->
+    <!-- ══════════════════════════════════ -->
+    <div class="domain-panel" id="domain-sec">
+
+      <!-- IAM -->
+      <div class="practice-panel active" id="sec-iam">
+        <div class="section-head">
+          <div class="s-eyebrow sec-ey">Security · Identity</div>
+          <div class="s-title">Identity & Access Management Best Practices</div>
+          <div class="s-desc">IAM misconfiguration is the #1 cause of cloud security breaches. These practices apply to every AWS account, every workload, without exception.</div>
+        </div>
+        <div class="alert a-red">🚨 <span><strong>The most common cloud breach vector:</strong> Overly permissive IAM roles and exposed access keys. These 5 practices eliminate the majority of IAM risk.</span></div>
+        <div class="practices-grid">
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 01</div><div class="pc-title">Least Privilege Always</div><div class="pc-desc">Grant only the permissions required for the specific task. Never use wildcards (*) in production policies. Start with read-only, add write permissions only when explicitly required and justified. Review permissions quarterly using IAM Access Analyzer.</div><div class="pc-tools"><span class="pc-tool">IAM Access Analyzer</span><span class="pc-tool">Permission Boundaries</span></div></div>
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 02</div><div class="pc-title">Never Use Root Account</div><div class="pc-desc">The root account has unlimited access to everything and cannot be restricted by SCPs or permission policies. Create it once, enable MFA, store credentials in a vault, and never use it again for day-to-day operations. Create separate admin IAM users/roles.</div><div class="pc-tools"><span class="pc-tool">MFA on Root</span><span class="pc-tool">IAM Admin Users</span></div></div>
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 03</div><div class="pc-title">Eliminate Long-Term Access Keys</div><div class="pc-desc">Access keys (AKID/SECRET) are permanent credentials that can be stolen, leaked in code, or brute-forced. Replace with IAM Roles for EC2, Lambda, ECS. Use AWS SSO / IAM Identity Center for human access. Rotate any remaining keys every 90 days maximum.</div><div class="pc-tools"><span class="pc-tool">IAM Roles</span><span class="pc-tool">IAM Identity Center</span><span class="pc-tool">Secrets Manager</span></div></div>
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 04</div><div class="pc-title">Enable MFA Everywhere</div><div class="pc-desc">Enforce MFA for all human IAM users and the root account. Use IAM condition keys (aws:MultiFactorAuthPresent) to require MFA for sensitive actions. Consider hardware MFA (YubiKey) for privileged accounts.</div><div class="pc-tools"><span class="pc-tool">Virtual MFA</span><span class="pc-tool">Hardware MFA</span><span class="pc-tool">IAM Conditions</span></div></div>
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 05</div><div class="pc-title">Use IAM Roles for Service-to-Service</div><div class="pc-desc">When an EC2, Lambda, or ECS task needs to access another AWS service (S3, DynamoDB, etc.), always use an IAM Role — never pass credentials as environment variables. The role is automatically rotated by AWS; credentials in code are not.</div><div class="pc-tools"><span class="pc-tool">Instance Profiles</span><span class="pc-tool">Execution Roles</span><span class="pc-tool">Task Roles</span></div></div>
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 06</div><div class="pc-title">Service Control Policies (SCPs)</div><div class="pc-desc">In multi-account environments, use SCPs at the AWS Organizations level to set maximum permission boundaries. SCPs are guardrails — they cannot grant permissions, only restrict them. Use to prevent disabling CloudTrail, creating public S3 buckets, or leaving specific regions.</div><div class="pc-tools"><span class="pc-tool">AWS Organizations</span><span class="pc-tool">SCPs</span><span class="pc-tool">Permission Boundaries</span></div></div>
+        </div>
+        <div class="do-dont">
+          <div class="do-box">
+            <div class="do-label">✅ IAM DO</div>
+            <div class="do-item">Enable AWS CloudTrail in all regions</div>
+            <div class="do-item">Use IAM roles, never access keys on EC2/Lambda</div>
+            <div class="do-item">Enable MFA for all human users</div>
+            <div class="do-item">Regularly review unused permissions with Access Analyzer</div>
+            <div class="do-item">Store secrets in Secrets Manager, not environment variables</div>
+          </div>
+          <div class="dont-box">
+            <div class="dont-label">❌ IAM NEVER</div>
+            <div class="dont-item">Use AdministratorAccess policy for application roles</div>
+            <div class="dont-item">Hardcode credentials in source code</div>
+            <div class="dont-item">Share IAM user credentials between team members</div>
+            <div class="dont-item">Leave access keys older than 90 days active</div>
+            <div class="dont-item">Disable CloudTrail to "save costs"</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA PROTECTION -->
+      <div class="practice-panel" id="sec-data">
+        <div class="section-head">
+          <div class="s-eyebrow sec-ey">Security · Data</div>
+          <div class="s-title">Data Protection Best Practices</div>
+          <div class="s-desc">Protect data at rest and in transit. Every piece of data in your cloud environment should be encrypted — the question is which key management approach is appropriate for each classification level.</div>
+        </div>
+        <div class="practices-grid">
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 01</div><div class="pc-title">Encrypt Everything at Rest</div><div class="pc-desc">Enable encryption on all AWS storage services. S3: server-side encryption (SSE-S3, SSE-KMS, or SSE-C). EBS: encrypted volumes. RDS: encrypted at instance creation (cannot be enabled after). ElastiCache: encryption at rest. KMS adds audit trail via CloudTrail.</div><div class="pc-tools"><span class="pc-tool">AWS KMS</span><span class="pc-tool">S3 SSE</span><span class="pc-tool">EBS Encryption</span></div></div>
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 02</div><div class="pc-title">Enforce HTTPS / TLS in Transit</div><div class="pc-desc">All data in transit must be encrypted. ALB: enforce HTTPS, redirect HTTP. API Gateway: HTTPS only. S3: enforce SecureTransport condition in bucket policy. RDS: require SSL connections. Never allow unencrypted communication for sensitive data.</div><div class="pc-tools"><span class="pc-tool">ACM Certificates</span><span class="pc-tool">TLS Policies</span><span class="pc-tool">S3 Bucket Policy</span></div></div>
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 03</div><div class="pc-title">Block All Public S3 Access</div><div class="pc-desc">Enable "Block Public Access" at the account level AND at each bucket level. Use AWS Config rule s3-bucket-public-read-prohibited to continuously monitor. S3 data breaches are almost always caused by accidentally public buckets.</div><div class="pc-tools"><span class="pc-tool">S3 Block Public Access</span><span class="pc-tool">AWS Config</span><span class="pc-tool">Security Hub</span></div></div>
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 04</div><div class="pc-title">Use AWS Secrets Manager</div><div class="pc-desc">Never store database passwords, API keys, or certificates in code, environment variables, or SSM Parameter Store unencrypted. Secrets Manager provides automatic rotation, fine-grained access control, and full audit trail for all secret access events.</div><div class="pc-tools"><span class="pc-tool">Secrets Manager</span><span class="pc-tool">KMS</span><span class="pc-tool">Rotation Lambda</span></div></div>
+        </div>
+      </div>
+
+      <!-- NETWORK SECURITY -->
+      <div class="practice-panel" id="sec-network">
+        <div class="section-head">
+          <div class="s-eyebrow sec-ey">Security · Network</div>
+          <div class="s-title">Network Security Best Practices</div>
+          <div class="s-desc">Defense in depth — multiple layers of network controls so that no single misconfiguration opens a critical path to your data.</div>
+        </div>
+        <div class="practices-grid">
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 01</div><div class="pc-title">Security Groups as Firewalls</div><div class="pc-desc">Security Groups are stateful firewalls at the instance level. Follow the principle of least privilege: open only the ports required from only the sources required. Reference other Security Groups (not IP ranges) for internal traffic. Never open 0.0.0.0/0 on sensitive ports.</div><div class="pc-tools"><span class="pc-tool">Security Groups</span><span class="pc-tool">SG References</span></div></div>
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 02</div><div class="pc-title">Network ACLs for Subnet Boundaries</div><div class="pc-desc">Use NACLs as a stateless second layer of defense at subnet boundaries. Block known malicious IP ranges. Explicitly deny traffic that should never cross subnet boundaries. NACLs process rules in order — lower rule number = higher priority.</div><div class="pc-tools"><span class="pc-tool">Network ACLs</span><span class="pc-tool">Subnet Isolation</span></div></div>
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 03</div><div class="pc-title">AWS WAF for Web Applications</div><div class="pc-desc">Deploy AWS WAF in front of ALB, CloudFront, and API Gateway. Enable AWS Managed Rules (covers OWASP Top 10). Add rate-limiting rules to prevent DDoS. Enable AWS Shield Standard (free) and consider Shield Advanced for critical applications.</div><div class="pc-tools"><span class="pc-tool">AWS WAF</span><span class="pc-tool">Shield</span><span class="pc-tool">Managed Rules</span></div></div>
+          <div class="practice-card pc-sec"><div class="pc-num">Practice 04</div><div class="pc-title">No Direct Internet to Private Resources</div><div class="pc-desc">Databases, application servers, and caches must never have public IP addresses. Outbound internet access from private subnets must go through a NAT Gateway. Inbound must go through a load balancer. Use AWS Systems Manager Session Manager instead of bastion hosts for admin access.</div><div class="pc-tools"><span class="pc-tool">NAT Gateway</span><span class="pc-tool">Session Manager</span><span class="pc-tool">Private Subnets</span></div></div>
+        </div>
+      </div>
+
+      <!-- DETECTION -->
+      <div class="practice-panel" id="sec-detect">
+        <div class="section-head">
+          <div class="s-eyebrow sec-ey">Security · Detection</div>
+          <div class="s-title">Threat Detection & Response Best Practices</div>
+          <div class="s-desc">Assume breach. The question is not whether you will be attacked, but whether you will detect it quickly and respond effectively. Automated detection is essential — manual log review at scale is impossible.</div>
+        </div>
+        <div class="pillar" style="border-left:3px solid var(--red)">
+          <div class="p-num" style="background:rgba(248,113,113,0.12);color:var(--red)">1</div>
+          <div><div class="p-title">Enable AWS GuardDuty in All Accounts & Regions</div><div class="p-desc">GuardDuty uses ML and threat intelligence to detect: compromised EC2 instances, unusual API calls, cryptocurrency mining, data exfiltration attempts, and more. Cost: ~$1–3/account/month for most workloads. The first 30 days are free. No reason not to enable it.</div><div class="p-tags"><span class="p-tag">GuardDuty</span><span class="p-tag">Threat Intelligence</span><span class="p-tag">ML Detection</span></div></div>
+        </div>
+        <div class="pillar" style="border-left:3px solid var(--red)">
+          <div class="p-num" style="background:rgba(248,113,113,0.12);color:var(--red)">2</div>
+          <div><div class="p-title">Centralize Logs with CloudTrail & CloudWatch</div><div class="p-desc">Enable CloudTrail in all regions with a multi-region trail. Send logs to a dedicated S3 bucket with MFA Delete enabled. Enable CloudTrail log file validation (detects if logs are tampered with). Ship logs to CloudWatch Logs for real-time alerting on critical events.</div><div class="p-tags"><span class="p-tag">CloudTrail</span><span class="p-tag">CloudWatch Logs</span><span class="p-tag">Log Integrity</span></div></div>
+        </div>
+        <div class="pillar" style="border-left:3px solid var(--red)">
+          <div class="p-num" style="background:rgba(248,113,113,0.12);color:var(--red)">3</div>
+          <div><div class="p-title">AWS Security Hub as Your Security Dashboard</div><div class="p-desc">Security Hub aggregates findings from GuardDuty, Inspector, Macie, IAM Access Analyzer, and Firewall Manager into a single prioritized view. It scores your environment against CIS AWS Foundations Benchmark and PCI DSS automatically.</div><div class="p-tags"><span class="p-tag">Security Hub</span><span class="p-tag">CIS Benchmark</span><span class="p-tag">Aggregated Findings</span></div></div>
+        </div>
+        <div class="pillar" style="border-left:3px solid var(--red)">
+          <div class="p-num" style="background:rgba(248,113,113,0.12);color:var(--red)">4</div>
+          <div><div class="p-title">Automate Incident Response</div><div class="p-desc">Don't rely on humans to respond to security alerts at 3 AM. Use EventBridge rules to trigger Lambda functions on critical GuardDuty findings. Example: GuardDuty detects compromised EC2 → EventBridge → Lambda → isolates instance (removes from SG) → notifies SNS → creates Jira ticket.</div><div class="p-tags"><span class="p-tag">EventBridge</span><span class="p-tag">Lambda</span><span class="p-tag">SNS</span><span class="p-tag">Automation</span></div></div>
+        </div>
+      </div>
+
+      <!-- KSA COMPLIANCE -->
+      <div class="practice-panel" id="sec-ksa">
+        <div class="section-head">
+          <div class="s-eyebrow sec-ey">Security · Saudi Arabia</div>
+          <div class="s-title">Saudi Arabia Cloud Compliance (NCA / PDPL)</div>
+          <div class="s-desc">Saudi Arabia has a rapidly maturing cloud regulatory landscape. Understanding these requirements is a critical differentiator for any cloud consultant operating in the Kingdom.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">🇸🇦 Key Regulatory Frameworks — AWS Mapping</div>
+          <table class="tbl">
+            <thead><tr><th>Regulation</th><th>Key Requirement</th><th>AWS Controls</th><th>Priority</th></tr></thead>
+            <tbody>
+              <tr><td><strong>NCA CCC</strong><br><small style="color:var(--muted)">Cybersecurity Controls</small></td><td>Secure cloud configuration, access control, monitoring, incident response</td><td>Security Hub, GuardDuty, Config, CloudTrail, IAM</td><td><span class="badge b-red">Critical</span></td></tr>
+              <tr><td><strong>PDPL</strong><br><small style="color:var(--muted)">Personal Data Protection</small></td><td>Data residency, consent, subject rights, cross-border transfer restrictions</td><td>AWS Bahrain Region (me-south-1), KMS, Macie, VPC Endpoints</td><td><span class="badge b-red">Critical</span></td></tr>
+              <tr><td><strong>NDMO Cloud Policy</strong><br><small style="color:var(--muted)">National Data Management</small></td><td>Government data classification, approved cloud deployment models</td><td>AWS GovCloud considerations, data classification tagging</td><td><span class="badge b-gold">High</span></td></tr>
+              <tr><td><strong>SAMA Framework</strong><br><small style="color:var(--muted)">Financial Sector</small></td><td>Cloud risk management for banks and financial institutions</td><td>CloudTrail, Config, Security Hub, dedicated tenancy</td><td><span class="badge b-gold">High</span></td></tr>
+              <tr><td><strong>Vision 2030 Std 5.13.2</strong><br><small style="color:var(--muted)">Digital Government</small></td><td>Cloud adoption milestones for government entities</td><td>Full AWS adoption roadmap, cloud maturity model</td><td><span class="badge b-blue">Medium</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert a-gold">🇸🇦 <span><strong>Data Residency:</strong> For most Saudi government and regulated data, use <strong>AWS Middle East (Bahrain) — me-south-1</strong> as primary region. AWS UAE (ae-central-1) is available as a secondary. Confirm your specific PDPL classification with legal counsel before designing the architecture.</span></div>
+      </div>
+
+    </div><!-- /domain-sec -->
+
+    <!-- ══════════════════════════════════ -->
+    <!-- COST OPTIMIZATION DOMAIN          -->
+    <!-- ══════════════════════════════════ -->
+    <div class="domain-panel" id="domain-cost">
+
+      <div class="practice-panel active" id="cost-visibility">
+        <div class="section-head">
+          <div class="s-eyebrow cost-ey">Cost Optimization · Foundation</div>
+          <div class="s-title">Cost Visibility Best Practices</div>
+          <div class="s-desc">You cannot optimize what you cannot see. Cost visibility is the foundation of every other cost practice — without it, you are guessing.</div>
+        </div>
+        <div class="practices-grid">
+          <div class="practice-card pc-cost"><div class="pc-num">Practice 01</div><div class="pc-title">Enable AWS Cost Explorer</div><div class="pc-desc">Cost Explorer provides visualizations of your AWS spending by service, account, region, tag, and time period. Enable it immediately on every account. Configure monthly budget alerts. Review weekly. It's free for standard usage.</div><div class="pc-tools"><span class="pc-tool">Cost Explorer</span><span class="pc-tool">AWS Budgets</span><span class="pc-tool">Cost Anomaly Detection</span></div></div>
+          <div class="practice-card pc-cost"><div class="pc-num">Practice 02</div><div class="pc-title">Implement Cost Allocation Tags</div><div class="pc-desc">Without tags, you cannot tell which team, project, or environment is spending what. Define mandatory tags (Project, Environment, Owner, CostCenter) and enforce them via SCPs. Cost Explorer uses tags to split costs by any dimension you define.</div><div class="pc-tools"><span class="pc-tool">Cost Allocation Tags</span><span class="pc-tool">Tag Policies</span><span class="pc-tool">AWS Config</span></div></div>
+          <div class="practice-card pc-cost"><div class="pc-num">Practice 03</div><div class="pc-title">Set Budgets & Alerts</div><div class="pc-desc">Create AWS Budgets for each account, team, and project. Set alerts at 50%, 80%, and 100% of budget. Configure cost anomaly detection to alert on unexpected spikes (e.g., someone accidentally provisions 100 GPU instances). Never discover overspend in the monthly invoice.</div><div class="pc-tools"><span class="pc-tool">AWS Budgets</span><span class="pc-tool">Cost Anomaly Detection</span><span class="pc-tool">SNS Alerts</span></div></div>
+          <div class="practice-card pc-cost"><div class="pc-num">Practice 04</div><div class="pc-title">Use AWS Cost & Usage Report (CUR)</div><div class="pc-desc">CUR is the most granular cost data available — line-item level detail for every resource, every hour, every day. Store in S3, query with Athena, visualize with QuickSight or Grafana. Essential for building custom cost dashboards for clients and finance teams.</div><div class="pc-tools"><span class="pc-tool">CUR</span><span class="pc-tool">Athena</span><span class="pc-tool">QuickSight</span></div></div>
+        </div>
+      </div>
+
+      <div class="practice-panel" id="cost-rightsizing">
+        <div class="section-head">
+          <div class="s-eyebrow cost-ey">Cost Optimization · Compute</div>
+          <div class="s-title">Rightsizing Best Practices</div>
+          <div class="s-desc">Rightsizing means matching resource size to actual workload requirements. The average AWS customer runs compute at 10–15% average CPU utilization — meaning 85–90% of compute spend is waste.</div>
+        </div>
+        <div class="practices-grid">
+          <div class="practice-card pc-cost"><div class="pc-num">Practice 01</div><div class="pc-title">Use AWS Compute Optimizer</div><div class="pc-desc">Compute Optimizer analyzes CloudWatch metrics for EC2, EBS, Lambda, and ECS and recommends the optimal instance type and size. It can identify instances that are over-provisioned by 2–4x. Typical saving: 25–40% on EC2 costs alone.</div><div class="pc-tools"><span class="pc-tool">Compute Optimizer</span><span class="pc-tool">CloudWatch Metrics</span></div></div>
+          <div class="practice-card pc-cost"><div class="pc-num">Practice 02</div><div class="pc-title">Use Graviton (ARM) Instances</div><div class="pc-desc">AWS Graviton3 processors deliver 40% better price/performance than comparable x86 instances. Supported by most managed services (RDS, ElastiCache, Lambda, ECS). If your application supports Linux ARM64, switching to Graviton is an immediate 20–40% cost reduction.</div><div class="pc-tools"><span class="pc-tool">Graviton3</span><span class="pc-tool">t4g/m7g/c7g</span><span class="pc-tool">ARM64</span></div></div>
+          <div class="practice-card pc-cost"><div class="pc-num">Practice 03</div><div class="pc-title">Lambda Over EC2 for Event-Driven Work</div><div class="pc-desc">Lambda charges only for execution time (per millisecond). An EC2 instance runs 24/7 whether processing or not. For workloads that run <20% of the time, Lambda is almost always cheaper — and removes the management overhead entirely.</div><div class="pc-tools"><span class="pc-tool">AWS Lambda</span><span class="pc-tool">Step Functions</span><span class="pc-tool">EventBridge</span></div></div>
+          <div class="practice-card pc-cost"><div class="pc-num">Practice 04</div><div class="pc-title">ECS Fargate for Containers</div><div class="pc-desc">Fargate eliminates the need to manage EC2 instances for container workloads. Pay per vCPU/memory per second. For bursty or infrequent workloads, Fargate is cheaper than maintaining EC2 capacity. Use Fargate Spot for fault-tolerant batch workloads at 70% discount.</div><div class="pc-tools"><span class="pc-tool">Fargate</span><span class="pc-tool">Fargate Spot</span><span class="pc-tool">ECS</span></div></div>
+        </div>
+      </div>
+
+      <div class="practice-panel" id="cost-pricing">
+        <div class="section-head">
+          <div class="s-eyebrow cost-ey">Cost Optimization · Pricing</div>
+          <div class="s-title">AWS Pricing Model Best Practices</div>
+          <div class="s-desc">AWS offers multiple pricing models for compute. Choosing the right model for each workload can reduce compute costs by 40–70% without changing anything about the architecture.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">💰 Pricing Models Comparison</div>
+          <table class="tbl">
+            <thead><tr><th>Model</th><th>Discount vs On-Demand</th><th>Commitment</th><th>Best For</th></tr></thead>
+            <tbody>
+              <tr><td><strong>On-Demand</strong></td><td><span class="badge b-red">0%</span></td><td>None</td><td>Unpredictable, short-term, testing</td></tr>
+              <tr><td><strong>Savings Plans (Compute)</strong></td><td><span class="badge b-blue">Up to 66%</span></td><td>1 or 3 year spend commitment</td><td>Consistent baseline compute — most flexible</td></tr>
+              <tr><td><strong>Reserved Instances</strong></td><td><span class="badge b-gold">Up to 72%</span></td><td>1 or 3 year instance commitment</td><td>Specific instance families in specific regions</td></tr>
+              <tr><td><strong>Spot Instances</strong></td><td><span class="badge b-green">Up to 90%</span></td><td>None (can be interrupted)</td><td>Batch, CI/CD, fault-tolerant, stateless</td></tr>
+              <tr><td><strong>Graviton (ARM)</strong></td><td><span class="badge b-purple">20–40%</span></td><td>None needed</td><td>Any Linux workload on supported instance types</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert a-gold">💡 <span><strong>The Optimal Strategy:</strong> Cover your predictable baseline with Savings Plans (66% discount). Run variable/burst capacity on Spot Instances (90% discount). Use On-Demand only for truly unpredictable or critical workloads that cannot tolerate interruption. This layered approach typically achieves 50–65% total EC2 cost reduction.</span></div>
+      </div>
+
+      <div class="practice-panel" id="cost-waste">
+        <div class="section-head">
+          <div class="s-eyebrow cost-ey">Cost Optimization · Waste</div>
+          <div class="s-title">Eliminate Cloud Waste Best Practices</div>
+          <div class="s-desc">Studies consistently show 30–35% of cloud spend is wasted. Here are the most common waste categories and how to eliminate them systematically.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">🗑️ The Top 8 Cloud Waste Sources</div>
+          <table class="tbl">
+            <thead><tr><th>Waste Type</th><th>Typical % of Wasted Spend</th><th>How to Eliminate</th></tr></thead>
+            <tbody>
+              <tr><td>Idle/Unused EC2 instances</td><td><span class="badge b-red">~28%</span></td><td>Compute Optimizer + auto-stop schedules for non-prod</td></tr>
+              <tr><td>Unattached EBS volumes</td><td><span class="badge b-gold">~12%</span></td><td>AWS Config rule: ec2-volume-inuse-check + automated cleanup</td></tr>
+              <tr><td>Old EBS snapshots</td><td><span class="badge b-gold">~10%</span></td><td>Lifecycle policies + Data Lifecycle Manager</td></tr>
+              <tr><td>Oversized RDS instances</td><td><span class="badge b-red">~15%</span></td><td>CloudWatch metrics review + Compute Optimizer</td></tr>
+              <tr><td>NAT Gateway data transfer</td><td><span class="badge b-blue">~8%</span></td><td>VPC Endpoints for S3/DynamoDB eliminate NAT costs</td></tr>
+              <tr><td>Unused Elastic IPs</td><td><span class="badge b-purple">~3%</span></td><td>AWS Config + automated detection and release</td></tr>
+              <tr><td>Old S3 objects (wrong tier)</td><td><span class="badge b-blue">~10%</span></td><td>S3 Intelligent Tiering + Lifecycle policies</td></tr>
+              <tr><td>Non-prod running 24/7</td><td><span class="badge b-gold">~14%</span></td><td>Instance Scheduler (non-prod off nights/weekends)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="practice-panel" id="cost-finops">
+        <div class="section-head">
+          <div class="s-eyebrow cost-ey">Cost Optimization · Culture</div>
+          <div class="s-title">FinOps Culture Best Practices</div>
+          <div class="s-desc">FinOps is not a tooling problem — it is a cultural and organizational practice. Technology alone cannot fix cloud cost problems without people, process, and accountability structures.</div>
+        </div>
+        <div class="pillar" style="border-left:3px solid var(--gold)">
+          <div class="p-num" style="background:rgba(245,158,11,0.12);color:var(--gold)">1</div>
+          <div><div class="p-title">Inform Phase — Visibility & Allocation</div><div class="p-desc">Every team must be able to see their cloud costs in near-real-time. Implement cost allocation tags, chargeback or showback models, and unit economics (cost per customer, cost per transaction). When teams see their spend, behavior changes immediately.</div></div>
+        </div>
+        <div class="pillar" style="border-left:3px solid var(--gold)">
+          <div class="p-num" style="background:rgba(245,158,11,0.12);color:var(--gold)">2</div>
+          <div><div class="p-title">Optimize Phase — Continuous Improvement</div><div class="p-desc">Run monthly cost reviews with each engineering team. Use Savings Plans and Reserved Instances for predictable workloads. Challenge every "always-on" resource. Build a waste elimination backlog and track it like technical debt.</div></div>
+        </div>
+        <div class="pillar" style="border-left:3px solid var(--gold)">
+          <div class="p-num" style="background:rgba(245,158,11,0.12);color:var(--gold)">3</div>
+          <div><div class="p-title">Operate Phase — Real-Time Decision Making</div><div class="p-desc">Embed cost awareness into engineering workflows. Define cost budgets per sprint. Create anomaly alerts that trigger same-day investigation. Make cost a first-class engineering metric alongside performance and reliability.</div></div>
+        </div>
+      </div>
+
+    </div><!-- /domain-cost -->
+
+    <!-- ══════════════════════════════════ -->
+    <!-- GOVERNANCE DOMAIN                 -->
+    <!-- ══════════════════════════════════ -->
+    <div class="domain-panel" id="domain-gov">
+
+      <div class="practice-panel active" id="gov-accounts">
+        <div class="section-head">
+          <div class="s-eyebrow gov-ey">Governance · Foundation</div>
+          <div class="s-title">Multi-Account Strategy Best Practices</div>
+          <div class="s-desc">Using a single AWS account for everything is the most common governance mistake. Multi-account architecture is the foundation of every enterprise cloud governance model.</div>
+        </div>
+        <div class="alert a-green">✅ <span><strong>Why Multi-Account?</strong> Security blast radius containment (a breach in one account cannot spread to others), separate billing per team/project, independent service limits, clean environment separation (dev/staging/prod), and regulatory compliance isolation.</span></div>
+        <div class="card">
+          <div class="card-title">🏗️ Recommended Account Structure</div>
+          <table class="tbl">
+            <thead><tr><th>Account</th><th>Purpose</th><th>Who Has Access</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Management (Root)</strong></td><td>AWS Organizations, billing, SCPs only. No workloads.</td><td>Finance + Cloud Leadership only</td></tr>
+              <tr><td><strong>Log Archive</strong></td><td>Centralized CloudTrail, Config, and VPC Flow Logs</td><td>Security team read-only</td></tr>
+              <tr><td><strong>Security/Audit</strong></td><td>Security Hub, GuardDuty, Config aggregator, Security tooling</td><td>Security team</td></tr>
+              <tr><td><strong>Shared Services</strong></td><td>Transit Gateway, DNS, Active Directory, shared tooling</td><td>Platform/Network team</td></tr>
+              <tr><td><strong>Dev / Sandbox</strong></td><td>Developer experimentation — loose guardrails</td><td>All developers</td></tr>
+              <tr><td><strong>Staging</strong></td><td>Pre-production testing — mirrors prod controls</td><td>Engineering + QA</td></tr>
+              <tr><td><strong>Production</strong></td><td>Live workloads — strictest controls, limited access</td><td>Approved list + break-glass only</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="practice-panel" id="gov-policy">
+        <div class="section-head">
+          <div class="s-eyebrow gov-ey">Governance · Policy</div>
+          <div class="s-title">Cloud Policy & Standards Best Practices</div>
+          <div class="s-desc">Governance without documented policy is opinion. Policy without enforcement is decoration. Effective cloud governance requires written standards AND automated enforcement.</div>
+        </div>
+        <div class="practices-grid">
+          <div class="practice-card pc-gov"><div class="pc-num">Practice 01</div><div class="pc-title">Service Control Policies (SCPs)</div><div class="pc-desc">SCPs set the maximum permissions boundary for all accounts in your organization. Use them to: deny use of unapproved regions, prevent disabling security services (GuardDuty, CloudTrail), block creation of public resources, enforce encryption requirements.</div><div class="pc-tools"><span class="pc-tool">AWS Organizations</span><span class="pc-tool">SCPs</span><span class="pc-tool">Preventive Controls</span></div></div>
+          <div class="practice-card pc-gov"><div class="pc-num">Practice 02</div><div class="pc-title">AWS Config Rules for Compliance</div><div class="pc-desc">AWS Config continuously evaluates your resource configurations against defined rules. Use managed rules (200+ available) and custom rules. Automatically remediate non-compliant resources using SSM Automation. Build compliance dashboards for executive reporting.</div><div class="pc-tools"><span class="pc-tool">AWS Config</span><span class="pc-tool">Config Rules</span><span class="pc-tool">Auto Remediation</span></div></div>
+          <div class="practice-card pc-gov"><div class="pc-num">Practice 03</div><div class="pc-title">AWS Control Tower Guardrails</div><div class="pc-desc">Control Tower provides pre-built governance guardrails categorized as Mandatory (always enforced), Strongly Recommended, and Elective. Preventive guardrails use SCPs. Detective guardrails use Config rules. Start with all Mandatory + Strongly Recommended.</div><div class="pc-tools"><span class="pc-tool">Control Tower</span><span class="pc-tool">Guardrails</span><span class="pc-tool">Landing Zone</span></div></div>
+          <div class="practice-card pc-gov"><div class="pc-num">Practice 04</div><div class="pc-title">Service Catalog for Approved Architectures</div><div class="pc-desc">AWS Service Catalog lets you define approved CloudFormation templates (products) that teams can self-service deploy. This gives teams speed and autonomy while ensuring they only deploy architectures that meet security, cost, and compliance standards.</div><div class="pc-tools"><span class="pc-tool">Service Catalog</span><span class="pc-tool">CloudFormation</span><span class="pc-tool">Self-Service</span></div></div>
+        </div>
+      </div>
+
+      <div class="practice-panel" id="gov-tagging">
+        <div class="section-head">
+          <div class="s-eyebrow gov-ey">Governance · Tagging</div>
+          <div class="s-title">Tagging Strategy Best Practices</div>
+          <div class="s-desc">Tags are the metadata backbone of cloud governance. Without a consistent tagging strategy, you cannot allocate costs, enforce policies, automate operations, or report compliance accurately.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">🏷️ Mandatory Tag Standard — Implement This</div>
+          <table class="tbl">
+            <thead><tr><th>Tag Key</th><th>Values Example</th><th>Purpose</th><th>Enforced By</th></tr></thead>
+            <tbody>
+              <tr><td><code>Environment</code></td><td>prod / staging / dev / sandbox</td><td>Environment separation, policy enforcement</td><td>SCP + Config</td></tr>
+              <tr><td><code>Project</code></td><td>erp-migration / portal-v2</td><td>Cost allocation per project</td><td>Config Rule</td></tr>
+              <tr><td><code>Owner</code></td><td>team-platform / john.doe</td><td>Accountability, notification routing</td><td>Config Rule</td></tr>
+              <tr><td><code>CostCenter</code></td><td>CC-1042 / IT-INFRA</td><td>Finance chargeback/showback</td><td>Tag Policy</td></tr>
+              <tr><td><code>DataClassification</code></td><td>public / internal / confidential / restricted</td><td>Security policy enforcement, PDPL compliance</td><td>SCP</td></tr>
+              <tr><td><code>Compliance</code></td><td>nca-ccc / pdpl / sama</td><td>Regulatory scope identification</td><td>Config Rule</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert a-green">✅ <span><strong>Enforcement Rule:</strong> Any resource without mandatory tags should be automatically flagged, the owner notified, and — after a grace period — automatically stopped (for EC2/RDS) or flagged for deletion review. AWS Config + Lambda can implement this fully automatically.</span></div>
+      </div>
+
+      <div class="practice-panel" id="gov-ops">
+        <div class="section-head">
+          <div class="s-eyebrow gov-ey">Governance · Operations</div>
+          <div class="s-title">Cloud Operations Best Practices</div>
+          <div class="s-desc">Operational excellence means running cloud workloads reliably and efficiently, with the ability to detect problems early, respond quickly, and learn from failures.</div>
+        </div>
+        <div class="practices-grid">
+          <div class="practice-card pc-gov"><div class="pc-num">Practice 01</div><div class="pc-title">Observability — Metrics, Logs, Traces</div><div class="pc-desc">Every production system needs: metrics (CloudWatch), structured logs (CloudWatch Logs / OpenSearch), and distributed tracing (AWS X-Ray). Without all three, diagnosing production incidents is guesswork. Define dashboards for the 4 Golden Signals: latency, traffic, errors, saturation.</div><div class="pc-tools"><span class="pc-tool">CloudWatch</span><span class="pc-tool">X-Ray</span><span class="pc-tool">OpenSearch</span></div></div>
+          <div class="practice-card pc-gov"><div class="pc-num">Practice 02</div><div class="pc-title">Infrastructure as Code — Always</div><div class="pc-desc">Every resource in production must be defined in code. Manual console changes are immediately a drift risk. Enforce this with AWS Config drift detection. Use CloudFormation StackSets to deploy consistent configurations across all accounts and regions simultaneously.</div><div class="pc-tools"><span class="pc-tool">CloudFormation</span><span class="pc-tool">CDK</span><span class="pc-tool">StackSets</span></div></div>
+          <div class="practice-card pc-gov"><div class="pc-num">Practice 03</div><div class="pc-title">Patch Management at Scale</div><div class="pc-desc">Use AWS Systems Manager Patch Manager to automate OS patching across all EC2 instances. Define patch baselines per OS and environment. Schedule maintenance windows. Never rely on humans to manually patch production servers — it never happens consistently.</div><div class="pc-tools"><span class="pc-tool">SSM Patch Manager</span><span class="pc-tool">Maintenance Windows</span><span class="pc-tool">Patch Baselines</span></div></div>
+          <div class="practice-card pc-gov"><div class="pc-num">Practice 04</div><div class="pc-title">Runbooks & Playbooks</div><div class="pc-desc">Document every operational procedure: deployment runbooks, incident response playbooks, DR activation procedures, access request processes. Use AWS Systems Manager OpsCenter to link runbooks directly to operational issues. On-call engineers shouldn't be guessing at 2 AM.</div><div class="pc-tools"><span class="pc-tool">SSM OpsCenter</span><span class="pc-tool">SSM Documents</span><span class="pc-tool">Automation</span></div></div>
+        </div>
+      </div>
+
+      <div class="practice-panel" id="gov-maturity">
+        <div class="section-head">
+          <div class="s-eyebrow gov-ey">Governance · Assessment</div>
+          <div class="s-title">Cloud Governance Maturity Assessment</div>
+          <div class="s-desc">Use this self-assessment to gauge your current governance maturity and identify the highest-priority improvement areas. Click each item to mark as achieved.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">📊 Maturity Scores — Architecture</div>
+          <div class="score-row"><div class="score-label">Multi-AZ deployments</div><div class="score-track"><div class="score-fill" style="width:0%;background:linear-gradient(90deg,#818cf8,#c084fc)" id="sfill-1"></div></div><div class="score-pct" id="spct-1">—</div></div>
+          <div class="score-row"><div class="score-label">IaC for all infrastructure</div><div class="score-track"><div class="score-fill" style="width:0%;background:linear-gradient(90deg,#818cf8,#c084fc)" id="sfill-2"></div></div><div class="score-pct" id="spct-2">—</div></div>
+          <div class="score-row"><div class="score-label">DR tested in last 6 months</div><div class="score-track"><div class="score-fill" style="width:0%;background:linear-gradient(90deg,#818cf8,#c084fc)" id="sfill-3"></div></div><div class="score-pct" id="spct-3">—</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📊 Maturity Scores — Security</div>
+          <div class="score-row"><div class="score-label">GuardDuty enabled all accounts</div><div class="score-track"><div class="score-fill" style="width:0%;background:linear-gradient(90deg,#f87171,#ef4444)" id="sfill-4"></div></div><div class="score-pct" id="spct-4">—</div></div>
+          <div class="score-row"><div class="score-label">MFA on all users</div><div class="score-track"><div class="score-fill" style="width:0%;background:linear-gradient(90deg,#f87171,#ef4444)" id="sfill-5"></div></div><div class="score-pct" id="spct-5">—</div></div>
+          <div class="score-row"><div class="score-label">No long-term access keys</div><div class="score-track"><div class="score-fill" style="width:0%;background:linear-gradient(90deg,#f87171,#ef4444)" id="sfill-6"></div></div><div class="score-pct" id="spct-6">—</div></div>
+          <div class="score-row"><div class="score-label">All data encrypted at rest</div><div class="score-track"><div class="score-fill" style="width:0%;background:linear-gradient(90deg,#f87171,#ef4444)" id="sfill-7"></div></div><div class="score-pct" id="spct-7">—</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📊 Maturity Scores — Cost & Governance</div>
+          <div class="score-row"><div class="score-label">Cost allocation tags enforced</div><div class="score-track"><div class="score-fill" style="width:0%;background:linear-gradient(90deg,#f59e0b,#fbbf24)" id="sfill-8"></div></div><div class="score-pct" id="spct-8">—</div></div>
+          <div class="score-row"><div class="score-label">Budgets & anomaly alerts active</div><div class="score-track"><div class="score-fill" style="width:0%;background:linear-gradient(90deg,#f59e0b,#fbbf24)" id="sfill-9"></div></div><div class="score-pct" id="spct-9">—</div></div>
+          <div class="score-row"><div class="score-label">Multi-account structure in place</div><div class="score-track"><div class="score-fill" style="width:0%;background:linear-gradient(90deg,#34d399,#059669)" id="sfill-10"></div></div><div class="score-pct" id="spct-10">—</div></div>
+          <div class="score-row"><div class="score-label">SCPs enforcing guardrails</div><div class="score-track"><div class="score-fill" style="width:0%;background:linear-gradient(90deg,#34d399,#059669)" id="sfill-11"></div></div><div class="score-pct" id="spct-11">—</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">✅ Assessment Checklist — Click to Mark Achieved</div>
+          <ul class="checklist">
+            <li onclick="toggleChk(this,1)"><div class="chk"></div><span>All production workloads deployed across minimum 2 AZs</span></li>
+            <li onclick="toggleChk(this,2)"><div class="chk"></div><span>All infrastructure defined as code (CloudFormation/CDK/Terraform)</span></li>
+            <li onclick="toggleChk(this,3)"><div class="chk"></div><span>DR procedures documented and tested within last 6 months</span></li>
+            <li onclick="toggleChk(this,4)"><div class="chk"></div><span>AWS GuardDuty enabled in all accounts and all regions</span></li>
+            <li onclick="toggleChk(this,5)"><div class="chk"></div><span>MFA enforced for all human IAM users including root</span></li>
+            <li onclick="toggleChk(this,6)"><div class="chk"></div><span>No long-term access keys older than 90 days exist</span></li>
+            <li onclick="toggleChk(this,7)"><div class="chk"></div><span>All data stores encrypted at rest with KMS or managed keys</span></li>
+            <li onclick="toggleChk(this,8)"><div class="chk"></div><span>Mandatory cost allocation tags enforced on all resources</span></li>
+            <li onclick="toggleChk(this,9)"><div class="chk"></div><span>AWS Budgets and anomaly alerts configured on all accounts</span></li>
+            <li onclick="toggleChk(this,10)"><div class="chk"></div><span>Multi-account structure with AWS Organizations in place</span></li>
+            <li onclick="toggleChk(this,11)"><div class="chk"></div><span>SCPs enforcing security guardrails across all accounts</span></li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /domain-gov -->
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<footer>☁️ Cloud Best Practices Reference Guide · Built for AWS Strategic Consultants · Saudi Arabia · Vision 2030 Aligned</footer>
+
+<script>
+  let currentDomain = 'arch';
+  const domainMap = {
+    arch: { cls: 'active-arch', first: 'arch-design' },
+    sec:  { cls: 'active-sec',  first: 'sec-iam' },
+    cost: { cls: 'active-cost', first: 'cost-visibility' },
+    gov:  { cls: 'active-gov',  first: 'gov-accounts' }
+  };
+
+  function switchDomain(d) {
+    currentDomain = d;
+    // Hide all panels
+    document.querySelectorAll('.domain-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('domain-' + d).classList.add('active');
+    // Nav tabs
+    ['arch','sec','cost','gov'].forEach(x => {
+      const t = document.getElementById('tab-' + x);
+      t.className = 'dn-tab';
+      if (x === d) t.classList.add(domainMap[x].cls);
+    });
+    // Sidebar groups
+    ['arch','sec','cost','gov'].forEach(x => {
+      document.getElementById('sb-' + x).style.display = x === d ? 'block' : 'none';
+    });
+    // Reset all practice panels in this domain
+    document.querySelectorAll('#domain-' + d + ' .practice-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(domainMap[d].first).classList.add('active');
+    // Sidebar items
+    document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('sb-active'));
+    document.querySelector('#sb-' + d + ' .sb-item').classList.add('sb-active');
+  }
+
+  function showPractice(domain, practice) {
+    document.querySelectorAll('#domain-' + domain + ' .practice-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(domain + '-' + practice).classList.add('active');
+    // Sidebar
+    document.querySelectorAll('#sb-' + domain + ' .sb-item').forEach(i => i.classList.remove('sb-active'));
+    event.currentTarget.classList.add('sb-active');
+  }
+
+  function toggleChk(li, idx) {
+    li.classList.toggle('chked');
+    const achieved = li.classList.contains('chked');
+    li.querySelector('.chk').textContent = achieved ? '✓' : '';
+    const scores = [null,85,72,60,95,90,80,88,75,82,55,65];
+    const fill = document.getElementById('sfill-' + idx);
+    const pct  = document.getElementById('spct-' + idx);
+    if (fill && pct) {
+      fill.style.width = achieved ? scores[idx] + '%' : '0%';
+      pct.textContent  = achieved ? scores[idx] + '%' : '—';
+    }
+  }
+</script>
+</body>
+</html>

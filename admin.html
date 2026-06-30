@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Admin — Mohammad Dassen Cloud Portfolio</title>
+<link rel="stylesheet" href="site.css">
+<style>
+  /* ADMIN SPECIFIC */
+  .admin-layout { display: grid; grid-template-columns: 230px 1fr; min-height: calc(100vh - 52px); }
+
+  /* SIDEBAR */
+  .admin-sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 20px 0; }
+  .asb-label { font-size: 0.55rem; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; padding: 10px 18px 6px; }
+  .asb-item {
+    display: flex; align-items: center; gap: 9px; padding: 9px 18px;
+    cursor: pointer; font-size: 0.72rem; color: var(--muted);
+    transition: all 0.15s; border-left: 2px solid transparent;
+  }
+  .asb-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .asb-item.active { color: var(--accent); background: rgba(192,132,252,0.07); border-left-color: var(--accent); }
+
+  /* MAIN */
+  .admin-main { padding: 28px; overflow-y: auto; }
+  .admin-panel { display: none; animation: fadeUp 0.2s ease; }
+  .admin-panel.active { display: block; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+  .panel-title { font-family: Georgia,serif; font-size: 1.3rem; color: var(--text); margin-bottom: 6px; }
+  .panel-sub   { font-size: 0.73rem; color: var(--muted); margin-bottom: 24px; }
+
+  /* CARDS TABLE */
+  .cards-table { width: 100%; border-collapse: collapse; font-size: 0.71rem; margin-bottom: 16px; }
+  .cards-table th { background: rgba(255,255,255,0.04); color: var(--muted); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .cards-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  .cards-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .cards-table tr:last-child td { border-bottom: none; }
+
+  /* BADGES */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 0.58rem; font-weight: 700; }
+  .b-live { background: rgba(52,211,153,0.12); color: var(--green); }
+  .b-soon { background: rgba(107,122,148,0.12); color: var(--muted); }
+  .b-new  { background: rgba(52,211,153,0.9); color: #0a0e1a; }
+
+  /* COLOR DOT */
+  .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-right: 5px; }
+
+  /* ACTION BTNS */
+  .act-btn { padding: 4px 10px; border-radius: 5px; font-size: 0.62rem; font-weight: 700; cursor: pointer; border: none; font-family: inherit; transition: opacity 0.2s; }
+  .act-edit   { background: rgba(129,140,248,0.15); color: var(--accent2); }
+  .act-del    { background: rgba(248,113,113,0.12); color: var(--red); }
+  .act-up, .act-dn { background: rgba(255,255,255,0.06); color: var(--muted); }
+  .act-btn:hover { opacity: 0.75; }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .form-full  { grid-column: 1 / -1; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-label { font-size: 0.63rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-input, .form-select, .form-textarea {
+    background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px;
+    padding: 9px 12px; color: var(--text); font-size: 0.78rem; font-family: inherit;
+    outline: none; transition: border 0.2s; width: 100%;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-select option { background: var(--surface2); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-hint { font-size: 0.6rem; color: var(--muted); }
+  .form-section { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+  .form-section-title { font-size: 0.78rem; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+  /* TOGGLE */
+  .toggle-wrap { display: flex; align-items: center; gap: 10px; }
+  .toggle { width: 36px; height: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; border: none; }
+  .toggle.on { background: var(--green); }
+  .toggle::after { content:''; position:absolute; width:14px; height:14px; background:#fff; border-radius:50%; top:3px; left:3px; transition: left 0.2s; }
+  .toggle.on::after { left: 19px; }
+  .toggle-lbl { font-size: 0.72rem; color: var(--text); }
+
+  /* ALERTS */
+  .alert-box { border-radius: 10px; padding: 12px 16px; font-size: 0.7rem; line-height: 1.6; margin-bottom: 14px; display: flex; gap: 10px; }
+  .alert-success { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); color: var(--green); }
+  .alert-info    { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); color: var(--blue); }
+  .alert-warn    { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: var(--gold); }
+
+  /* PREVIEW */
+  .preview-wrap { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+  .preview-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
+
+  /* STATS GRID */
+  .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-card  { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+  .stat-card .num  { font-family: Georgia,serif; font-size: 1.6rem; font-weight: 700; color: var(--accent); }
+  .stat-card .lbl  { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; display: none; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; width: 100%; max-width: 620px; max-height: 90vh; overflow-y: auto; position: relative; }
+  .modal-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-size: 0.8rem; padding: 4px 10px; cursor: pointer; }
+  .modal-title { font-family: Georgia,serif; font-size: 1.1rem; color: var(--text); margin-bottom: 20px; }
+
+  /* ACTIONS ROW */
+  .actions-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
+  .save-indicator { font-size: 0.65rem; color: var(--green); opacity: 0; transition: opacity 0.3s; }
+  .save-indicator.show { opacity: 1; }
+
+  @media(max-width:700px) {
+    .admin-layout { grid-template-columns: 1fr; }
+    .admin-sidebar { display: none; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .form-grid  { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<nav class="site-topbar">
+  <div class="topbar-brand">☁️ MD Cloud</div>
+  <div class="topbar-nav">
+    <a href="index.html">← Back to Site</a>
+    <a href="#" class="active">⚙️ Admin Panel</a>
+  </div>
+  <span id="save-indicator" class="save-indicator">✅ Saved</span>
+</nav>
+
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <div class="admin-sidebar">
+    <div class="asb-label">Admin</div>
+    <div class="asb-item active" onclick="showPanel('dashboard')">📊 Dashboard</div>
+    <div class="asb-item" onclick="showPanel('cards')">🃏 Manage Cards</div>
+    <div class="asb-item" onclick="showPanel('add-card')">➕ Add New Card</div>
+    <div class="asb-label">Site Settings</div>
+    <div class="asb-item" onclick="showPanel('profile')">👤 Profile & Info</div>
+    <div class="asb-item" onclick="showPanel('nav')">🔗 Navigation Links</div>
+    <div class="asb-item" onclick="showPanel('stats')">📈 Stats & Chips</div>
+    <div class="asb-label">Data</div>
+    <div class="asb-item" onclick="showPanel('export')">📤 Export / Import</div>
+    <div class="asb-item" onclick="showPanel('reset')">🔄 Reset to Default</div>
+    <div class="asb-label">Quick Links</div>
+    <div class="asb-item" onclick="window.open('index.html')">🌐 View Home Page</div>
+    <div class="asb-item" onclick="window.open('cloud-advisory.html')">🎓 Cloud Advisory</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="admin-main">
+
+    <!-- ══════ DASHBOARD ══════ -->
+    <div class="admin-panel active" id="panel-dashboard">
+      <div class="panel-title">Dashboard</div>
+      <div class="panel-sub">Overview of your cloud portfolio site.</div>
+
+      <div class="stats-grid" id="dash-stats"></div>
+
+      <div class="alert-box alert-info">💡 <span>Use the <strong>Admin Panel</strong> to add new cards, update content, and manage your site — no code required. All changes save instantly to your browser and persist across sessions.</span></div>
+
+      <div class="form-section">
+        <div class="form-section-title">📋 Quick Reference — How to Add a New Resource</div>
+        <ol style="font-size:0.72rem;color:var(--muted);line-height:2;padding-left:20px;">
+          <li>Create your new HTML file (e.g. <code style="color:var(--accent)">war-template.html</code>) and upload it to GitHub</li>
+          <li>Click <strong style="color:var(--text)">➕ Add New Card</strong> in the sidebar</li>
+          <li>Fill in the card details — title, description, icon, color, URL, tags</li>
+          <li>Set Status to <strong style="color:var(--green)">Live</strong> and click <strong style="color:var(--text)">Save Card</strong></li>
+          <li>The card appears instantly on your home page</li>
+        </ol>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">🃏 Current Cards</div>
+        <div id="dash-cards-list"></div>
+      </div>
+    </div>
+
+    <!-- ══════ MANAGE CARDS ══════ -->
+    <div class="admin-panel" id="panel-cards">
+      <div class="panel-title">Manage Cards</div>
+      <div class="panel-sub">Edit, reorder, delete, or toggle visibility of resource cards. Changes apply immediately to the home page.</div>
+
+      <div class="actions-row">
+        <button class="btn-primary" onclick="showPanel('add-card')">➕ Add New Card</button>
+        <button class="btn-ghost" onclick="renderCardsTable()">🔄 Refresh</button>
+      </div>
+
+      <div class="form-section" style="padding:0;overflow:hidden;">
+        <table class="cards-table" id="cards-table">
+          <thead>
+            <tr>
+              <th>Order</th><th>Icon</th><th>Title</th><th>Topic</th>
+              <th>Color</th><th>Status</th><th>New?</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="cards-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════ ADD CARD ══════ -->
+    <div class="admin-panel" id="panel-add-card">
+      <div class="panel-title" id="add-card-title">➕ Add New Card</div>
+      <div class="panel-sub" id="add-card-sub">Fill in the details below to add a new resource card to your home page.</div>
+
+      <input type="hidden" id="edit-card-id">
+
+      <div class="form-section">
+        <div class="form-section-title">🖼️ Basic Information</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Card Icon (emoji)</label>
+            <input class="form-input" id="f-icon" placeholder="🏗️" maxlength="4">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Type Label <span class="form-hint">(shown above title)</span></label>
+            <input class="form-input" id="f-type" placeholder="Interactive Tool">
+          </div>
+          <div class="form-group form-full">
+            <label class="form-label">Card Title</label>
+            <input class="form-input" id="f-title" placeholder="Well-Architected Review Template">
+          </div>
+          <div class="form-group form-full">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" id="f-desc" placeholder="Describe what this resource does and who it's for..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">🎨 Appearance & Behavior</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Color Accent</label>
+            <select class="form-select" id="f-color">
+              <option value="purple">Purple (Default)</option>
+              <option value="gold">Gold</option>
+              <option value="green">Green</option>
+              <option value="blue">Blue</option>
+              <option value="red">Red</option>
+              <option value="orange">Orange</option>
+              <option value="teal">Teal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Topic / Category</label>
+            <select class="form-select" id="f-topic">
+              <option value="Learning">Learning</option>
+              <option value="Tools">Tools</option>
+              <option value="Compliance">Compliance</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="f-status">
+              <option value="live">✅ Live</option>
+              <option value="soon">🔜 Coming Soon</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Display Order <span class="form-hint">(lower = first)</span></label>
+            <input class="form-input" type="number" id="f-order" value="10">
+          </div>
+          <div class="form-group form-full">
+            <label class="form-label">URL / Filename <span class="form-hint">(e.g. war-template.html or # for coming soon)</span></label>
+            <input class="form-input" id="f-url" placeholder="war-template.html">
+          </div>
+          <div class="form-group form-full">
+            <label class="form-label">Tags <span class="form-hint">(comma separated, max 5)</span></label>
+            <input class="form-input" id="f-tags" placeholder="WAF, 6 Pillars, Consulting, Template">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Show "NEW" Badge</label>
+            <div class="toggle-wrap" style="margin-top:4px;">
+              <button class="toggle" id="tog-new" onclick="this.classList.toggle('on')"></button>
+              <span class="toggle-lbl">Show badge on card</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE PREVIEW -->
+      <div class="preview-wrap">
+        <div class="preview-label">Live Preview</div>
+        <div style="max-width:295px;">
+          <div class="card cc-purple card-live" id="card-preview" style="cursor:default;">
+            <div class="card-new-badge" id="prev-new" style="display:none;">NEW</div>
+            <div class="card-icon" id="prev-icon">🏗️</div>
+            <div class="card-type" id="prev-type" style="color:var(--accent)">Interactive Tool</div>
+            <div class="card-title" id="prev-title">Card Title</div>
+            <div class="card-desc" id="prev-desc">Card description will appear here...</div>
+            <div class="card-tags" id="prev-tags"></div>
+            <div class="card-link" id="prev-link" style="color:var(--accent)">Open →</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button class="btn-primary" onclick="saveCard()">💾 Save Card</button>
+        <button class="btn-ghost"   onclick="clearCardForm()">✕ Clear Form</button>
+        <button class="btn-ghost"   onclick="showPanel('cards')">← Back to Cards</button>
+      </div>
+    </div>
+
+    <!-- ══════ PROFILE ══════ -->
+    <div class="admin-panel" id="panel-profile">
+      <div class="panel-title">Profile & Info</div>
+      <div class="panel-sub">Update your name, title, role, and contact information. Changes reflect immediately on the home page.</div>
+
+      <div class="form-section">
+        <div class="form-section-title">👤 Personal Information</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input class="form-input" id="p-name" placeholder="Mohammad Dassen">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input class="form-input" id="p-title" placeholder="AWS Cloud Architect & Strategic Consultant">
+          </div>
+          <div class="form-group form-full">
+            <label class="form-label">Role / Subtitle</label>
+            <input class="form-input" id="p-role" placeholder="Senior IT Infrastructure Specialist · Cloud Advisory · Riyadh, Saudi Arabia">
+          </div>
+          <div class="form-group">
+            <label class="form-label">LinkedIn URL</label>
+            <input class="form-input" id="p-linkedin" placeholder="https://linkedin.com/in/...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input class="form-input" id="p-email" type="email" placeholder="your@email.com">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">🏢 Active Client Engagements</div>
+        <div id="clients-editor"></div>
+        <button class="btn-ghost" style="margin-top:10px;font-size:0.68rem;" onclick="addClientRow()">➕ Add Client</button>
+      </div>
+
+      <div class="actions-row">
+        <button class="btn-primary" onclick="saveProfile()">💾 Save Profile</button>
+      </div>
+    </div>
+
+    <!-- ══════ STATS ══════ -->
+    <div class="admin-panel" id="panel-stats">
+      <div class="panel-title">Stats & Hero Chips</div>
+      <div class="panel-sub">Edit the statistics and chips displayed in the hero section of your home page.</div>
+
+      <div class="form-section">
+        <div class="form-section-title">📊 Hero Statistics (4 items)</div>
+        <div id="stats-editor"></div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">🏷️ Hero Chips</div>
+        <div id="chips-editor"></div>
+        <button class="btn-ghost" style="margin-top:10px;font-size:0.68rem;" onclick="addChipRow()">➕ Add Chip</button>
+      </div>
+      <div class="actions-row">
+        <button class="btn-primary" onclick="saveStats()">💾 Save Stats & Chips</button>
+      </div>
+    </div>
+
+    <!-- ══════ NAV ══════ -->
+    <div class="admin-panel" id="panel-nav">
+      <div class="panel-title">Navigation Links</div>
+      <div class="panel-sub">The topbar navigation is automatically generated from your live cards. Add custom links below for additional pages or external resources.</div>
+      <div class="alert-box alert-info">💡 <span>The main navigation is auto-generated from your Live cards. This page is for adding extra custom links only.</span></div>
+      <div class="form-section">
+        <div class="form-section-title">Current Auto-Generated Nav Links</div>
+        <div id="nav-preview" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+    </div>
+
+    <!-- ══════ EXPORT ══════ -->
+    <div class="admin-panel" id="panel-export">
+      <div class="panel-title">Export / Import Config</div>
+      <div class="panel-sub">Export your current site configuration as JSON to back it up or transfer to another device. Import a previously exported config to restore.</div>
+
+      <div class="form-section">
+        <div class="form-section-title">📤 Export Configuration</div>
+        <p style="font-size:0.72rem;color:var(--muted);margin-bottom:14px;">Copy the JSON below and save it somewhere safe. This includes all your cards and profile settings.</p>
+        <textarea class="form-textarea" id="export-box" style="min-height:160px;font-size:0.65rem;font-family:monospace;" readonly></textarea>
+        <div class="actions-row" style="margin-top:10px;">
+          <button class="btn-primary" onclick="exportConfig()">📋 Generate Export</button>
+          <button class="btn-ghost" onclick="copyExport()">📄 Copy to Clipboard</button>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">📥 Import Configuration</div>
+        <p style="font-size:0.72rem;color:var(--muted);margin-bottom:14px;">Paste a previously exported config JSON here and click Import.</p>
+        <textarea class="form-textarea" id="import-box" style="min-height:120px;font-size:0.65rem;font-family:monospace;" placeholder='Paste JSON here...'></textarea>
+        <div class="actions-row" style="margin-top:10px;">
+          <button class="btn-primary" onclick="importConfig()">📥 Import & Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ RESET ══════ -->
+    <div class="admin-panel" id="panel-reset">
+      <div class="panel-title">Reset to Default</div>
+      <div class="panel-sub">Clear all admin customizations and restore the default configuration from site-config.js.</div>
+      <div class="alert-box alert-warn">⚠️ <span><strong>Warning:</strong> This will erase all changes you made via the admin panel. The site-config.js defaults will be restored. This cannot be undone (unless you have an export backup).</span></div>
+      <div class="actions-row">
+        <button class="btn-ghost" style="border-color:rgba(248,113,113,0.4);color:var(--red);" onclick="resetAll()">🗑️ Reset Everything to Default</button>
+        <button class="btn-ghost" onclick="showPanel('dashboard')">← Cancel</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕ Close</button>
+    <div class="modal-title">Edit Card</div>
+    <p style="font-size:0.72rem;color:var(--muted);margin-bottom:16px;">Make changes and click Save. The form above will be pre-filled.</p>
+    <button class="btn-primary" onclick="closeModal()">OK — Continue Editing in Form</button>
+  </div>
+</div>
+
+<script src="site-config.js"></script>
+<script>
+  /* ──────────────────────────────────
+     HELPERS
+  ────────────────────────────────── */
+  const C = window.SITE_CONFIG;
+
+  function save(key, val) {
+    localStorage.setItem(key, JSON.stringify(val));
+    const ind = document.getElementById('save-indicator');
+    ind.classList.add('show');
+    setTimeout(()=>ind.classList.remove('show'), 1800);
+  }
+
+  function showPanel(id) {
+    document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.asb-item').forEach(i=>i.classList.remove('active'));
+    document.getElementById('panel-'+id).classList.add('active');
+    const items = document.querySelectorAll('.asb-item');
+    items.forEach(i=>{ if(i.textContent.toLowerCase().includes(id.replace('-',' '))) i.classList.add('active'); });
+    // Special cases
+    if (id==='add-card') { clearCardForm(); renderPreview(); }
+    if (id==='cards')    renderCardsTable();
+    if (id==='dashboard')renderDashboard();
+    if (id==='profile')  renderProfileForm();
+    if (id==='stats')    renderStatsForm();
+    if (id==='nav')      renderNavPreview();
+  }
+
+  function showSave() {
+    const ind = document.getElementById('save-indicator');
+    ind.classList.add('show');
+    setTimeout(()=>ind.classList.remove('show'), 1800);
+  }
+
+  /* ──────────────────────────────────
+     DASHBOARD
+  ────────────────────────────────── */
+  function renderDashboard() {
+    const live = C.cards.filter(c=>c.status==='live').length;
+    const soon = C.cards.filter(c=>c.status==='soon').length;
+    document.getElementById('dash-stats').innerHTML = [
+      { num: C.cards.length, lbl: 'Total Cards' },
+      { num: live,            lbl: 'Live'         },
+      { num: soon,            lbl: 'Coming Soon'  },
+      { num: localStorage.length, lbl: 'Saved Items' }
+    ].map(s=>`<div class="stat-card"><div class="num">${s.num}</div><div class="lbl">${s.lbl}</div></div>`).join('');
+
+    document.getElementById('dash-cards-list').innerHTML = `
+      <table class="cards-table" style="font-size:0.68rem;">
+        <thead><tr><th>#</th><th>Title</th><th>Topic</th><th>Status</th></tr></thead>
+        <tbody>${C.cards.sort((a,b)=>a.order-b.order).map((c,i)=>`
+          <tr>
+            <td style="color:var(--muted)">${i+1}</td>
+            <td>${c.icon} ${c.title}</td>
+            <td><span style="color:var(--muted)">${c.topic}</span></td>
+            <td><span class="badge ${c.status==='live'?'b-live':'b-soon'}">${c.status}</span></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  /* ──────────────────────────────────
+     CARDS TABLE
+  ────────────────────────────────── */
+  const COLOR_HEX = { purple:'#c084fc', gold:'#f59e0b', green:'#34d399', blue:'#60a5fa', red:'#f87171', orange:'#fb923c', teal:'#2dd4bf' };
+
+  function renderCardsTable() {
+    const sorted = [...C.cards].sort((a,b)=>a.order-b.order);
+    document.getElementById('cards-tbody').innerHTML = sorted.map((c,i)=>`
+      <tr>
+        <td style="color:var(--muted)">${c.order}</td>
+        <td style="font-size:1.2rem">${c.icon}</td>
+        <td style="max-width:220px;">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--text);line-height:1.3;">${c.title}</div>
+          <div style="font-size:0.61rem;color:var(--muted);margin-top:2px;">${c.url}</div>
+        </td>
+        <td><span style="color:var(--muted);font-size:0.67rem;">${c.topic}</span></td>
+        <td><span class="color-dot" style="background:${COLOR_HEX[c.color]||'#6b7a94'}"></span>${c.color}</td>
+        <td><span class="badge ${c.status==='live'?'b-live':'b-soon'}">${c.status}</span></td>
+        <td>${c.isNew?'<span class="badge b-new">NEW</span>':'-'}</td>
+        <td>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <button class="act-btn act-up"   onclick="moveCard('${c.id}',-1)">↑</button>
+            <button class="act-btn act-dn"   onclick="moveCard('${c.id}',1)">↓</button>
+            <button class="act-btn act-edit" onclick="editCard('${c.id}')">Edit</button>
+            <button class="act-btn act-del"  onclick="deleteCard('${c.id}')">Del</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  function moveCard(id, dir) {
+    const idx = C.cards.findIndex(c=>c.id===id);
+    if (idx < 0) return;
+    const sorted = [...C.cards].sort((a,b)=>a.order-b.order);
+    const si = sorted.findIndex(c=>c.id===id);
+    const target = sorted[si + dir];
+    if (!target) return;
+    const tmp = C.cards.find(c=>c.id===id).order;
+    C.cards.find(c=>c.id===id).order    = target.order;
+    C.cards.find(c=>c.id===target.id).order = tmp;
+    save('md_site_cards', C.cards);
+    renderCardsTable();
+  }
+
+  function deleteCard(id) {
+    if (!confirm('Delete this card? This cannot be undone.')) return;
+    C.cards = C.cards.filter(c=>c.id!==id);
+    save('md_site_cards', C.cards);
+    renderCardsTable();
+    renderDashboard();
+  }
+
+  function editCard(id) {
+    const c = C.cards.find(c=>c.id===id);
+    if (!c) return;
+    showPanel('add-card');
+    document.getElementById('add-card-title').textContent = '✏️ Edit Card';
+    document.getElementById('add-card-sub').textContent   = 'Update the card details below.';
+    document.getElementById('edit-card-id').value = c.id;
+    document.getElementById('f-icon').value    = c.icon;
+    document.getElementById('f-type').value    = c.type;
+    document.getElementById('f-title').value   = c.title;
+    document.getElementById('f-desc').value    = c.desc;
+    document.getElementById('f-color').value   = c.color;
+    document.getElementById('f-topic').value   = c.topic;
+    document.getElementById('f-status').value  = c.status;
+    document.getElementById('f-order').value   = c.order;
+    document.getElementById('f-url').value     = c.url;
+    document.getElementById('f-tags').value    = c.tags.join(', ');
+    const togNew = document.getElementById('tog-new');
+    togNew.classList.toggle('on', c.isNew);
+    renderPreview();
+  }
+
+  /* ──────────────────────────────────
+     ADD / SAVE CARD
+  ────────────────────────────────── */
+  function saveCard() {
+    const title = document.getElementById('f-title').value.trim();
+    if (!title) { alert('Please enter a card title.'); return; }
+    const url   = document.getElementById('f-url').value.trim() || '#';
+    const editId = document.getElementById('edit-card-id').value;
+    const id = editId || 'card-' + Date.now();
+    const tagsRaw = document.getElementById('f-tags').value;
+    const tags = tagsRaw.split(',').map(t=>t.trim()).filter(Boolean).slice(0,5);
+    const isNew = document.getElementById('tog-new').classList.contains('on');
+
+    const card = {
+      id, title,
+      desc:   document.getElementById('f-desc').value.trim(),
+      icon:   document.getElementById('f-icon').value.trim() || '📄',
+      color:  document.getElementById('f-color').value,
+      status: document.getElementById('f-status').value,
+      url,
+      type:   document.getElementById('f-type').value.trim() || 'Resource',
+      tags,
+      isNew,
+      topic:  document.getElementById('f-topic').value,
+      order:  parseInt(document.getElementById('f-order').value) || 10
+    };
+
+    if (editId) {
+      const idx = C.cards.findIndex(c=>c.id===editId);
+      if (idx >= 0) C.cards[idx] = card;
+    } else {
+      C.cards.push(card);
+    }
+    save('md_site_cards', C.cards);
+    alert('✅ Card saved! Visit the home page to see it.');
+    clearCardForm();
+    showPanel('cards');
+  }
+
+  function clearCardForm() {
+    document.getElementById('edit-card-id').value = '';
+    document.getElementById('add-card-title').textContent = '➕ Add New Card';
+    document.getElementById('add-card-sub').textContent   = 'Fill in the details below to add a new resource card to your home page.';
+    ['f-icon','f-type','f-title','f-url','f-tags'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f-desc').value  = '';
+    document.getElementById('f-color').value = 'purple';
+    document.getElementById('f-topic').value = 'Tools';
+    document.getElementById('f-status').value= 'soon';
+    document.getElementById('f-order').value = String(Math.max(...C.cards.map(c=>c.order), 0)+1);
+    document.getElementById('tog-new').classList.remove('on');
+    renderPreview();
+  }
+
+  /* ──────────────────────────────────
+     LIVE PREVIEW
+  ────────────────────────────────── */
+  function renderPreview() {
+    const icon  = document.getElementById('f-icon')?.value  || '🏗️';
+    const type  = document.getElementById('f-type')?.value  || 'Resource Type';
+    const title = document.getElementById('f-title')?.value || 'Card Title';
+    const desc  = document.getElementById('f-desc')?.value  || 'Description will appear here.';
+    const color = document.getElementById('f-color')?.value || 'purple';
+    const status= document.getElementById('f-status')?.value|| 'soon';
+    const tagsStr= document.getElementById('f-tags')?.value || '';
+    const tags  = tagsStr.split(',').map(t=>t.trim()).filter(Boolean).slice(0,5);
+    const isNew = document.getElementById('tog-new')?.classList.contains('on');
+
+    const preview = document.getElementById('card-preview');
+    if (!preview) return;
+    preview.className = `card cc-${color} card-live`;
+    document.getElementById('prev-new').style.display  = isNew ? '' : 'none';
+    document.getElementById('prev-icon').textContent   = icon;
+    document.getElementById('prev-type').textContent   = type;
+    document.getElementById('prev-title').textContent  = title;
+    document.getElementById('prev-desc').textContent   = desc;
+    document.getElementById('prev-tags').innerHTML     = tags.map(t=>`<span class="card-tag">${t}</span>`).join('');
+    document.getElementById('prev-link').textContent   = status==='live' ? 'Open →' : 'Coming Soon';
+    document.getElementById('prev-link').style.color   = COLOR_HEX[color]||'#c084fc';
+    document.getElementById('prev-type').style.color   = COLOR_HEX[color]||'#c084fc';
+  }
+
+  // Attach live preview listeners
+  setTimeout(()=>{
+    ['f-icon','f-type','f-title','f-desc','f-color','f-status','f-tags','f-order'].forEach(id=>{
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', renderPreview);
+      if (el) el.addEventListener('change', renderPreview);
+    });
+    document.getElementById('tog-new')?.addEventListener('click', ()=>setTimeout(renderPreview,50));
+  }, 100);
+
+  /* ──────────────────────────────────
+     PROFILE
+  ────────────────────────────────── */
+  function renderProfileForm() {
+    document.getElementById('p-name').value    = C.owner.name;
+    document.getElementById('p-title').value   = C.owner.title;
+    document.getElementById('p-role').value    = C.owner.role;
+    document.getElementById('p-linkedin').value= C.owner.linkedin;
+    document.getElementById('p-email').value   = C.owner.email;
+
+    document.getElementById('clients-editor').innerHTML = C.owner.clients.map((cl,i)=>`
+      <div style="display:grid;grid-template-columns:1fr 1fr 40px;gap:8px;margin-bottom:8px;" id="client-row-${i}">
+        <input class="form-input" id="cl-name-${i}" value="${cl.name}" placeholder="Client name">
+        <input class="form-input" id="cl-sub-${i}"  value="${cl.sub}"  placeholder="Engagement description">
+        <button class="act-btn act-del" onclick="removeClientRow(${i})" style="height:38px;">✕</button>
+      </div>`).join('');
+  }
+
+  function addClientRow() {
+    C.owner.clients.push({ name:'', sub:'' });
+    renderProfileForm();
+  }
+
+  function removeClientRow(i) {
+    C.owner.clients.splice(i,1);
+    renderProfileForm();
+  }
+
+  function saveProfile() {
+    C.owner.name     = document.getElementById('p-name').value.trim();
+    C.owner.title    = document.getElementById('p-title').value.trim();
+    C.owner.role     = document.getElementById('p-role').value.trim();
+    C.owner.linkedin = document.getElementById('p-linkedin').value.trim();
+    C.owner.email    = document.getElementById('p-email').value.trim();
+
+    const rows = document.querySelectorAll('[id^="client-row-"]');
+    C.owner.clients = [];
+    rows.forEach((_, i) => {
+      const name = document.getElementById('cl-name-'+i)?.value?.trim();
+      const sub  = document.getElementById('cl-sub-'+i)?.value?.trim();
+      if (name) C.owner.clients.push({ name, sub: sub||'' });
+    });
+    save('md_site_owner', { name:C.owner.name, title:C.owner.title, role:C.owner.role, linkedin:C.owner.linkedin, email:C.owner.email, clients:C.owner.clients });
+    showSave();
+    alert('✅ Profile saved!');
+  }
+
+  /* ──────────────────────────────────
+     STATS & CHIPS
+  ────────────────────────────────── */
+  function renderStatsForm() {
+    document.getElementById('stats-editor').innerHTML = C.owner.stats.map((s,i)=>`
+      <div style="display:grid;grid-template-columns:100px 1fr;gap:8px;margin-bottom:8px;">
+        <input class="form-input" id="st-num-${i}" value="${s.num}"   placeholder="20+">
+        <input class="form-input" id="st-lbl-${i}" value="${s.label}" placeholder="Years Experience">
+      </div>`).join('');
+
+    document.getElementById('chips-editor').innerHTML = C.owner.chips.map((c,i)=>`
+      <div style="display:grid;grid-template-columns:1fr 120px 40px;gap:8px;margin-bottom:8px;" id="chip-row-${i}">
+        <input class="form-input" id="ch-lbl-${i}"   value="${c.label}"   placeholder="🏅 AWS Certified">
+        <select class="form-select" id="ch-col-${i}">
+          ${['default','gold','green','blue','purple','red'].map(v=>`<option value="${v}" ${c.color===v?'selected':''}>${v}</option>`).join('')}
+        </select>
+        <button class="act-btn act-del" onclick="removeChip(${i})" style="height:38px;">✕</button>
+      </div>`).join('');
+  }
+
+  function addChipRow() {
+    C.owner.chips.push({ label:'New Chip', color:'default' });
+    renderStatsForm();
+  }
+
+  function removeChip(i) {
+    C.owner.chips.splice(i,1);
+    renderStatsForm();
+  }
+
+  function saveStats() {
+    C.owner.stats = C.owner.stats.map((s,i)=>({
+      num:   document.getElementById('st-num-'+i)?.value || s.num,
+      label: document.getElementById('st-lbl-'+i)?.value || s.label
+    }));
+    const chipRows = document.querySelectorAll('[id^="chip-row-"]');
+    C.owner.chips = [];
+    chipRows.forEach((_,i)=>{
+      const lbl = document.getElementById('ch-lbl-'+i)?.value;
+      const col = document.getElementById('ch-col-'+i)?.value;
+      if (lbl) C.owner.chips.push({ label:lbl, color:col||'default' });
+    });
+    save('md_site_owner', { ...JSON.parse(localStorage.getItem('md_site_owner')||'{}'), stats:C.owner.stats, chips:C.owner.chips });
+    showSave();
+    alert('✅ Stats & Chips saved!');
+  }
+
+  /* ──────────────────────────────────
+     NAV PREVIEW
+  ────────────────────────────────── */
+  function renderNavPreview() {
+    const live = C.cards.filter(c=>c.status==='live');
+    document.getElementById('nav-preview').innerHTML = [
+      { label:'Home', href:'index.html' },
+      ...live.map(c=>({ label:c.title.split('—')[0].trim().substring(0,22), href:c.url })),
+      { label:'About', href:'#about' },
+      { label:'Contact', href:'#contact' }
+    ].map(l=>`<div class="filter-btn">${l.label}</div>`).join('');
+  }
+
+  /* ──────────────────────────────────
+     EXPORT / IMPORT
+  ────────────────────────────────── */
+  function exportConfig() {
+    const data = { cards: C.cards, owner: C.owner, exported: new Date().toISOString() };
+    document.getElementById('export-box').value = JSON.stringify(data, null, 2);
+  }
+  function copyExport() {
+    const box = document.getElementById('export-box');
+    if (!box.value) { exportConfig(); }
+    navigator.clipboard.writeText(box.value).then(()=>alert('✅ Copied to clipboard!'));
+  }
+  function importConfig() {
+    try {
+      const data = JSON.parse(document.getElementById('import-box').value);
+      if (data.cards) { C.cards = data.cards; save('md_site_cards', C.cards); }
+      if (data.owner) { Object.assign(C.owner, data.owner); save('md_site_owner', C.owner); }
+      alert('✅ Configuration imported successfully! Reload the home page to see changes.');
+    } catch(e) { alert('❌ Invalid JSON. Please check the format and try again.'); }
+  }
+
+  /* ──────────────────────────────────
+     RESET
+  ────────────────────────────────── */
+  function resetAll() {
+    if (!confirm('Are you sure? This will erase all admin changes.')) return;
+    localStorage.removeItem('md_site_cards');
+    localStorage.removeItem('md_site_owner');
+    alert('✅ Reset complete. Reload the page to see defaults.');
+    location.reload();
+  }
+
+  function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+  /* ──────────────────────────────────
+     INIT
+  ────────────────────────────────── */
+  renderDashboard();
+</script>
+</body>
+</html>

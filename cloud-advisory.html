@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS Phase 5 — Strategic Consulting Mastery</title>
+<style>
+  :root {
+    --bg: #07090f;
+    --surface: #0e1219;
+    --surface2: #141820;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8edf5;
+    --muted: #6b7a94;
+    --accent: #c084fc;
+    --accent2: #818cf8;
+    --gold: #f59e0b;
+    --green: #34d399;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --font-display: 'Georgia', 'Times New Roman', serif;
+    --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, #0e0812 0%, #0d1018 50%, #0a0e18 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 24px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(192,132,252,0.08) 0%, transparent 70%);
+  }
+  .header-eyebrow {
+    font-size: 0.62rem; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--font-display);
+    font-size: 1.8rem; font-weight: 700;
+    color: var(--text); line-height: 1.2; margin-bottom: 10px;
+  }
+  .header h1 span { color: var(--accent); font-style: italic; }
+  .header-sub {
+    font-size: 0.78rem; color: var(--muted); max-width: 540px; margin: 0 auto 20px;
+    line-height: 1.6;
+  }
+  .progress-bar-wrap { max-width: 440px; margin: 0 auto; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--muted); margin-bottom: 6px; }
+  .progress-track { height: 5px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 10px; transition: width 0.5s ease; }
+
+  /* ── Nav Tabs ── */
+  .nav { display: flex; overflow-x: auto; gap: 2px; padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--border); scrollbar-width: none; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 13px 18px; font-size: 0.72rem; font-weight: 600; color: var(--muted);
+    cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap;
+    transition: all 0.2s; letter-spacing: 0.3px;
+  }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── Layout ── */
+  .main { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 220px); }
+  .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 20px 0; }
+  .content { padding: 24px; overflow-y: auto; }
+
+  /* ── Sidebar ── */
+  .sidebar-section-label {
+    font-size: 0.58rem; color: var(--muted); text-transform: uppercase; letter-spacing: 2px;
+    padding: 0 18px; margin: 16px 0 8px;
+  }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 18px;
+    cursor: pointer; transition: all 0.15s; border-left: 2px solid transparent;
+    font-size: 0.75rem; color: var(--muted);
+  }
+  .sidebar-item:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+  .sidebar-item.active { background: rgba(192,132,252,0.07); color: var(--accent); border-left-color: var(--accent); }
+  .sidebar-item.done { color: var(--green); }
+  .sidebar-item.done .si-num { background: var(--green); color: #0a0e1a; }
+  .si-num {
+    width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center; font-size: 0.6rem;
+    font-weight: 700; flex-shrink: 0;
+  }
+  .si-num.active-num { background: var(--accent); color: #0a0e1a; }
+
+  /* ── Content Panels ── */
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── Module Header ── */
+  .module-header { margin-bottom: 24px; }
+  .module-eyebrow { font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .module-title { font-family: var(--font-display); font-size: 1.4rem; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
+  .module-meta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .meta-chip {
+    font-size: 0.62rem; padding: 3px 10px; border-radius: 20px; font-weight: 600;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border2); color: var(--muted);
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 20px; margin-bottom: 16px;
+  }
+  .card-title { font-size: 0.8rem; font-weight: 700; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .card-title .icon { font-size: 1rem; }
+  .card p { font-size: 0.76rem; color: var(--muted); line-height: 1.7; margin-bottom: 10px; }
+  .card p:last-child { margin-bottom: 0; }
+
+  /* ── Concept Grid ── */
+  .concept-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+  .concept-card {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px; cursor: pointer; transition: all 0.2s;
+  }
+  .concept-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .concept-card .cc-icon { font-size: 1.4rem; margin-bottom: 8px; }
+  .concept-card .cc-title { font-size: 0.77rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .concept-card .cc-desc { font-size: 0.67rem; color: var(--muted); line-height: 1.5; }
+
+  /* ── Pillars ── */
+  .pillar {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px; margin-bottom: 10px;
+  }
+  .pillar-num {
+    width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 800; flex-shrink: 0; font-family: var(--font-display);
+  }
+  .pillar-content {}
+  .pillar-title { font-size: 0.8rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .pillar-desc { font-size: 0.7rem; color: var(--muted); line-height: 1.6; }
+  .pillar-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .pillar-tag { font-size: 0.6rem; padding: 2px 8px; border-radius: 5px; background: rgba(255,255,255,0.05); color: var(--muted); }
+
+  /* ── Steps ── */
+  .step-list { counter-reset: steps; }
+  .step {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 14px 0; border-bottom: 1px solid var(--border); position: relative;
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%; background: rgba(192,132,252,0.12);
+    border: 1px solid rgba(192,132,252,0.3); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 800; flex-shrink: 0;
+  }
+  .step-body {}
+  .step-title { font-size: 0.8rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .step-desc { font-size: 0.71rem; color: var(--muted); line-height: 1.6; }
+  .step-action {
+    display: inline-block; margin-top: 8px; font-size: 0.63rem; color: var(--accent);
+    background: rgba(192,132,252,0.08); border: 1px solid rgba(192,132,252,0.2);
+    padding: 3px 10px; border-radius: 6px; font-weight: 600;
+  }
+
+  /* ── Framework Diagram ── */
+  .framework {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px;
+  }
+  .framework-title { font-size: 0.7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; text-align: center; }
+  .fw-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .fw-box {
+    flex: 1; border-radius: 8px; padding: 10px 8px; text-align: center;
+    font-size: 0.65rem; font-weight: 700; line-height: 1.4;
+  }
+  .fw-center {
+    background: linear-gradient(135deg, rgba(192,132,252,0.2), rgba(129,140,248,0.2));
+    border: 1px solid rgba(192,132,252,0.3); color: var(--accent);
+  }
+  .fw-green { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); color: var(--green); }
+  .fw-blue { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); color: var(--blue); }
+  .fw-gold { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: var(--gold); }
+  .fw-red { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); color: var(--red); }
+
+  /* ── WAF Pillars Visual ── */
+  .waf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .waf-card {
+    border-radius: 10px; padding: 12px 10px; text-align: center;
+    border: 1px solid; transition: all 0.2s; cursor: pointer;
+  }
+  .waf-card:hover { transform: translateY(-3px); }
+  .waf-icon { font-size: 1.3rem; margin-bottom: 6px; }
+  .waf-name { font-size: 0.67rem; font-weight: 700; margin-bottom: 3px; }
+  .waf-q { font-size: 0.6rem; line-height: 1.4; }
+
+  /* ── Table ── */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.71rem; margin-bottom: 16px; }
+  .data-table th { background: rgba(255,255,255,0.04); color: var(--muted); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 0.6rem; font-weight: 700; }
+  .badge-green { background: rgba(52,211,153,0.12); color: var(--green); }
+  .badge-gold { background: rgba(245,158,11,0.12); color: var(--gold); }
+  .badge-blue { background: rgba(96,165,250,0.12); color: var(--blue); }
+  .badge-red { background: rgba(248,113,113,0.12); color: var(--red); }
+
+  /* ── Quote Block ── */
+  .quote {
+    border-left: 3px solid var(--accent); padding: 12px 16px; margin: 16px 0;
+    background: rgba(192,132,252,0.05); border-radius: 0 10px 10px 0;
+  }
+  .quote p { font-family: var(--font-display); font-style: italic; font-size: 0.82rem; color: var(--text); line-height: 1.6; }
+  .quote-attr { font-size: 0.65rem; color: var(--accent); margin-top: 6px; font-weight: 600; }
+
+  /* ── Practice Scenario ── */
+  .scenario {
+    background: linear-gradient(135deg, rgba(192,132,252,0.06), rgba(129,140,248,0.04));
+    border: 1px solid rgba(192,132,252,0.2); border-radius: 14px; padding: 18px; margin-bottom: 16px;
+  }
+  .scenario-label { font-size: 0.58rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; font-weight: 700; }
+  .scenario-title { font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .scenario-desc { font-size: 0.73rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+  .scenario-tasks { list-style: none; }
+  .scenario-tasks li {
+    font-size: 0.71rem; color: var(--muted); padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .scenario-tasks li::before { content: '→'; color: var(--accent); flex-shrink: 0; }
+
+  /* ── Deliverable Template ── */
+  .deliverable {
+    background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px; padding: 18px; margin-bottom: 12px;
+  }
+  .del-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .del-title { font-size: 0.8rem; font-weight: 700; color: var(--text); }
+  .del-type { font-size: 0.6rem; color: var(--muted); background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 5px; }
+  .del-structure { font-size: 0.7rem; color: var(--muted); line-height: 1.7; }
+  .del-structure strong { color: var(--text); }
+
+  /* ── Tooltip ── */
+  .tooltip-trigger { border-bottom: 1px dashed var(--accent); cursor: help; color: var(--accent); }
+
+  /* ── CTA Button ── */
+  .cta-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  .btn {
+    padding: 9px 18px; border-radius: 8px; font-size: 0.72rem; font-weight: 700; cursor: pointer;
+    border: none; transition: all 0.2s; font-family: var(--font-body); letter-spacing: 0.3px;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #0a0e1a; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-ghost { background: rgba(255,255,255,0.05); border: 1px solid var(--border2); color: var(--text); }
+  .btn-ghost:hover { background: rgba(255,255,255,0.09); }
+
+  /* ── Checklist ── */
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex; gap: 10px; align-items: flex-start; padding: 8px 0;
+    border-bottom: 1px solid var(--border); font-size: 0.73rem; color: var(--muted);
+    cursor: pointer; transition: color 0.2s;
+  }
+  .checklist li:hover { color: var(--text); }
+  .checklist li:last-child { border-bottom: none; }
+  .check-box {
+    width: 18px; height: 18px; border-radius: 5px; border: 1px solid var(--border2);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; transition: all 0.2s;
+  }
+  .checklist li.checked .check-box { background: var(--green); border-color: var(--green); color: #0a0e1a; }
+  .checklist li.checked span { text-decoration: line-through; color: var(--muted); }
+
+  /* ── Alert ── */
+  .alert {
+    border-radius: 10px; padding: 12px 16px; margin-bottom: 14px;
+    font-size: 0.72rem; line-height: 1.6; display: flex; gap: 10px; align-items: flex-start;
+  }
+  .alert-gold { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: #fbbf24; }
+  .alert-green { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); color: var(--green); }
+  .alert-blue { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); color: var(--blue); }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  /* ── Responsive ── */
+  @media (max-width: 700px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .concept-grid, .waf-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-eyebrow">AWS Phase 5 · 18-Month Mastery Program</div>
+  <h1>Strategic <span>Consulting</span> Mastery</h1>
+  <p class="header-sub">From technical practitioner to trusted cloud advisory leader — a structured curriculum covering every skill, framework, and deliverable that commands premium consulting rates.</p>
+  <div class="progress-bar-wrap">
+    <div class="progress-label"><span>Your Progress</span><span id="progress-pct">0% Complete</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-tab active" onclick="switchModule(0)">1. Foundations</div>
+  <div class="nav-tab" onclick="switchModule(1)">2. Well-Architected</div>
+  <div class="nav-tab" onclick="switchModule(2)">3. Cloud Governance</div>
+  <div class="nav-tab" onclick="switchModule(3)">4. Executive Communication</div>
+  <div class="nav-tab" onclick="switchModule(4)">5. TCO & Business Case</div>
+  <div class="nav-tab" onclick="switchModule(5)">6. CCoE Leadership</div>
+  <div class="nav-tab" onclick="switchModule(6)">7. Risk & Compliance</div>
+  <div class="nav-tab" onclick="switchModule(7)">8. APN & Practice</div>
+</div>
+
+<!-- LAYOUT -->
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-section-label">Curriculum</div>
+    <div class="sidebar-item active" onclick="switchModule(0)"><div class="si-num active-num" id="sn0">1</div>Consulting Identity</div>
+    <div class="sidebar-item" onclick="switchModule(1)"><div class="si-num" id="sn1">2</div>Well-Architected Reviews</div>
+    <div class="sidebar-item" onclick="switchModule(2)"><div class="si-num" id="sn2">3</div>Cloud Governance</div>
+    <div class="sidebar-item" onclick="switchModule(3)"><div class="si-num" id="sn3">4</div>Executive Communication</div>
+    <div class="sidebar-item" onclick="switchModule(4)"><div class="si-num" id="sn4">5</div>TCO & Business Cases</div>
+    <div class="sidebar-item" onclick="switchModule(5)"><div class="si-num" id="sn5">6</div>CCoE Leadership</div>
+    <div class="sidebar-item" onclick="switchModule(6)"><div class="si-num" id="sn6">7</div>Risk & Compliance</div>
+    <div class="sidebar-item" onclick="switchModule(7)"><div class="si-num" id="sn7">8</div>APN & Practice Building</div>
+    <div class="sidebar-section-label" style="margin-top:20px;">Resources</div>
+    <div class="sidebar-item"><div class="si-num">📄</div>Deliverable Templates</div>
+    <div class="sidebar-item"><div class="si-num">🎯</div>Practice Scenarios</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MODULE 0: FOUNDATIONS / CONSULTING IDENTITY -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="panel active" id="panel0">
+      <div class="module-header">
+        <div class="module-eyebrow">Module 1 · Weeks 1–3</div>
+        <div class="module-title">The Consulting Mindset &amp; Identity Shift</div>
+        <div class="module-meta">
+          <span class="meta-chip">🧠 Foundational</span>
+          <span class="meta-chip">⏱ 3 Weeks</span>
+          <span class="meta-chip">🎯 Beginner</span>
+        </div>
+      </div>
+
+      <div class="alert alert-gold">⚡ <span><strong>The Core Shift:</strong> A consultant is not paid for what they build — they are paid for the value they create and the decisions they enable. This module rewires how you think about your role.</span></div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🔄</span> The Identity Transformation</div>
+        <p>After 20+ years as an infrastructure specialist, your instinct is to solve technical problems. As a strategic consultant, your job is to solve <em>business</em> problems using cloud as the instrument. The difference is profound — and it changes everything from how you listen in meetings to how you write proposals.</p>
+        <p>This module teaches you to think in three layers simultaneously: the technology layer (what AWS services do), the architecture layer (how they fit together), and the business layer (what value they create for the client).</p>
+      </div>
+
+      <div class="quote">
+        <p>"Clients don't buy technical expertise. They buy confidence that their problems will be solved and their risks will be managed."</p>
+        <div class="quote-attr">— Foundational principle of technology consulting</div>
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="cc-icon">🏗️</div>
+          <div class="cc-title">Technical Expert vs. Advisor</div>
+          <div class="cc-desc">Expert: "Here is how VPC Transit Gateway works." Advisor: "Here is why your current network design will block your expansion into 3 new regions and cost you 2.4x more." Learn to lead with impact, not mechanics.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🎯</div>
+          <div class="cc-title">The Discovery Mindset</div>
+          <div class="cc-desc">Top consultants ask more questions than they answer in initial engagements. Master the art of discovery: understanding the client's pain, fear, ambition, and constraints before proposing any solution.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">💼</div>
+          <div class="cc-title">Scope & Engagement Design</div>
+          <div class="cc-desc">Learn to scope consulting engagements clearly — defining what you will deliver, what success looks like, what is out of scope, and how to protect yourself from scope creep.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🤝</div>
+          <div class="cc-title">Trusted Advisor Framework</div>
+          <div class="cc-desc">The Trusted Advisor model (Maister et al.): credibility × reliability × intimacy ÷ self-orientation. Understand why the best consultants win long-term relationships, not just projects.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">📋</span> The 4 Consulting Engagement Models</div>
+        <table class="data-table">
+          <thead><tr><th>Model</th><th>Description</th><th>Typical Duration</th><th>Your Role</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Assessment</strong></td><td>Evaluate current state vs. target state</td><td>2–4 weeks</td><td>Analyst + Advisor</td></tr>
+            <tr><td><strong>Strategy & Roadmap</strong></td><td>Define where client should go and how</td><td>4–8 weeks</td><td>Strategic Advisor</td></tr>
+            <tr><td><strong>Architecture Design</strong></td><td>Detailed technical architecture for a solution</td><td>2–6 weeks</td><td>Lead Architect</td></tr>
+            <tr><td><strong>Governance Advisory</strong></td><td>Ongoing advisory on cloud operations and decisions</td><td>6–24 months</td><td>Trusted Advisor</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🚀</span> Week-by-Week Learning Plan</div>
+        <div class="step-list">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Week 1 — Study the Trusted Advisor Model</div>
+              <div class="step-desc">Read "The Trusted Advisor" by Maister, Green & Galford (or summary). Complete the Trust Equation self-assessment. Identify your current self-orientation weaknesses. Write your consulting positioning statement: who you serve, what problem you solve, and what outcome you deliver.</div>
+              <span class="step-action">📖 Read: "The Trusted Advisor" — Chapters 1–5</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Week 2 — Master Discovery Conversations</div>
+              <div class="step-desc">Practice structured discovery using the SPIN framework (Situation, Problem, Implication, Need-payoff). Role-play discovery calls with a colleague or record yourself. Learn to ask "What keeps you up at night about your current cloud environment?" before asking any technical questions.</div>
+              <span class="step-action">🎭 Practice: 3 mock discovery conversations</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Week 3 — Build Your Consulting Identity Document</div>
+              <div class="step-desc">Create your professional positioning: a one-page consulting bio, your service catalog (3–5 core offerings), your target client profile, and your value proposition statement. This becomes the foundation of every proposal and introduction.</div>
+              <span class="step-action">📄 Deliverable: Personal Consulting Brief (1 page)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scenario">
+        <div class="scenario-label">Practice Scenario</div>
+        <div class="scenario-title">University CIO Discovery Call — Simulate This</div>
+        <div class="scenario-desc">You are meeting a CIO of a mid-sized Saudi university (similar to PNU or IMAMU) for the first time. They have mentioned "cloud adoption challenges" in their intro email. How do you structure the first 45 minutes?</div>
+        <ul class="scenario-tasks">
+          <li>Open with: "Before I share anything about what we do, I'd love to understand your situation. Can you walk me through your current cloud environment?"</li>
+          <li>Identify: What pain triggered this meeting? What outcome do they want? What have they tried before?</li>
+          <li>Uncover business drivers: Vision 2030 compliance deadlines, budget cycles, political constraints</li>
+          <li>Close discovery with: "Based on what you've shared, it sounds like [summary]. Is that accurate?" — never propose in the first meeting</li>
+        </ul>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn btn-primary" onclick="markDone(0); switchModule(1)">Mark Complete &amp; Continue →</button>
+        <button class="btn btn-ghost">Download Module Notes</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MODULE 1: WELL-ARCHITECTED REVIEWS -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="panel" id="panel1">
+      <div class="module-header">
+        <div class="module-eyebrow">Module 2 · Weeks 4–7</div>
+        <div class="module-title">AWS Well-Architected Framework Reviews</div>
+        <div class="module-meta">
+          <span class="meta-chip">🏗️ Technical + Advisory</span>
+          <span class="meta-chip">⏱ 4 Weeks</span>
+          <span class="meta-chip">🎯 Core Consulting Skill</span>
+        </div>
+      </div>
+
+      <div class="alert alert-green">✅ <span><strong>The WAR is your #1 consulting deliverable.</strong> A Well-Architected Review (WAR) is the single most powerful tool you have — it creates a structured, credible, AWS-endorsed assessment of any client's environment and generates a roadmap of improvements (i.e., more consulting work).</span></div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🏛️</span> The 6 Pillars — Deep Understanding</div>
+        <div class="waf-grid">
+          <div class="waf-card" style="border-color:rgba(245,158,11,0.3); background:rgba(245,158,11,0.05);">
+            <div class="waf-icon">⚡</div>
+            <div class="waf-name" style="color:#fbbf24;">Operational Excellence</div>
+            <div class="waf-q" style="color:#92400e8a; color: #a16207;">"Can you run, monitor, and improve your systems effectively?"</div>
+          </div>
+          <div class="waf-card" style="border-color:rgba(248,113,113,0.3); background:rgba(248,113,113,0.05);">
+            <div class="waf-icon">🔐</div>
+            <div class="waf-name" style="color:#f87171;">Security</div>
+            <div class="waf-q" style="color:#991b1b; color: #b91c1c;">"Can you protect data, systems, and assets?"</div>
+          </div>
+          <div class="waf-card" style="border-color:rgba(96,165,250,0.3); background:rgba(96,165,250,0.05);">
+            <div class="waf-icon">🔄</div>
+            <div class="waf-name" style="color:#60a5fa;">Reliability</div>
+            <div class="waf-q" style="color:#1e40af; color: #2563eb;">"Can you recover from failures and meet demand?"</div>
+          </div>
+          <div class="waf-card" style="border-color:rgba(52,211,153,0.3); background:rgba(52,211,153,0.05);">
+            <div class="waf-icon">📈</div>
+            <div class="waf-name" style="color:#34d399;">Performance Efficiency</div>
+            <div class="waf-q" style="color:#065f46; color: #047857;">"Are you using resources efficiently as requirements change?"</div>
+          </div>
+          <div class="waf-card" style="border-color:rgba(192,132,252,0.3); background:rgba(192,132,252,0.05);">
+            <div class="waf-icon">💰</div>
+            <div class="waf-name" style="color:#c084fc;">Cost Optimization</div>
+            <div class="waf-q" style="color:#6b21a8; color: #7c3aed;">"Are you spending money on the right things at the right amount?"</div>
+          </div>
+          <div class="waf-card" style="border-color:rgba(167,243,208,0.3); background:rgba(167,243,208,0.04);">
+            <div class="waf-icon">🌱</div>
+            <div class="waf-name" style="color:#6ee7b7;">Sustainability</div>
+            <div class="waf-q" style="color:#065f46; color: #059669;">"Are you minimizing environmental impact of your cloud workloads?"</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">📋</span> How to Conduct a WAR — Step by Step</div>
+        <div class="step-list">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Pre-Engagement: Scope the Workload</div>
+              <div class="step-desc">Define which workload you are reviewing (a specific application, platform, or business unit). Identify the workload owner, technical lead, and business owner. Book 90-minute workshops — one per pillar. Clarify that this is not an audit; it is a collaborative improvement exercise.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Activate the AWS Well-Architected Tool</div>
+              <div class="step-desc">Log into AWS Console → Well-Architected Tool → Define a Workload. Enter workload name, region, environment type, and team. This tool provides 300+ review questions organized by pillar. The tool generates the report for you automatically.</div>
+              <span class="step-action">🔗 Free via: AWS Console → Well-Architected Tool</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Run Pillar Workshops (90 min each)</div>
+              <div class="step-desc">For each pillar: review the design principles, walk through the questions with the client team, document current state, identify risk levels (HIGH / MEDIUM / NONE), and capture evidence. Do not let it become a checkbox exercise — dig into the "why" behind each answer.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">Generate the Risk Report</div>
+              <div class="step-desc">The AWS tool categorizes findings as High Risk Items (HRIs) and Medium Risk Items (MRIs). Export the report. Typically you will find 15–40 improvement items. Prioritize by impact × effort matrix.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <div class="step-title">Deliver the Executive Findings Presentation</div>
+              <div class="step-desc">Transform the technical findings into a business narrative. Structure: Current State → Risk Exposure → Priority Improvement Areas → Recommended Roadmap → Investment Summary. This is your consulting deliverable — not the raw report.</div>
+              <span class="step-action">📄 Deliverable: WAR Executive Summary (10–15 slides)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="deliverable">
+        <div class="del-header">
+          <div class="del-title">📄 WAR Executive Report Structure</div>
+          <div class="del-type">Consulting Deliverable Template</div>
+        </div>
+        <div class="del-structure">
+          <strong>Section 1 — Executive Summary (1 page)</strong><br>
+          Business context, scope of review, top 3 critical findings, recommended next steps.<br><br>
+          <strong>Section 2 — Current State Assessment</strong><br>
+          Workload description, risk heat map (6 pillars × risk level), key statistics (X HRIs, Y MRIs found).<br><br>
+          <strong>Section 3 — Pillar-by-Pillar Findings</strong><br>
+          For each pillar: Design Principle gaps, specific HRIs with business impact, evidence gathered.<br><br>
+          <strong>Section 4 — Prioritized Improvement Roadmap</strong><br>
+          Impact vs. effort matrix, 90-day quick wins, 6-month initiatives, 12-month strategic improvements.<br><br>
+          <strong>Section 5 — Investment Summary</strong><br>
+          Estimated cost to remediate (consulting + implementation), estimated risk reduction value.
+        </div>
+      </div>
+
+      <div class="scenario">
+        <div class="scenario-label">Practice Scenario</div>
+        <div class="scenario-title">Conduct a Self-WAR on a Demo Workload</div>
+        <div class="scenario-desc">AWS provides sample workloads in their Well-Architected Labs. Practice a full review cycle using these free resources before doing it with a real client.</div>
+        <ul class="scenario-tasks">
+          <li>Visit: <strong>wellarchitectedlabs.com</strong> — complete the "Well-Architected Tool" lab (free, ~2 hours)</li>
+          <li>Complete a review on a demo workload using all 6 pillars</li>
+          <li>Write a 2-page mock executive summary for a fictional CTO</li>
+          <li>Time yourself: a real WAR engagement takes 3–5 days of consultant time</li>
+        </ul>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn btn-primary" onclick="markDone(1); switchModule(2)">Mark Complete &amp; Continue →</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MODULE 2: CLOUD GOVERNANCE -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="panel" id="panel2">
+      <div class="module-header">
+        <div class="module-eyebrow">Module 3 · Weeks 8–11</div>
+        <div class="module-title">Cloud Governance Frameworks</div>
+        <div class="module-meta">
+          <span class="meta-chip">🏛️ Strategic</span>
+          <span class="meta-chip">⏱ 4 Weeks</span>
+          <span class="meta-chip">🎯 High Value Skill</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🏛️</span> What is Cloud Governance? (Beginner Explanation)</div>
+        <p>Governance is the system of rules, accountability, and decision-making structures that ensure cloud resources are used securely, cost-effectively, and in alignment with organizational strategy. Without governance, organizations end up with cloud sprawl, security gaps, and uncontrolled costs.</p>
+        <p>As a consultant, selling governance advisory is one of the highest-value services you can offer, because it is ongoing, strategic, and non-commoditized.</p>
+      </div>
+
+      <div class="framework">
+        <div class="framework-title">The Cloud Governance Framework — 5 Domains</div>
+        <div class="fw-row">
+          <div class="fw-box fw-center" style="flex:3;">☁️ CLOUD GOVERNANCE<br><small style="font-weight:400;">The overarching system of control</small></div>
+        </div>
+        <div class="fw-row">
+          <div class="fw-box fw-green">🔐<br>Security &amp;<br>Compliance</div>
+          <div class="fw-box fw-blue">💰<br>Financial<br>Management (FinOps)</div>
+          <div class="fw-box fw-gold">⚙️<br>Operational<br>Excellence</div>
+          <div class="fw-box fw-red">📊<br>Resource &amp;<br>Asset Management</div>
+          <div class="fw-box" style="border: 1px solid rgba(255,255,255,0.1); color: var(--muted);">🎯<br>Strategy &amp;<br>Alignment</div>
+        </div>
+      </div>
+
+      <div class="pillar" style="border-left: 3px solid #34d399;">
+        <div class="pillar-num" style="background:rgba(52,211,153,0.15); color:#34d399;">1</div>
+        <div class="pillar-content">
+          <div class="pillar-title">Security & Compliance Governance</div>
+          <div class="pillar-desc">Define who can access what, under what conditions, and with what controls. In Saudi Arabia this includes NCA (National Cybersecurity Authority) compliance, PDPL (Personal Data Protection Law), and CSP cloud security controls. AWS tools: AWS Organizations SCPs, AWS Config Rules, AWS Security Hub, IAM Access Analyzer.</div>
+          <div class="pillar-tags"><span class="pillar-tag">SCPs</span><span class="pillar-tag">AWS Config</span><span class="pillar-tag">Security Hub</span><span class="pillar-tag">NCA Controls</span><span class="pillar-tag">PDPL</span></div>
+        </div>
+      </div>
+      <div class="pillar" style="border-left: 3px solid #60a5fa;">
+        <div class="pillar-num" style="background:rgba(96,165,250,0.15); color:#60a5fa;">2</div>
+        <div class="pillar-content">
+          <div class="pillar-title">FinOps — Cloud Financial Management</div>
+          <div class="pillar-desc">FinOps is a cultural and operational practice for shared financial accountability in cloud. Learn the FinOps Framework (finops.org): Inform → Optimize → Operate. AWS tools: AWS Cost Explorer, AWS Budgets, Cost Anomaly Detection, Savings Plans, Reserved Instances. A consultant who saves a client SAR 2M per year earns a percentage of that — this is extremely lucrative work.</div>
+          <div class="pillar-tags"><span class="pillar-tag">Cost Explorer</span><span class="pillar-tag">Savings Plans</span><span class="pillar-tag">FinOps Framework</span><span class="pillar-tag">Unit Economics</span></div>
+        </div>
+      </div>
+      <div class="pillar" style="border-left: 3px solid #f59e0b;">
+        <div class="pillar-num" style="background:rgba(245,158,11,0.15); color:#f59e0b;">3</div>
+        <div class="pillar-content">
+          <div class="pillar-title">AWS Control Tower & Landing Zone</div>
+          <div class="pillar-desc">For enterprise clients with multiple AWS accounts, Control Tower provides a pre-configured governance foundation. Landing Zones standardize the multi-account environment. As a consultant, you design, deploy, and advise on Landing Zone configurations — this is high-value, high-complexity work. Learn: Account Vending Machine, Guardrails (preventive + detective), Log Archive, Audit accounts.</div>
+          <div class="pillar-tags"><span class="pillar-tag">Control Tower</span><span class="pillar-tag">Landing Zone</span><span class="pillar-tag">Guardrails</span><span class="pillar-tag">Multi-Account</span></div>
+        </div>
+      </div>
+      <div class="pillar" style="border-left: 3px solid #c084fc;">
+        <div class="pillar-num" style="background:rgba(192,132,252,0.15); color:#c084fc;">4</div>
+        <div class="pillar-content">
+          <div class="pillar-title">Tagging Strategies & Resource Management</div>
+          <div class="pillar-desc">A proper tagging strategy is the foundation of every other governance practice — without it, you cannot allocate costs, enforce policies, or manage resources at scale. Define: mandatory tags (Environment, CostCenter, Owner, Project, Compliance), enforcement mechanisms (SCPs, AWS Config), and reporting dashboards.</div>
+          <div class="pillar-tags"><span class="pillar-tag">Tag Policies</span><span class="pillar-tag">AWS Config</span><span class="pillar-tag">Cost Allocation</span><span class="pillar-tag">Automation</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🎯</span> Governance Maturity Model — Assess Any Client</div>
+        <table class="data-table">
+          <thead><tr><th>Level</th><th>Name</th><th>Characteristics</th><th>Your Advisory Role</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge-red">L1</span></td><td>Initial</td><td>No governance. Accounts shared. No tagging. No cost visibility.</td><td>Assess & Design from scratch</td></tr>
+            <tr><td><span class="badge badge-gold">L2</span></td><td>Developing</td><td>Basic IAM. Some tagging. Manual cost reviews. Reactive security.</td><td>Structured improvement program</td></tr>
+            <tr><td><span class="badge badge-blue">L3</span></td><td>Defined</td><td>Policies documented. Multi-account. Automated compliance checks.</td><td>Optimize & operationalize</td></tr>
+            <tr><td><span class="badge badge-green">L4</span></td><td>Managed</td><td>Full FinOps practice. CCoE in place. Continuous compliance. Proactive.</td><td>Strategic oversight & advisory</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn btn-primary" onclick="markDone(2); switchModule(3)">Mark Complete &amp; Continue →</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MODULE 3: EXECUTIVE COMMUNICATION -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="panel" id="panel3">
+      <div class="module-header">
+        <div class="module-eyebrow">Module 4 · Weeks 12–15</div>
+        <div class="module-title">Executive Communication &amp; Advisory Presence</div>
+        <div class="module-meta">
+          <span class="meta-chip">🎤 Communication</span>
+          <span class="meta-chip">⏱ 4 Weeks</span>
+          <span class="meta-chip">🎯 Career-Defining Skill</span>
+        </div>
+      </div>
+
+      <div class="alert alert-blue">💡 <span><strong>The multiplier skill:</strong> You can be the most technically brilliant AWS architect in Saudi Arabia — but if you cannot communicate value to a CIO or Minister of Digital Government in their language, you will always be hired as an implementer, never as a strategic advisor. This module changes that.</span></div>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="cc-icon">🔺</div>
+          <div class="cc-title">The Pyramid Principle</div>
+          <div class="cc-desc">Lead with the answer, then support with argument, then evidence. Never build up to your conclusion — executives have 10 minutes. Example: "My recommendation is Cloud-first. Here are the 3 reasons. Here is the supporting data."</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">📊</div>
+          <div class="cc-title">Executive-Level Storytelling</div>
+          <div class="cc-desc">Every briefing needs a narrative arc: Current reality → Risk/Opportunity → Recommended path → What you need from leadership. Data supports the story; it does not replace it.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🎯</div>
+          <div class="cc-title">The So What? Test</div>
+          <div class="cc-desc">After every statement you plan to make, ask: "So what?" If you cannot answer from the client's perspective, cut that statement. Example: "We migrated 40 servers to AWS." → So what? → "reducing DR recovery time from 8 hours to 15 minutes."</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🛡️</div>
+          <div class="cc-title">Handling Objections</div>
+          <div class="cc-desc">The ACE framework: Acknowledge the concern, Clarify the underlying fear, Explain how your recommendation addresses it. Never argue with a CIO — redirect with curiosity: "That's a critical concern. Can you help me understand what's driving that?"</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">📝</span> Executive Briefing Structure — Master This Template</div>
+        <div class="deliverable" style="margin-bottom:10px;">
+          <div class="del-header"><div class="del-title">The 5-Slide Executive Briefing</div><div class="del-type">Core Template</div></div>
+          <div class="del-structure">
+            <strong>Slide 1 — Situation (30 seconds):</strong> Where you are today. One paragraph, no jargon.<br><br>
+            <strong>Slide 2 — Risk / Opportunity (1 minute):</strong> What happens if you do nothing vs. what you gain by acting. Use SAR figures, not percentages alone.<br><br>
+            <strong>Slide 3 — Recommendation (1 minute):</strong> Your single clear recommendation. Not 3 options — one recommendation with options only if asked.<br><br>
+            <strong>Slide 4 — Implementation Path (30 seconds):</strong> Phase 1 (quick wins), Phase 2 (core), Phase 3 (optimization). Timeline and owner for each.<br><br>
+            <strong>Slide 5 — Decision Required:</strong> Explicit ask. "We need approval for SAR X to proceed to Phase 1 by [date]." Never leave a meeting without a clear next step.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🗣️</span> Language Translation — Technical to Executive</div>
+        <table class="data-table">
+          <thead><tr><th>Technical Language</th><th>Executive Language</th></tr></thead>
+          <tbody>
+            <tr><td>"We should enable Multi-AZ for RDS"</td><td>"We should eliminate the single point of failure that could cause 8+ hours of system downtime"</td></tr>
+            <tr><td>"Implement SCPs across the organization"</td><td>"Establish guardrails that prevent any team from accidentally incurring unauthorized cloud costs or compliance violations"</td></tr>
+            <tr><td>"Migrate to Spot Instances where possible"</td><td>"Reduce compute costs by up to 70% on non-critical workloads — estimated SAR 840,000 annual saving"</td></tr>
+            <tr><td>"Deploy CloudTrail in all regions"</td><td>"Create a complete, tamper-proof audit trail of all system activity to meet NCA regulatory requirements"</td></tr>
+            <tr><td>"Set up a WAF in front of the ALB"</td><td>"Protect the university portal against web attacks that have taken similar institutions offline for days"</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn btn-primary" onclick="markDone(3); switchModule(4)">Mark Complete &amp; Continue →</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MODULE 4: TCO & BUSINESS CASES -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="panel" id="panel4">
+      <div class="module-header">
+        <div class="module-eyebrow">Module 5 · Weeks 16–19</div>
+        <div class="module-title">TCO Analysis &amp; Cloud Business Cases</div>
+        <div class="module-meta">
+          <span class="meta-chip">💰 Financial Advisory</span>
+          <span class="meta-chip">⏱ 4 Weeks</span>
+          <span class="meta-chip">🎯 Deal-Winning Skill</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">💰</span> What is TCO Analysis? (Beginner Start)</div>
+        <p>Total Cost of Ownership (TCO) is a financial comparison between keeping infrastructure on-premises vs. moving to cloud. It considers not just hardware costs, but power, cooling, facilities, staffing, licensing, maintenance, and opportunity cost. A well-built TCO analysis is often the single document that unlocks cloud transformation approval from finance committees and boards.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🔢</span> The 3-Layer TCO Framework</div>
+        <div class="pillar" style="border-left:3px solid #f59e0b; margin-bottom:8px;">
+          <div class="pillar-num" style="background:rgba(245,158,11,0.15); color:#f59e0b;">L1</div>
+          <div class="pillar-content">
+            <div class="pillar-title">Direct Infrastructure Costs</div>
+            <div class="pillar-desc">Hardware (servers, storage, networking), software licensing, data center lease/build costs, power and cooling, network connectivity. These are the visible costs most organizations track. Map each on-premises cost to its cloud equivalent.</div>
+          </div>
+        </div>
+        <div class="pillar" style="border-left:3px solid #60a5fa; margin-bottom:8px;">
+          <div class="pillar-num" style="background:rgba(96,165,250,0.15); color:#60a5fa;">L2</div>
+          <div class="pillar-content">
+            <div class="pillar-title">Operational & Hidden Costs</div>
+            <div class="pillar-desc">Staff time for maintenance and patching, unplanned downtime costs (revenue loss per hour × MTTR), security incident response costs, compliance audit costs, hardware refresh cycles every 3–5 years. These are often 2–3x larger than direct costs and are the most powerful part of the TCO argument.</div>
+          </div>
+        </div>
+        <div class="pillar" style="border-left:3px solid #c084fc;">
+          <div class="pillar-num" style="background:rgba(192,132,252,0.15); color:#c084fc;">L3</div>
+          <div class="pillar-content">
+            <div class="pillar-title">Business Value & Opportunity Cost</div>
+            <div class="pillar-desc">Speed-to-market improvement (new features deployed in days vs. months), ability to scale for peak demand without over-provisioning, access to AI/ML and advanced services, competitive agility. This layer justifies premium pricing for your advisory work.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🛠️</span> AWS Tools for TCO Analysis</div>
+        <table class="data-table">
+          <thead><tr><th>Tool</th><th>What it Does</th><th>When to Use</th></tr></thead>
+          <tbody>
+            <tr><td><strong>AWS Pricing Calculator</strong></td><td>Build detailed cost estimates for AWS architecture</td><td>Building the cloud-side of the TCO comparison</td></tr>
+            <tr><td><strong>AWS Migration Evaluator</strong></td><td>Analyzes on-premises inventory and builds TCO comparison automatically</td><td>Enterprise migrations with complex on-prem estates</td></tr>
+            <tr><td><strong>AWS Cost Explorer</strong></td><td>Analyzes current AWS spend with forecasting</td><td>Post-migration optimization and reporting</td></tr>
+            <tr><td><strong>Excel / Custom Models</strong></td><td>Your custom TCO model tailored to client specifics</td><td>Always — adds consultant credibility and customization</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="deliverable">
+        <div class="del-header"><div class="del-title">📊 Business Case Document Structure</div><div class="del-type">Consulting Deliverable</div></div>
+        <div class="del-structure">
+          <strong>Section 1 — Executive Summary:</strong> Recommendation, 3-year cost comparison (on-prem vs cloud), headline saving figure, ROI percentage and payback period.<br><br>
+          <strong>Section 2 — Current State Cost Inventory:</strong> Itemized on-premises costs across all 3 TCO layers. Include data sources (actual invoices or estimates with assumptions documented).<br><br>
+          <strong>Section 3 — Proposed Cloud Architecture Cost Model:</strong> AWS Pricing Calculator output + reserved instance / savings plan adjustments. Show year 1, 2, 3 separately (year 1 is highest due to migration costs).<br><br>
+          <strong>Section 4 — Cost Comparison &amp; ROI Analysis:</strong> Side-by-side table, NPV analysis, payback period, sensitivity analysis (what if cloud costs are 20% higher than estimated?).<br><br>
+          <strong>Section 5 — Non-Financial Benefits:</strong> Quantified where possible — agility, compliance risk reduction, staff reallocation value.<br><br>
+          <strong>Section 6 — Risks &amp; Mitigations:</strong> Migration risks, cost overrun risks, vendor lock-in considerations, regulatory considerations for data residency in Saudi Arabia.
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn btn-primary" onclick="markDone(4); switchModule(5)">Mark Complete &amp; Continue →</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MODULE 5: CCoE -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="panel" id="panel5">
+      <div class="module-header">
+        <div class="module-eyebrow">Module 6 · Weeks 20–23</div>
+        <div class="module-title">Cloud Center of Excellence (CCoE) Leadership</div>
+        <div class="module-meta">
+          <span class="meta-chip">🏗️ Organizational Design</span>
+          <span class="meta-chip">⏱ 4 Weeks</span>
+          <span class="meta-chip">🎯 Enterprise Advisory</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🏢</span> What is a CCoE? (From Zero)</div>
+        <p>A Cloud Center of Excellence is the organizational team responsible for enabling, governing, and scaling cloud adoption across an enterprise. It is part team, part function, part community of practice. Organizations with a mature CCoE adopt cloud 4–5x faster than those without one.</p>
+        <p>As a consultant, you can be hired to design, stand up, and lead a CCoE as an interim or advisory capacity — this is some of the highest-value and longest-duration consulting work available.</p>
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="cc-icon">👥</div>
+          <div class="cc-title">CCoE Team Composition</div>
+          <div class="cc-desc">Cloud Architects (technical leadership), FinOps Practitioners (cost management), Security Engineers (compliance and risk), DevOps Engineers (tooling and automation), Product Owner (prioritization). Typically 5–12 people depending on organization size.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🎯</div>
+          <div class="cc-title">CCoE Operating Model</div>
+          <div class="cc-desc">Two models: Centralized (CCoE does everything) vs. Federated (CCoE enables product teams who do their own cloud work). Best practice for universities and enterprises: Start centralized, evolve to federated over 12–18 months.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">📋</div>
+          <div class="cc-title">CCoE Charter</div>
+          <div class="cc-desc">Every CCoE needs a charter: mission statement, scope of authority, what they control vs. advise, how they measure success (KPIs), how they engage with other teams, and their budget and headcount.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">📈</div>
+          <div class="cc-title">Measuring CCoE Success</div>
+          <div class="cc-desc">KPIs: Cloud adoption rate (% workloads on cloud), cost optimization savings, time to provision new environments, compliance score (% resources meeting policy), incident reduction rate, developer satisfaction score.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🗺️</span> How to Stand Up a CCoE — Your Consulting Engagement Plan</div>
+        <div class="step-list">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Month 1 — Assessment & Charter Design</div><div class="step-desc">Assess current cloud capability maturity. Interview stakeholders. Design the CCoE charter. Secure executive sponsorship. Define the mandate, budget, and initial team.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Month 2–3 — Foundation Building</div><div class="step-desc">Establish Landing Zone (AWS Control Tower). Define tagging and cost allocation standards. Create the cloud governance framework. Build the service catalog of approved architectures.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Month 4–6 — Enablement & First Wins</div><div class="step-desc">Train internal teams. Migrate 2–3 pilot workloads. Demonstrate cost savings and operational improvements. Build internal credibility for the CCoE model.</div></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Month 7–12 — Scale & Operationalize</div><div class="step-desc">Scale to all business units. Establish regular reporting cadences. Transition to self-service model. Evolve from centralized to federated. Your role shifts from builder to advisor.</div></div></div>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn btn-primary" onclick="markDone(5); switchModule(6)">Mark Complete &amp; Continue →</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MODULE 6: RISK & COMPLIANCE -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="panel" id="panel6">
+      <div class="module-header">
+        <div class="module-eyebrow">Module 7 · Weeks 24–27</div>
+        <div class="module-title">Risk Management &amp; Regulatory Compliance Advisory</div>
+        <div class="module-meta">
+          <span class="meta-chip">🔐 Compliance</span>
+          <span class="meta-chip">⏱ 4 Weeks</span>
+          <span class="meta-chip">🎯 Saudi Market Critical</span>
+        </div>
+      </div>
+
+      <div class="alert alert-gold">🇸🇦 <span><strong>Saudi Arabia Context:</strong> The regulatory landscape for cloud in KSA is unique and evolving rapidly. This creates enormous consulting opportunity — organizations need expert guidance on NCA, PDPL, CSP cloud security controls, and Vision 2030 digital government standards. This is your market differentiation.</span></div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">📜</span> Key Saudi Arabia Cloud Compliance Frameworks</div>
+        <table class="data-table">
+          <thead><tr><th>Framework</th><th>Issuing Body</th><th>What it Covers</th><th>AWS Alignment</th></tr></thead>
+          <tbody>
+            <tr><td><strong>NCA Cloud Cybersecurity Controls (CCC)</strong></td><td>National Cybersecurity Authority</td><td>Security requirements for cloud services used by government and critical sectors</td><td>AWS Security Hub, Config, GuardDuty</td></tr>
+            <tr><td><strong>PDPL</strong></td><td>SDAIA</td><td>Personal data protection, consent, data residency, cross-border transfer restrictions</td><td>AWS Regions (Bahrain/UAE), encryption, access controls</td></tr>
+            <tr><td><strong>NDMO Cloud Policy</strong></td><td>National Data Management Office</td><td>Government data classification, cloud deployment models, sovereignty requirements</td><td>AWS GovCloud considerations, data residency</td></tr>
+            <tr><td><strong>Digital Government Standard 5.13.2</strong></td><td>Digital Government Authority</td><td>Cloud adoption milestones for government entities</td><td>Full AWS adoption roadmap</td></tr>
+            <tr><td><strong>SAMA Cloud Framework</strong></td><td>Saudi Central Bank</td><td>Cloud risk management for financial institutions</td><td>AWS FS-ISAC, compliance reports</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">⚖️</span> Risk Advisory Framework for Cloud Consulting</div>
+        <div class="step-list">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Risk Identification</div><div class="step-desc">Use the AWS Shared Responsibility Model as your starting map. Categorize risks: Security risks (unauthorized access, data breach), Operational risks (vendor lock-in, outages), Financial risks (cost overrun, license issues), Compliance risks (regulatory violations, data residency).</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Risk Assessment (Likelihood × Impact)</div><div class="step-desc">Build a risk register for each client engagement. Rate each risk: Likelihood (1–5) × Impact (1–5) = Risk Score (1–25). Focus remediation on scores above 12. Present as a heat map to executive audiences.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Risk Treatment Selection</div><div class="step-desc">For each high risk, recommend: Accept (document and monitor), Mitigate (implement controls), Transfer (insurance, SLAs), or Avoid (change the architecture). Document your rationale — this protects you as a consultant and builds trust with the client.</div></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Compliance Gap Analysis</div><div class="step-desc">Map the client's current controls against the required framework (e.g., NCA CCC). Identify gaps. Prioritize by risk level and compliance deadline. Build a remediation roadmap with owners and timelines.</div></div></div>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn btn-primary" onclick="markDone(6); switchModule(7)">Mark Complete &amp; Continue →</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MODULE 7: APN & PRACTICE BUILDING -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="panel" id="panel7">
+      <div class="module-header">
+        <div class="module-eyebrow">Module 8 · Weeks 28–32</div>
+        <div class="module-title">AWS Partner Network &amp; Building Your Practice</div>
+        <div class="module-meta">
+          <span class="meta-chip">🤝 Business Development</span>
+          <span class="meta-chip">⏱ 5 Weeks</span>
+          <span class="meta-chip">🎯 Practice Scaling</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🌐</span> AWS Partner Network (APN) — Your Business Accelerator</div>
+        <p>The AWS Partner Network is the global ecosystem of companies that use AWS to build solutions and services for customers. As an APN partner, you gain access to AWS leads, co-selling opportunities, technical resources, marketing support, and enhanced credibility with enterprise clients. For a Saudi consulting practice, APN status is a significant competitive advantage.</p>
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="cc-icon">🏅</div>
+          <div class="cc-title">APN Consulting Partner Tiers</div>
+          <div class="cc-desc"><strong>Registered:</strong> Entry level, minimal requirements. <strong>Select:</strong> 2 certified individuals, revenue threshold. <strong>Advanced:</strong> More certifications, customer references, revenue. <strong>Premier:</strong> Elite tier, extensive requirements. Start at Registered, target Advanced within 12 months.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🤝</div>
+          <div class="cc-title">Co-Selling with AWS</div>
+          <div class="cc-desc">APN partners can register client opportunities with AWS. AWS sales teams co-sell with partners, meaning AWS may bring you into deals with their enterprise clients. This is a pipeline multiplier — AWS has relationships with every major Saudi government entity and corporation.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">🎓</div>
+          <div class="cc-title">AWS Competencies</div>
+          <div class="cc-desc">AWS Competencies are earned credentials that validate your practice's depth in specific areas (Government, Education, Security, Migration, etc.). A Government Competency signals expertise to Saudi ministry procurement teams — extremely valuable in your target market.</div>
+        </div>
+        <div class="concept-card">
+          <div class="cc-icon">📣</div>
+          <div class="cc-title">Partner-Led Marketing</div>
+          <div class="cc-desc">APN partners can co-brand with AWS, appear in AWS partner finder directories, receive marketing development funds (MDF), and participate in AWS events (re:Invent, local summits). This builds visibility in the market without proportional marketing spend.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🗺️</span> 12-Month Practice Building Roadmap</div>
+        <div class="step-list">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Months 1–3 — Register & Certify</div><div class="step-desc">Register as APN partner (partner.amazonaws.com). Ensure you have required certifications (SAA-C03 minimum, SAP-C02 preferred). Define your practice focus: Government Cloud Advisory, Education Sector, or Enterprise Migration.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Months 4–6 — Build Reference Cases</div><div class="step-desc">Document 2–3 client engagements as case studies (with permission). Quantify outcomes: cost saved, time reduced, compliance achieved. Submit as customer references for APN tier advancement. These become your most powerful sales tool.</div><span class="step-action">📄 Deliverable: 3 Client Case Studies</span></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Months 7–9 — Pursue a Competency</div><div class="step-desc">Apply for an AWS Competency aligned with your practice (Government or Education is most relevant for your Saudi market work). This requires technical validation, customer references, and a practice assessment. AWS assigns a Partner Development Manager to guide you.</div></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Months 10–12 — Activate Co-Sell Pipeline</div><div class="step-desc">Register opportunities in APN Customer Engagements (ACE) pipeline. Brief your AWS Partner Development Manager on your target clients. Attend AWS Summit Riyadh. Publish thought leadership on LinkedIn aligned with AWS cloud topics in the Saudi market.</div></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">✅</span> Master Readiness Checklist</div>
+        <ul class="checklist" id="master-checklist">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>AWS SAA-C03 Certified</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>AWS SAP-C02 Certified</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Conducted 2+ Well-Architected Reviews</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Delivered at least 1 executive cloud briefing</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Built at least 1 TCO / Business Case document</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Designed a cloud governance framework for a client</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Completed FinOps Foundation certification (finops.org)</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Registered as APN Consulting Partner</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Created 2+ client case studies with measurable outcomes</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Established LinkedIn thought leadership presence (10+ posts)</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Attended AWS Summit (or equivalent regional event)</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Familiar with NCA CCC and PDPL requirements for cloud</span></li>
+        </ul>
+      </div>
+
+      <div class="quote">
+        <p>"The consultant who moves from 'here is what the technology does' to 'here is what this decision means for your organization in three years' is the one who gets called first, paid most, and trusted longest."</p>
+        <div class="quote-attr">— Strategic Consulting Mastery, Phase 5 Capstone</div>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn btn-primary" onclick="markDone(7); celebrateCompletion()">🏆 Complete Program</button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+  const totalModules = 8;
+  const completed = new Set();
+
+  function switchModule(idx) {
+    document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i === idx));
+    document.querySelectorAll('.nav-tab').forEach((t,i) => t.classList.toggle('active', i === idx));
+    document.querySelectorAll('.sidebar-item').forEach((s,i) => {
+      if (i < totalModules) s.classList.toggle('active', i === idx);
+    });
+    // Update sidebar num highlight
+    for (let i = 0; i < totalModules; i++) {
+      const el = document.getElementById('sn' + i);
+      if (!el) continue;
+      if (completed.has(i)) { el.classList.remove('active-num'); }
+      else if (i === idx) { el.classList.add('active-num'); }
+      else { el.classList.remove('active-num'); }
+    }
+    document.querySelector('.content').scrollTop = 0;
+  }
+
+  function markDone(idx) {
+    completed.add(idx);
+    const si = document.querySelector('.sidebar-item:nth-child(' + (idx + 2) + ')');
+    const sidebarItems = document.querySelectorAll('.sidebar-item');
+    if (sidebarItems[idx]) {
+      sidebarItems[idx].classList.add('done');
+      const num = sidebarItems[idx].querySelector('.si-num');
+      if (num) { num.textContent = '✓'; num.classList.remove('active-num'); }
+    }
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const pct = Math.round((completed.size / totalModules) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-pct').textContent = pct + '% Complete';
+  }
+
+  function toggleCheck(li) {
+    li.classList.toggle('checked');
+    if (li.classList.contains('checked')) li.querySelector('.check-box').textContent = '✓';
+    else li.querySelector('.check-box').textContent = '';
+  }
+
+  function celebrateCompletion() {
+    document.querySelector('.header h1').innerHTML = '🏆 Program <span>Complete!</span>';
+    document.querySelector('.header-sub').textContent = 'Congratulations — you have completed the AWS Strategic Consulting Mastery curriculum. You are now equipped to operate as a trusted cloud advisory leader.';
+    document.getElementById('progress-fill').style.width = '100%';
+    document.getElementById('progress-pct').textContent = '100% Complete';
+  }
+</script>
+
+</body>
+</html>

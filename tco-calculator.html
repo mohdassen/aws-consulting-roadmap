@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud TCO Calculator — AWS vs On-Premises</title>
+<style>
+  :root {
+    --bg:#07090f; --surface:#0e1219; --surface2:#141820;
+    --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12);
+    --text:#e8edf5; --muted:#6b7a94;
+    --green:#34d399; --red:#f87171; --gold:#f59e0b;
+    --blue:#60a5fa; --accent:#c084fc; --accent2:#818cf8;
+    --orange:#fb923c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+
+  /* HEADER */
+  .header{background:linear-gradient(135deg,#070a08,#0d1210,#0a180e);border-bottom:1px solid var(--border);padding:36px 24px 28px;text-align:center;position:relative;overflow:hidden;}
+  .header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(52,211,153,0.08) 0%,transparent 65%);}
+  .header-badge{display:inline-block;font-size:0.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--green);font-weight:700;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);padding:4px 14px;border-radius:20px;margin-bottom:14px;}
+  .header h1{font-family:Georgia,serif;font-size:1.8rem;color:var(--text);margin-bottom:8px;line-height:1.2;}
+  .header h1 span{color:var(--green);font-style:italic;}
+  .header-sub{font-size:0.74rem;color:var(--muted);max-width:540px;margin:0 auto;}
+
+  /* TABS */
+  .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);}
+  .tab{flex:1;padding:14px;text-align:center;cursor:pointer;font-size:0.72rem;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;transition:all 0.2s;}
+  .tab.active{color:var(--green);border-bottom-color:var(--green);}
+  .tab-icon{display:block;font-size:1.1rem;margin-bottom:3px;}
+
+  /* LAYOUT */
+  .main{max-width:1100px;margin:0 auto;padding:24px;}
+  .panel{display:none;}
+  .panel.active{display:block;animation:fadeUp 0.2s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  /* RESULT BANNER */
+  .result-banner{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+  .rb-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;}
+  .rb-label{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+  .rb-value{font-family:Georgia,serif;font-size:1.5rem;font-weight:700;line-height:1;}
+  .rb-sub{font-size:0.62rem;color:var(--muted);margin-top:4px;}
+  .rb-green{color:var(--green);}
+  .rb-red{color:var(--red);}
+  .rb-gold{color:var(--gold);}
+  .rb-accent{color:var(--accent);}
+
+  /* SECTION */
+  .section{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:16px;overflow:hidden;}
+  .section-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
+  .sh-title{font-size:0.82rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+  .sh-total{font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:8px;}
+  .sh-onprem{background:rgba(248,113,113,0.1);color:var(--red);}
+  .sh-aws{background:rgba(52,211,153,0.1);color:var(--green);}
+  .section-body{padding:18px;}
+
+  /* INPUT GRID */
+  .input-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:8px;}
+  .input-group{display:flex;flex-direction:column;gap:5px;}
+  .input-label{font-size:0.64rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+  .input-sub{font-size:0.58rem;color:var(--muted);margin-top:1px;}
+  .inp{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-size:0.8rem;font-family:inherit;width:100%;transition:border 0.2s;outline:none;}
+  .inp:focus{border-color:var(--green);}
+  .inp-prefix{position:relative;}
+  .inp-prefix span{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.75rem;pointer-events:none;}
+  .inp-prefix .inp{padding-left:28px;}
+
+  /* COMPARISON TABLE */
+  .comp-table{width:100%;border-collapse:collapse;font-size:0.72rem;margin-top:8px;}
+  .comp-table th{background:rgba(255,255,255,0.04);color:var(--muted);font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;padding:8px 14px;text-align:left;border-bottom:1px solid var(--border);}
+  .comp-table th:not(:first-child){text-align:right;}
+  .comp-table td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
+  .comp-table td:not(:first-child){text-align:right;font-family:Georgia,serif;}
+  .comp-table tr:last-child td{border-bottom:none;font-weight:700;background:rgba(255,255,255,0.02);}
+  .comp-table tr:hover td{background:rgba(255,255,255,0.02);}
+  .td-onprem{color:var(--red);}
+  .td-aws{color:var(--green);}
+  .td-save{color:var(--gold);}
+
+  /* CHART */
+  .chart-wrap{margin:20px 0;}
+  .chart-title{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;text-align:center;}
+  .bar-chart{display:flex;flex-direction:column;gap:10px;}
+  .bc-row{display:flex;align-items:center;gap:12px;}
+  .bc-label{font-size:0.68rem;color:var(--text);min-width:160px;text-align:right;}
+  .bc-track{flex:1;height:22px;background:rgba(255,255,255,0.04);border-radius:6px;overflow:hidden;position:relative;}
+  .bc-fill{height:100%;border-radius:6px;transition:width 0.6s ease;display:flex;align-items:center;padding-left:8px;}
+  .bc-fill span{font-size:0.62rem;font-weight:700;color:rgba(255,255,255,0.9);white-space:nowrap;}
+  .bc-onprem{background:linear-gradient(90deg,#dc2626,#f87171);}
+  .bc-aws{background:linear-gradient(90deg,#059669,#34d399);}
+
+  /* ROI SUMMARY */
+  .roi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;}
+  .roi-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;}
+  .roi-icon{font-size:1.4rem;margin-bottom:6px;}
+  .roi-label{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+  .roi-value{font-family:Georgia,serif;font-size:1.1rem;font-weight:700;}
+
+  /* ALERT */
+  .alert{border-radius:10px;padding:11px 15px;margin-bottom:14px;font-size:0.7rem;line-height:1.6;display:flex;gap:9px;}
+  .a-green{background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.2);color:var(--green);}
+  .a-gold{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);color:#fbbf24;}
+  .a-blue{background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.2);color:var(--blue);}
+
+  /* TOGGLE */
+  .toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .toggle{width:36px;height:20px;background:rgba(255,255,255,0.1);border-radius:10px;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;}
+  .toggle.on{background:var(--green);}
+  .toggle::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left 0.2s;}
+  .toggle.on::after{left:19px;}
+  .toggle-label{font-size:0.72rem;color:var(--text);}
+  .toggle-sub{font-size:0.62rem;color:var(--muted);}
+
+  /* QUAL BENEFITS */
+  .qual-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+  .qual-card{background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:10px;padding:12px;}
+  .qc-title{font-size:0.75rem;font-weight:700;color:var(--text);margin-bottom:4px;}
+  .qc-desc{font-size:0.67rem;color:var(--muted);line-height:1.55;}
+  .qc-value{font-size:0.7rem;color:var(--green);font-weight:600;margin-top:5px;}
+
+  .divider{border:none;border-top:1px solid var(--border);margin:16px 0;}
+
+  /* PRINT */
+  .print-btn{padding:10px 20px;border-radius:8px;font-size:0.72rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#0a0e1a;transition:opacity 0.2s;float:right;margin-bottom:16px;}
+  .print-btn:hover{opacity:0.85;}
+
+  footer{border-top:1px solid var(--border);text-align:center;padding:18px;font-size:0.62rem;color:var(--muted);clear:both;}
+
+  @media(max-width:700px){
+    .result-banner{grid-template-columns:1fr 1fr;}
+    .input-grid{grid-template-columns:1fr 1fr;}
+    .roi-grid{grid-template-columns:1fr 1fr;}
+    .qual-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-badge">💰 Financial Advisory Tool</div>
+  <h1>Cloud <span>TCO Calculator</span></h1>
+  <p class="header-sub">Compare Total Cost of Ownership: On-Premises vs AWS Cloud. Enter your infrastructure details below to generate an executive-ready cost analysis for Saudi enterprise clients.</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" id="tab-input" onclick="switchTab('input')"><span class="tab-icon">📊</span>Input Parameters</div>
+  <div class="tab" id="tab-result" onclick="switchTab('result')"><span class="tab-icon">💡</span>TCO Analysis</div>
+  <div class="tab" id="tab-exec" onclick="switchTab('exec')"><span class="tab-icon">📄</span>Executive Summary</div>
+</div>
+
+<div class="main">
+
+  <!-- ════════════════ INPUT PANEL ════════════════ -->
+  <div class="panel active" id="panel-input">
+    <div class="alert a-blue">💡 <span><strong>Instructions:</strong> Enter your current on-premises costs in the fields below. AWS costs are calculated automatically based on your workload specifications. All amounts in Saudi Riyals (SAR). Change any value and click "Calculate TCO" to update results.</span></div>
+
+    <!-- COMPUTE -->
+    <div class="section">
+      <div class="section-head" onclick="toggleSection(this)">
+        <div class="sh-title">🖥️ Compute Infrastructure</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="sh-total sh-onprem" id="tot-compute-onprem">SAR 0</span>
+          <span style="color:var(--muted);font-size:0.7rem;">vs</span>
+          <span class="sh-total sh-aws" id="tot-compute-aws">SAR 0</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="input-grid">
+          <div class="input-group">
+            <div class="input-label">Number of Physical Servers</div>
+            <div class="input-sub">Current production servers</div>
+            <input class="inp" type="number" id="srv-count" value="20" min="1" oninput="calculate()">
+          </div>
+          <div class="input-group">
+            <div class="input-label">Avg Server Cost (SAR)</div>
+            <div class="input-sub">Hardware purchase price</div>
+            <div class="inp-prefix"><span>﷼</span><input class="inp" type="number" id="srv-cost" value="75000" oninput="calculate()"></div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">Server Refresh Cycle (years)</div>
+            <div class="input-sub">Typical 3-5 years</div>
+            <input class="inp" type="number" id="srv-refresh" value="4" min="1" max="10" oninput="calculate()">
+          </div>
+          <div class="input-group">
+            <div class="input-label">Annual Server Maintenance (SAR)</div>
+            <div class="input-sub">Support contracts, parts</div>
+            <div class="inp-prefix"><span>﷼</span><input class="inp" type="number" id="srv-maint" value="180000" oninput="calculate()"></div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">Average CPU Utilization (%)</div>
+            <div class="input-sub">Honest average, not peak</div>
+            <input class="inp" type="number" id="srv-util" value="15" min="1" max="100" oninput="calculate()">
+          </div>
+          <div class="input-group">
+            <div class="input-label">Annual Software Licensing (SAR)</div>
+            <div class="input-sub">OS, hypervisor, tools</div>
+            <div class="inp-prefix"><span>﷼</span><input class="inp" type="number" id="srv-lic" value="120000" oninput="calculate()"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA CENTER -->
+    <div class="section">
+      <div class="section-head" onclick="toggleSection(this)">
+        <div class="sh-title">🏢 Data Center Costs</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="sh-total sh-onprem" id="tot-dc-onprem">SAR 0</span>
+          <span style="color:var(--muted);font-size:0.7rem;">vs</span>
+          <span class="sh-total sh-aws" id="tot-dc-aws">SAR 0</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="input-grid">
+          <div class="input-group">
+            <div class="input-label">Annual DC Lease / Facility (SAR)</div>
+            <div class="input-sub">Colocation or owned facility</div>
+            <div class="inp-prefix"><span>﷼</span><input class="inp" type="number" id="dc-lease" value="360000" oninput="calculate()"></div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">Annual Power & Cooling (SAR)</div>
+            <div class="input-sub">Electricity + HVAC costs</div>
+            <div class="inp-prefix"><span>﷼</span><input class="inp" type="number" id="dc-power" value="240000" oninput="calculate()"></div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">Annual Network Connectivity (SAR)</div>
+            <div class="input-sub">Internet, MPLS, WAN links</div>
+            <div class="inp-prefix"><span>﷼</span><input class="inp" type="number" id="dc-net" value="180000" oninput="calculate()"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STORAGE -->
+    <div class="section">
+      <div class="section-head" onclick="toggleSection(this)">
+        <div class="sh-title">💾 Storage Infrastructure</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="sh-total sh-onprem" id="tot-storage-onprem">SAR 0</span>
+          <span style="color:var(--muted);font-size:0.7rem;">vs</span>
+          <span class="sh-total sh-aws" id="tot-storage-aws">SAR 0</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="input-grid">
+          <div class="input-group">
+            <div class="input-label">Total Storage Capacity (TB)</div>
+            <div class="input-sub">Current provisioned storage</div>
+            <input class="inp" type="number" id="stor-tb" value="100" oninput="calculate()">
+          </div>
+          <div class="input-group">
+            <div class="input-label">Storage Hardware Cost / TB (SAR)</div>
+            <div class="input-sub">SAN/NAS per TB cost</div>
+            <div class="inp-prefix"><span>﷼</span><input class="inp" type="number" id="stor-cost" value="8000" oninput="calculate()"></div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">Annual Storage Admin Cost (SAR)</div>
+            <div class="input-sub">Staff time for storage mgmt</div>
+            <div class="inp-prefix"><span>﷼</span><input class="inp" type="number" id="stor-admin" value="60000" oninput="calculate()"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAFFING -->
+    <div class="section">
+      <div class="section-head" onclick="toggleSection(this)">
+        <div class="sh-title">👥 IT Staffing & Operations</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="sh-total sh-onprem" id="tot-staff-onprem">SAR 0</span>
+          <span style="color:var(--muted);font-size:0.7rem;">vs</span>
+          <span class="sh-total sh-aws" id="tot-staff-aws">SAR 0</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="input-grid">
+          <div class="input-group">
+            <div class="input-label">Infra Staff Headcount</div>
+            <div class="input-sub">FTEs managing on-prem</div>
+            <input class="inp" type="number" id="staff-count" value="5" min="0" oninput="calculate()">
+          </div>
+          <div class="input-group">
+            <div class="input-label">Avg Annual Salary / FTE (SAR)</div>
+            <div class="input-sub">Total comp incl. benefits</div>
+            <div class="inp-prefix"><span>﷼</span><input class="inp" type="number" id="staff-salary" value="180000" oninput="calculate()"></div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">% Time on Infra Management</div>
+            <div class="input-sub">That cloud would eliminate</div>
+            <input class="inp" type="number" id="staff-pct" value="60" min="0" max="100" oninput="calculate()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOWNTIME -->
+    <div class="section">
+      <div class="section-head" onclick="toggleSection(this)">
+        <div class="sh-title">⚠️ Downtime & Risk Costs</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="sh-total sh-onprem" id="tot-down-onprem">SAR 0</span>
+          <span style="color:var(--muted);font-size:0.7rem;">vs</span>
+          <span class="sh-total sh-aws" id="tot-down-aws">SAR 0</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="input-grid">
+          <div class="input-group">
+            <div class="input-label">Unplanned Downtime Hours / Year</div>
+            <div class="input-sub">On-premises actual hours</div>
+            <input class="inp" type="number" id="down-hours" value="24" min="0" oninput="calculate()">
+          </div>
+          <div class="input-group">
+            <div class="input-label">Cost per Downtime Hour (SAR)</div>
+            <div class="input-sub">Revenue + productivity loss</div>
+            <div class="inp-prefix"><span>﷼</span><input class="inp" type="number" id="down-cost" value="50000" oninput="calculate()"></div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">DR / Backup Infrastructure (SAR/yr)</div>
+            <div class="input-sub">Secondary site, backup hardware</div>
+            <div class="inp-prefix"><span>﷼</span><input class="inp" type="number" id="dr-cost" value="200000" oninput="calculate()"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AWS OPTIONS -->
+    <div class="section">
+      <div class="section-head" onclick="toggleSection(this)">
+        <div class="sh-title">☁️ AWS Optimization Options</div>
+        <span style="font-size:0.65rem;color:var(--muted);">Applied to AWS side of calculation</span>
+      </div>
+      <div class="section-body">
+        <div class="toggle-row">
+          <div class="toggle on" id="tog-sp" onclick="toggleOpt(this,'sp')"></div>
+          <div><div class="toggle-label">Apply Savings Plans (1-year)</div><div class="toggle-sub">~30% discount on compute vs On-Demand</div></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle on" id="tog-grav" onclick="toggleOpt(this,'grav')"></div>
+          <div><div class="toggle-label">Use Graviton3 ARM Instances</div><div class="toggle-sub">Additional 20% price/performance improvement</div></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle on" id="tog-spot" onclick="toggleOpt(this,'spot')"></div>
+          <div><div class="toggle-label">Spot Instances for Non-Critical Workloads (40%)</div><div class="toggle-sub">~70% discount on eligible workloads</div></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle on" id="tog-s3" onclick="toggleOpt(this,'s3')"></div>
+          <div><div class="toggle-label">S3 Intelligent Tiering for Storage</div><div class="toggle-sub">Automatic cost optimization for infrequent access data</div></div>
+        </div>
+        <div class="toggle-row">
+          <div class="input-group" style="flex-direction:row;align-items:center;gap:12px;">
+            <div class="toggle-label">Analysis Period (years):</div>
+            <input class="inp" type="number" id="years" value="3" min="1" max="5" style="width:70px;" oninput="calculate()">
+          </div>
+        </div>
+        <br>
+        <button onclick="calculate(); switchTab('result')" style="padding:10px 24px;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;background:linear-gradient(135deg,#059669,#34d399);color:#0a0e1a;width:100%;letter-spacing:0.5px;">
+          ⚡ Calculate TCO & View Analysis →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ RESULT PANEL ════════════════ -->
+  <div class="panel" id="panel-result">
+    <button class="print-btn" onclick="window.print()">🖨️ Export Report</button>
+
+    <!-- RESULT CARDS -->
+    <div class="result-banner">
+      <div class="rb-card">
+        <div class="rb-label">On-Premises (<span id="rb-yrs">3</span>-Year Total)</div>
+        <div class="rb-value rb-red" id="rb-onprem">SAR 0</div>
+        <div class="rb-sub">Full infrastructure cost</div>
+      </div>
+      <div class="rb-card">
+        <div class="rb-label">AWS Cloud (<span id="rb-yrs2">3</span>-Year Total)</div>
+        <div class="rb-value rb-green" id="rb-aws">SAR 0</div>
+        <div class="rb-sub">Including migration (Y1 premium)</div>
+      </div>
+      <div class="rb-card">
+        <div class="rb-label">Total Savings</div>
+        <div class="rb-value rb-gold" id="rb-save">SAR 0</div>
+        <div class="rb-sub" id="rb-save-pct">0% cost reduction</div>
+      </div>
+      <div class="rb-card">
+        <div class="rb-label">ROI / Payback Period</div>
+        <div class="rb-value rb-accent" id="rb-roi">0%</div>
+        <div class="rb-sub" id="rb-payback">Payback: — months</div>
+      </div>
+    </div>
+
+    <!-- YEAR-BY-YEAR -->
+    <div class="section">
+      <div class="section-head"><div class="sh-title">📅 Year-by-Year Cost Comparison (SAR)</div></div>
+      <div class="section-body">
+        <table class="comp-table" id="yearly-table">
+          <thead><tr><th>Cost Category</th><th class="td-onprem">On-Prem Y1</th><th class="td-aws">AWS Y1</th><th class="td-onprem">On-Prem Y2</th><th class="td-aws">AWS Y2</th><th class="td-onprem">On-Prem Y3</th><th class="td-aws">AWS Y3</th></tr></thead>
+          <tbody id="yearly-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BAR CHART -->
+    <div class="section">
+      <div class="section-head"><div class="sh-title">📊 Cost Breakdown Visual Comparison</div></div>
+      <div class="section-body">
+        <div class="chart-wrap">
+          <div class="chart-title">Annual Cost by Category — On-Premises vs AWS (SAR)</div>
+          <div class="bar-chart" id="bar-chart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROI METRICS -->
+    <div class="section">
+      <div class="section-head"><div class="sh-title">📈 ROI & Financial Metrics</div></div>
+      <div class="section-body">
+        <div class="roi-grid">
+          <div class="roi-card"><div class="roi-icon">💰</div><div class="roi-label">Annual Savings</div><div class="roi-value rb-green" id="roi-annual">SAR 0</div></div>
+          <div class="roi-card"><div class="roi-icon">📅</div><div class="roi-label">Payback Period</div><div class="roi-value rb-gold" id="roi-payback">— months</div></div>
+          <div class="roi-card"><div class="roi-icon">📊</div><div class="roi-label">3-Year ROI</div><div class="roi-value rb-accent" id="roi-pct">0%</div></div>
+          <div class="roi-card"><div class="roi-icon">🏗️</div><div class="roi-label">Migration Investment</div><div class="roi-value rb-red" id="roi-migration">SAR 0</div></div>
+          <div class="roi-card"><div class="roi-icon">⚡</div><div class="roi-label">Cost per Server Equivalent</div><div class="roi-value rb-blue" id="roi-perserver">SAR 0</div></div>
+          <div class="roi-card"><div class="roi-icon">📉</div><div class="roi-label">Cost Reduction %</div><div class="roi-value rb-green" id="roi-reduction">0%</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SENSITIVITY -->
+    <div class="section">
+      <div class="section-head"><div class="sh-title">🎯 Sensitivity Analysis</div></div>
+      <div class="section-body">
+        <div class="alert a-gold">⚡ <span><strong>Conservative Scenario:</strong> What if AWS costs are 20% higher than estimated? The analysis below shows the savings range to demonstrate the business case holds even in worst-case scenarios.</span></div>
+        <table class="comp-table">
+          <thead><tr><th>Scenario</th><th>AWS Cost</th><th>3-Year Savings</th><th>ROI</th><th>Recommendation</th></tr></thead>
+          <tbody id="sensitivity-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ EXEC PANEL ════════════════ -->
+  <div class="panel" id="panel-exec">
+    <button class="print-btn" onclick="window.print()">🖨️ Print for Client</button>
+
+    <div class="alert a-green">📄 <span><strong>Executive Summary</strong> — This page is formatted as a client-ready briefing. Print or screenshot to include in your consulting proposal or board presentation.</span></div>
+
+    <div class="section">
+      <div class="section-head"><div class="sh-title">📋 Executive Summary — Cloud Migration Business Case</div></div>
+      <div class="section-body">
+        <p style="font-size:0.78rem;color:var(--muted);line-height:1.7;margin-bottom:16px;" id="exec-narrative">Complete the input fields and calculate to generate the executive narrative.</p>
+
+        <div class="divider"></div>
+
+        <div style="font-size:0.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Key Financial Findings</div>
+        <table class="comp-table">
+          <thead><tr><th>Metric</th><th>Value</th><th>Business Implication</th></tr></thead>
+          <tbody id="exec-table"></tbody>
+        </table>
+
+        <div class="divider"></div>
+
+        <div style="font-size:0.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Non-Financial Benefits</div>
+        <div class="qual-grid">
+          <div class="qual-card">
+            <div class="qc-title">⚡ Agility & Speed to Market</div>
+            <div class="qc-desc">New environments provisioned in minutes vs weeks. Developers can experiment and innovate without infrastructure bottlenecks. New services can be deployed globally without physical infrastructure build-out.</div>
+            <div class="qc-value">↑ Feature delivery velocity 3–5x</div>
+          </div>
+          <div class="qual-card">
+            <div class="qc-title">🔐 Security & Compliance</div>
+            <div class="qc-desc">AWS provides 300+ security, compliance, and governance services. Automated compliance monitoring and enforcement. NCA, PDPL, and NDMO alignment built into platform controls.</div>
+            <div class="qc-value">↓ Security risk exposure significantly</div>
+          </div>
+          <div class="qual-card">
+            <div class="qc-title">🌍 Global Reach</div>
+            <div class="qc-desc">Deploy to 30+ AWS Regions globally without physical infrastructure investment. Content delivered from 450+ CloudFront edge locations. Expansion to new markets in days, not months.</div>
+            <div class="qc-value">Global presence with zero capex</div>
+          </div>
+          <div class="qual-card">
+            <div class="qc-title">👥 Staff Reallocation</div>
+            <div class="qc-desc">Infrastructure management time freed up can be reinvested in innovation, digital services, and strategic projects. Team upskilling to cloud creates new internal capability and higher retention.</div>
+            <div class="qc-value" id="exec-staff-value">↑ Innovation capacity</div>
+          </div>
+          <div class="qual-card">
+            <div class="qc-title">🇸🇦 Vision 2030 Alignment</div>
+            <div class="qc-desc">Cloud adoption directly supports Vision 2030 digital transformation objectives and Digital Government Standard 5.13.2 compliance requirements. Positions organization as a digital transformation leader.</div>
+            <div class="qc-value">Strategic regulatory alignment</div>
+          </div>
+          <div class="qual-card">
+            <div class="qc-title">📈 Scalability</div>
+            <div class="qc-desc">Scale instantly to handle demand spikes without over-provisioning static capacity. Pay-per-use model eliminates waste from provisioned-but-idle resources. Auto-scaling responds to real demand in real time.</div>
+            <div class="qc-value">Eliminate over-provisioning waste</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div style="font-size:0.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Recommended Next Steps</div>
+        <div style="font-size:0.73rem;color:var(--muted);line-height:1.8;">
+          <span style="color:var(--text);">1. Approve Phase 1 Discovery & Assessment</span> — 4-week engagement to validate TCO assumptions with actual infrastructure inventory and AWS Migration Evaluator analysis.<br>
+          <span style="color:var(--text);">2. Conduct AWS Well-Architected Review</span> — Assess target architecture against all 6 pillars before migration begins.<br>
+          <span style="color:var(--text);">3. Define Migration Wave Plan</span> — Prioritize workloads using 7Rs framework (Retire, Retain, Rehost, Replatform, Refactor, Repurchase, Relocate).<br>
+          <span style="color:var(--text);">4. Establish Cloud Governance Foundation</span> — Deploy Landing Zone, SCPs, and tagging standards before first workload migration.<br>
+          <span style="color:var(--text);">5. Execute Pilot Migration</span> — Migrate 2–3 non-critical workloads to validate estimates and build team capability.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+<footer>☁️ Cloud TCO Calculator · AWS vs On-Premises · Saudi Arabia · For Consulting Advisory Use · Mohammad Dassen</footer>
+
+<script>
+  // Options state
+  const opts = { sp: true, grav: true, spot: true, s3: true };
+
+  function toggleOpt(el, key) {
+    opts[key] = !opts[key];
+    el.classList.toggle('on', opts[key]);
+    calculate();
+  }
+  function toggleSection(head) {
+    const body = head.nextElementSibling;
+    body.style.display = body.style.display === 'none' ? 'block' : '';
+  }
+  function switchTab(t) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(tb => tb.classList.remove('active'));
+    document.getElementById('panel-' + t).classList.add('active');
+    document.getElementById('tab-' + t).classList.add('active');
+  }
+
+  function fmt(n) { return 'SAR ' + Math.round(n).toLocaleString(); }
+  function fmtN(n) { return Math.round(n).toLocaleString(); }
+
+  function calculate() {
+    const yrs = parseInt(document.getElementById('years').value) || 3;
+
+    // ── On-Prem Costs ──
+    const srvCount  = +document.getElementById('srv-count').value  || 0;
+    const srvCost   = +document.getElementById('srv-cost').value   || 0;
+    const srvRef    = +document.getElementById('srv-refresh').value || 4;
+    const srvMaint  = +document.getElementById('srv-maint').value  || 0;
+    const srvLic    = +document.getElementById('srv-lic').value    || 0;
+    const srvUtil   = +document.getElementById('srv-util').value   || 15;
+    const dcLease   = +document.getElementById('dc-lease').value   || 0;
+    const dcPower   = +document.getElementById('dc-power').value   || 0;
+    const dcNet     = +document.getElementById('dc-net').value     || 0;
+    const storTb    = +document.getElementById('stor-tb').value    || 0;
+    const storCost  = +document.getElementById('stor-cost').value  || 0;
+    const storAdmin = +document.getElementById('stor-admin').value || 0;
+    const staffN    = +document.getElementById('staff-count').value|| 0;
+    const staffSal  = +document.getElementById('staff-salary').value|| 0;
+    const staffPct  = +document.getElementById('staff-pct').value  || 0;
+    const downHrs   = +document.getElementById('down-hours').value || 0;
+    const downCost  = +document.getElementById('down-cost').value  || 0;
+    const drCost    = +document.getElementById('dr-cost').value    || 0;
+
+    // Annual on-prem breakdown
+    const op_compute = (srvCount * srvCost / srvRef) + srvMaint + srvLic;
+    const op_dc      = dcLease + dcPower + dcNet;
+    const op_storage = (storTb * storCost / srvRef) + storAdmin;
+    const op_staff   = staffN * staffSal * (staffPct / 100);
+    const op_down    = (downHrs * downCost) + drCost;
+    const op_annual  = op_compute + op_dc + op_storage + op_staff + op_down;
+
+    // ── AWS Costs ──
+    // Compute: right-sized based on utilization, with pricing optimizations
+    const srvEquiv   = Math.max(1, Math.ceil(srvCount * (srvUtil / 100) * 1.3)); // right-sized + 30% headroom
+    const baseEC2    = srvEquiv * 28000; // SAR ~28k/server/year On-Demand equivalent (m5.xlarge class)
+    let   awsEC2     = baseEC2;
+    if (opts.sp)   awsEC2 *= 0.72;  // Savings Plans: 28% off
+    if (opts.grav) awsEC2 *= 0.82;  // Graviton: 18% additional
+    if (opts.spot) awsEC2 *= 0.88;  // 40% spot at 70% disc: weighted ~12% off
+    const awsCompute = awsEC2 + (srvLic * 0.2); // some licensing eliminated
+    const awsCompute_maint = srvMaint * 0.05;    // AWS managed = near zero maintenance
+
+    // Storage
+    const s3Rate     = opts.s3 ? 85 : 110; // SAR per TB per year (S3 standard vs intelligent tiering)
+    const awsStorage = storTb * s3Rate + (storAdmin * 0.15); // dramatically reduced admin
+
+    // Network
+    const awsNet     = dcNet * 0.6; // CloudFront + data transfer often cheaper at scale
+
+    // Staff (30% reduction in infra overhead, staff redeployed)
+    const awsStaff   = staffN * staffSal * (staffPct / 100) * 0.35; // 65% reduction in infra management
+
+    // Downtime (Multi-AZ reduces unplanned downtime by ~85%)
+    const awsDown    = (downHrs * 0.15 * downCost) + (drCost * 0.15); // DR dramatically cheaper with AWS
+
+    // AWS management overhead (CloudWatch, Config, etc.)
+    const awsMgmt    = 18000 * Math.ceil(srvCount / 5); // ~SAR 18k per 5-server equivalent
+
+    const aws_annual = awsCompute + awsCompute_maint + awsStorage + awsNet + awsStaff + awsDown + awsMgmt;
+
+    // Migration cost (Y1 one-time)
+    const migrationCost = op_annual * 0.25; // typically 25% of first year on-prem cost
+
+    // Multi-year
+    let totalOnPrem = 0, totalAWS = 0;
+    const yearlyOnPrem = [], yearlyAWS = [];
+    for (let y = 1; y <= yrs; y++) {
+      const yop  = op_annual * Math.pow(1.05, y-1); // 5% annual infra cost growth
+      const yaws = aws_annual * Math.pow(1.02, y-1); // 2% AWS cost growth (pricing generally decreasing)
+      const ymig = y === 1 ? migrationCost : 0;
+      yearlyOnPrem.push(yop);
+      yearlyAWS.push(yaws + ymig);
+      totalOnPrem += yop;
+      totalAWS    += yaws + ymig;
+    }
+
+    const totalSave   = totalOnPrem - totalAWS;
+    const annualSave  = op_annual - aws_annual;
+    const paybackMths = annualSave > 0 ? Math.ceil((migrationCost / annualSave) * 12) : 999;
+    const roi         = totalAWS > 0 ? Math.round(((totalSave) / totalAWS) * 100) : 0;
+    const reduction   = totalOnPrem > 0 ? Math.round((totalSave / totalOnPrem) * 100) : 0;
+
+    // ── Update UI ──
+    // Section totals
+    document.getElementById('tot-compute-onprem').textContent = 'SAR ' + fmtN(op_compute);
+    document.getElementById('tot-compute-aws').textContent    = 'SAR ' + fmtN(awsCompute + awsCompute_maint);
+    document.getElementById('tot-dc-onprem').textContent      = 'SAR ' + fmtN(op_dc);
+    document.getElementById('tot-dc-aws').textContent         = 'SAR ' + fmtN(awsNet + awsMgmt);
+    document.getElementById('tot-storage-onprem').textContent = 'SAR ' + fmtN(op_storage);
+    document.getElementById('tot-storage-aws').textContent    = 'SAR ' + fmtN(awsStorage);
+    document.getElementById('tot-staff-onprem').textContent   = 'SAR ' + fmtN(op_staff);
+    document.getElementById('tot-staff-aws').textContent      = 'SAR ' + fmtN(awsStaff);
+    document.getElementById('tot-down-onprem').textContent    = 'SAR ' + fmtN(op_down);
+    document.getElementById('tot-down-aws').textContent       = 'SAR ' + fmtN(awsDown);
+
+    // Result banner
+    ['rb-yrs','rb-yrs2'].forEach(id => document.getElementById(id).textContent = yrs);
+    document.getElementById('rb-onprem').textContent  = fmt(totalOnPrem);
+    document.getElementById('rb-aws').textContent     = fmt(totalAWS);
+    document.getElementById('rb-save').textContent    = totalSave >= 0 ? fmt(totalSave) : '—';
+    document.getElementById('rb-save-pct').textContent = reduction + '% cost reduction';
+    document.getElementById('rb-roi').textContent     = roi + '%';
+    document.getElementById('rb-payback').textContent = paybackMths < 999 ? 'Payback: ' + paybackMths + ' months' : 'Payback: >5 years';
+
+    // Yearly table
+    const cats = [
+      ['Compute & Infrastructure', yearlyOnPrem.map(y=>y*(op_compute/op_annual)), yearlyAWS.map((y,i)=>awsCompute+awsCompute_maint+(i===0?migrationCost*0.4:0))],
+      ['Data Center & Facilities',  yearlyOnPrem.map(y=>y*(op_dc/op_annual)), yearlyAWS.map(()=>awsNet+awsMgmt)],
+      ['Storage',                    yearlyOnPrem.map(y=>y*(op_storage/op_annual)), yearlyAWS.map(()=>awsStorage)],
+      ['Staffing (Infra %)',         yearlyOnPrem.map(y=>y*(op_staff/op_annual)), yearlyAWS.map(()=>awsStaff)],
+      ['Downtime & DR',              yearlyOnPrem.map(y=>y*(op_down/op_annual)), yearlyAWS.map((y,i)=>awsDown+(i===0?migrationCost*0.6:0))],
+    ];
+    let tBody = '';
+    cats.forEach(([label, opArr, awsArr]) => {
+      tBody += '<tr><td>' + label + '</td>';
+      for (let y = 0; y < Math.min(yrs, 3); y++) {
+        tBody += '<td class="td-onprem">' + fmtN(opArr[y]||0) + '</td>';
+        tBody += '<td class="td-aws">' + fmtN(awsArr[y]||0) + '</td>';
+      }
+      tBody += '</tr>';
+    });
+    // Totals row
+    tBody += '<tr><td><strong>TOTAL</strong></td>';
+    for (let y = 0; y < Math.min(yrs, 3); y++) {
+      tBody += '<td class="td-onprem"><strong>' + fmtN(yearlyOnPrem[y]||0) + '</strong></td>';
+      tBody += '<td class="td-aws"><strong>' + fmtN(yearlyAWS[y]||0) + '</strong></td>';
+    }
+    tBody += '</tr>';
+    document.getElementById('yearly-body').innerHTML = tBody;
+
+    // Bar chart
+    const maxVal = Math.max(op_compute, op_dc, op_storage, op_staff, op_down);
+    const barCats = [
+      ['Compute', op_compute, awsCompute + awsCompute_maint],
+      ['Data Center', op_dc, awsNet + awsMgmt],
+      ['Storage', op_storage, awsStorage],
+      ['Staffing', op_staff, awsStaff],
+      ['Downtime & DR', op_down, awsDown],
+    ];
+    let barHtml = '';
+    barCats.forEach(([label, op, aws]) => {
+      const opPct  = maxVal > 0 ? Math.max(4, (op/maxVal)*100) : 0;
+      const awsPct = maxVal > 0 ? Math.max(4, (aws/maxVal)*100) : 0;
+      barHtml += `<div class="bc-row"><div class="bc-label">${label}</div><div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+        <div class="bc-track"><div class="bc-fill bc-onprem" style="width:${opPct}%"><span>﷼${fmtN(op)}</span></div></div>
+        <div class="bc-track"><div class="bc-fill bc-aws" style="width:${awsPct}%"><span>﷼${fmtN(aws)}</span></div></div>
+      </div></div>`;
+    });
+    document.getElementById('bar-chart').innerHTML = barHtml;
+
+    // ROI metrics
+    document.getElementById('roi-annual').textContent    = fmt(annualSave);
+    document.getElementById('roi-payback').textContent   = paybackMths < 999 ? paybackMths + ' months' : '>5 years';
+    document.getElementById('roi-pct').textContent       = roi + '%';
+    document.getElementById('roi-migration').textContent = fmt(migrationCost);
+    document.getElementById('roi-perserver').textContent = 'SAR ' + fmtN(aws_annual / srvEquiv) + '/server equiv.';
+    document.getElementById('roi-reduction').textContent = reduction + '%';
+
+    // Sensitivity
+    const sensScenarios = [
+      ['Optimistic (AWS 10% lower)', totalAWS * 0.9, totalOnPrem - totalAWS * 0.9],
+      ['Base Case', totalAWS, totalSave],
+      ['Conservative (AWS 20% higher)', totalAWS * 1.2, totalOnPrem - totalAWS * 1.2],
+    ];
+    let sensHtml = '';
+    sensScenarios.forEach(([s, awsCost, save]) => {
+      const sRoi = awsCost > 0 ? Math.round(((save)/awsCost)*100) : 0;
+      const color = save > 0 ? 'var(--green)' : 'var(--red)';
+      const badge = save > 0 ? 'b-green' : 'b-red';
+      sensHtml += `<tr><td>${s}</td><td>${fmt(awsCost)}</td><td style="color:${color};font-weight:700;">${fmt(Math.abs(save))} ${save>0?'saved':'more'}</td><td>${sRoi}%</td><td><span class="badge ${badge}">${save>0?'✅ Proceed':'⚠️ Review'}</span></td></tr>`;
+    });
+    document.getElementById('sensitivity-body').innerHTML = sensHtml;
+
+    // Executive panel
+    document.getElementById('exec-narrative').textContent =
+      `Based on the ${yrs}-year TCO analysis, migrating from on-premises infrastructure to AWS represents a compelling financial opportunity. ` +
+      `The current on-premises environment costs an estimated ${fmt(op_annual)} per year across compute, facilities, storage, staffing, and downtime. ` +
+      `The equivalent AWS architecture — right-sized, with Savings Plans and optimization — is estimated at ${fmt(aws_annual)} per year, ` +
+      `representing a ${reduction}% cost reduction. ` +
+      `Over ${yrs} years, this generates total savings of ${fmt(totalSave)}, with an investment payback period of ${paybackMths} months. ` +
+      `The ${yrs}-year ROI is ${roi}%, with migration investment estimated at ${fmt(migrationCost)}. ` +
+      `These estimates are based on AWS Middle East (Bahrain) pricing and assume adoption of compute savings plans and right-sizing. ` +
+      `Detailed validation using AWS Migration Evaluator is recommended as the next step.`;
+
+    const execRows = [
+      ['3-Year On-Premises Cost', fmt(totalOnPrem), 'Full infrastructure ownership cost'],
+      ['3-Year AWS Cloud Cost', fmt(totalAWS), 'Including Year 1 migration investment'],
+      ['Total 3-Year Savings', fmt(totalSave), `${reduction}% reduction in total IT spend`],
+      ['Annual Recurring Savings', fmt(annualSave), 'From Year 2 onward'],
+      ['Migration Investment', fmt(migrationCost), 'One-time, Year 1 only'],
+      ['Payback Period', paybackMths + ' months', 'Time to recover migration investment'],
+      ['3-Year ROI', roi + '%', 'Return on migration investment'],
+      ['Server Optimization', `${srvCount} physical → ${srvEquiv} cloud equiv.`, `${Math.round((1-srvEquiv/srvCount)*100)}% reduction via right-sizing`],
+    ];
+    let execHtml = '';
+    execRows.forEach(([m, v, i]) => {
+      execHtml += `<tr><td><strong>${m}</strong></td><td style="color:var(--green);font-family:Georgia,serif;font-weight:700;">${v}</td><td style="color:var(--muted);">${i}</td></tr>`;
+    });
+    document.getElementById('exec-table').innerHTML = execHtml;
+
+    const staffSavHrs = Math.round(staffN * (staffPct/100) * 0.65 * 1800);
+    document.getElementById('exec-staff-value').textContent = `↑ ${fmtN(staffSavHrs)} hours/year reinvested`;
+  }
+
+  // Init
+  calculate();
+</script>
+</body>
+</html>

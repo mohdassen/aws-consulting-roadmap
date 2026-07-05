@@ -1,0 +1,108 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#09090e"/>
+      <stop offset="50%"  stop-color="#0e0e18"/>
+      <stop offset="100%" stop-color="#0a0a14"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="50%" cy="0%" r="60%">
+      <stop offset="0%"   stop-color="#c084fc" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#c084fc" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="10%" cy="100%" r="40%">
+      <stop offset="0%"   stop-color="#60a5fa" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow3" cx="90%" cy="100%" r="40%">
+      <stop offset="0%"   stop-color="#f59e0b" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow1)"/>
+  <rect width="1200" height="630" fill="url(#glow2)"/>
+  <rect width="1200" height="630" fill="url(#glow3)"/>
+
+  <!-- Top accent bar -->
+  <rect width="1200" height="4" fill="#f59e0b"/>
+
+  <!-- Left purple accent line -->
+  <rect x="72" y="80" width="3" height="440" fill="#c084fc" opacity="0.6"/>
+
+  <!-- Subtle grid lines -->
+  <line x1="0" y1="200" x2="1200" y2="200" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+  <line x1="0" y1="400" x2="1200" y2="400" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+  <line x1="600" y1="0" x2="600" y2="630" stroke="rgba(255,255,255,0.02)" stroke-width="1"/>
+
+  <!-- EYEBROW PILL -->
+  <rect x="96" y="84" width="380" height="28" rx="14" fill="rgba(192,132,252,0.08)" stroke="rgba(192,132,252,0.25)" stroke-width="1"/>
+  <text x="286" y="103" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-size="11" font-weight="700" fill="#c084fc" letter-spacing="2">☁  AWS CLOUD ARCHITECT  ·  RIYADH, KSA</text>
+
+  <!-- MAIN NAME -->
+  <text x="96" y="180" font-family="Georgia,'Times New Roman',serif" font-size="68" font-weight="700" fill="#ecedf2">Mohammad</text>
+  <text x="96" y="255" font-family="Georgia,'Times New Roman',serif" font-size="68" font-weight="700" fill="#c084fc" font-style="italic">Dassen</text>
+
+  <!-- TAGLINE -->
+  <text x="96" y="305" font-family="'Segoe UI',system-ui,sans-serif" font-size="18" fill="#9093aa" letter-spacing="0.5">Strategic Cloud Advisory  ·  NCA &amp; PDPL Compliance  ·  Vision 2030 Aligned</text>
+
+  <!-- Divider -->
+  <line x1="96" y1="330" x2="820" y2="330" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- TOOL PILLS ROW 1 -->
+  <!-- AWS Roadmap -->
+  <rect x="96" y="350" width="210" height="40" rx="8" fill="rgba(245,158,11,0.08)" stroke="rgba(245,158,11,0.3)" stroke-width="1"/>
+  <text x="201" y="375" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="600" fill="#f59e0b">🏛️  18-Month AWS Roadmap</text>
+
+  <!-- Cloud Advisory -->
+  <rect x="318" y="350" width="180" height="40" rx="8" fill="rgba(192,132,252,0.08)" stroke="rgba(192,132,252,0.3)" stroke-width="1"/>
+  <text x="408" y="375" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="600" fill="#c084fc">🎓  Cloud Advisory</text>
+
+  <!-- NCA Compliance -->
+  <rect x="510" y="350" width="220" height="40" rx="8" fill="rgba(248,113,113,0.08)" stroke="rgba(248,113,113,0.3)" stroke-width="1"/>
+  <text x="620" y="375" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="600" fill="#f87171">🇸🇦  NCA &amp; PDPL Checklist</text>
+
+  <!-- TOOL PILLS ROW 2 -->
+  <!-- TCO Calculator -->
+  <rect x="96" y="404" width="210" height="40" rx="8" fill="rgba(52,211,153,0.08)" stroke="rgba(52,211,153,0.3)" stroke-width="1"/>
+  <text x="201" y="429" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="600" fill="#34d399">💰  TCO Calculator (SAR)</text>
+
+  <!-- WAR Template -->
+  <rect x="318" y="404" width="175" height="40" rx="8" fill="rgba(96,165,250,0.08)" stroke="rgba(96,165,250,0.3)" stroke-width="1"/>
+  <text x="406" y="429" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="600" fill="#60a5fa">🏗️  WAR Template</text>
+
+  <!-- Best Practices -->
+  <rect x="505" y="404" width="225" height="40" rx="8" fill="rgba(251,146,60,0.08)" stroke="rgba(251,146,60,0.3)" stroke-width="1"/>
+  <text x="617" y="429" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="600" fill="#fb923c">📋  Best Practices Guide</text>
+
+  <!-- RIGHT SIDE — Stats -->
+  <rect x="860" y="80" width="1" height="470" fill="rgba(255,255,255,0.06)"/>
+
+  <text x="1030" y="150" text-anchor="middle" font-family="Georgia,serif" font-size="52" font-weight="700" fill="#c084fc">20+</text>
+  <text x="1030" y="178" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="11" fill="#6b7a94" letter-spacing="2" text-transform="uppercase">YEARS EXPERIENCE</text>
+
+  <line x1="900" y1="200" x2="1160" y2="200" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+  <text x="1030" y="270" text-anchor="middle" font-family="Georgia,serif" font-size="52" font-weight="700" fill="#f59e0b">6</text>
+  <text x="1030" y="298" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="11" fill="#6b7a94" letter-spacing="2">FREE TOOLS</text>
+
+  <line x1="900" y1="325" x2="1160" y2="325" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+  <text x="1030" y="395" text-anchor="middle" font-family="Georgia,serif" font-size="52" font-weight="700" fill="#34d399">SAR</text>
+  <text x="1030" y="423" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="11" fill="#6b7a94" letter-spacing="2">DENOMINATED</text>
+
+  <line x1="900" y1="450" x2="1160" y2="450" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+  <text x="1030" y="510" text-anchor="middle" font-family="Georgia,serif" font-size="32" font-weight="700" fill="#60a5fa">300+</text>
+  <text x="1030" y="535" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="11" fill="#6b7a94" letter-spacing="2">WAF QUESTIONS</text>
+
+  <!-- BOTTOM STRIP -->
+  <rect y="570" width="1200" height="60" fill="rgba(14,18,25,0.9)"/>
+  <text x="96" y="602" font-family="'Segoe UI',system-ui,sans-serif" font-size="14" fill="#6b7a94">mohdassen.github.io/aws-consulting-roadmap</text>
+  <rect x="820" y="580" width="200" height="30" rx="6" fill="rgba(192,132,252,0.12)" stroke="rgba(192,132,252,0.3)" stroke-width="1"/>
+  <text x="920" y="600" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="700" fill="#c084fc">6 Free Tools  →</text>
+
+  <!-- Bottom accent bar -->
+  <rect y="626" width="1200" height="4" fill="#c084fc" opacity="0.4"/>
+</svg>

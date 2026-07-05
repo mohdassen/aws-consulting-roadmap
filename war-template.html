@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Well-Architected Review Template — Mohammad Dassen</title>
+<style>
+/* ─────────────────────────────────────────────
+   DESIGN SYSTEM
+   Palette: Near-black canvas, warm slate surfaces,
+   amber-gold WAF accent, per-pillar accent colors.
+   Signature: Radial "radar" risk heat map — the one
+   chart that makes a WAR report instantly legible
+   to a CIO without reading a single paragraph.
+───────────────────────────────────────────── */
+:root {
+  --canvas:   #09090d;
+  --surface:  #111116;
+  --surface2: #18181f;
+  --surface3: #1e1e28;
+  --border:   rgba(255,255,255,0.06);
+  --border2:  rgba(255,255,255,0.11);
+  --text:     #ecedf2;
+  --muted:    #6b6e85;
+  --muted2:   #9093aa;
+  --gold:     #e8a428;
+  --gold2:    #f5c55a;
+  --op:   #60a5fa;  /* Operational Excellence - blue  */
+  --sec:  #f87171;  /* Security               - red   */
+  --rel:  #34d399;  /* Reliability            - green */
+  --per:  #a78bfa;  /* Performance            - violet*/
+  --cost: #fb923c;  /* Cost                   - orange*/
+  --sus:  #2dd4bf;  /* Sustainability         - teal  */
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--canvas); color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh; line-height: 1.6;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ── BACK BAR ── */
+.back-bar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 24px; height: 46px; display: flex; align-items: center;
+  position: sticky; top: 0; z-index: 200;
+}
+.back-bar a {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 0.71rem; font-weight: 600; color: var(--muted2);
+  transition: color 0.2s;
+}
+.back-bar a:hover { color: var(--gold); }
+.back-bar .arrow { transition: transform 0.2s; }
+.back-bar a:hover .arrow { transform: translateX(-3px); }
+.back-bar .site-id { margin-left: auto; font-size: 0.61rem; color: var(--muted); }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(160deg, #0c0c14 0%, #0e0e18 55%, #0a0a10 100%);
+  border-bottom: 1px solid var(--border); padding: 72px 32px 64px;
+  text-align: center; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(232,164,40,0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 30% 60% at 10% 100%, rgba(96,165,250,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 60% at 90% 100%, rgba(248,113,113,0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); font-weight: 700;
+  background: rgba(232,164,40,0.08); border: 1px solid rgba(232,164,40,0.22);
+  padding: 5px 16px; border-radius: 20px; margin-bottom: 22px;
+}
+.hero h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2.8rem; font-weight: 700; color: var(--text);
+  line-height: 1.12; margin-bottom: 14px; max-width: 720px; margin-inline: auto;
+}
+.hero h1 em { color: var(--gold); font-style: italic; }
+.hero-desc {
+  font-size: 0.82rem; color: var(--muted2); max-width: 560px;
+  margin: 0 auto 36px; line-height: 1.75;
+}
+.hero-meta { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
+.hero-stat { text-align: center; }
+.hs-num {
+  font-family: Georgia, serif; font-size: 2rem; font-weight: 700;
+  color: var(--gold); line-height: 1;
+}
+.hs-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; margin-top: 4px; }
+
+/* ── NAV TABS ── */
+.nav-tabs {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; overflow-x: auto; scrollbar-width: none;
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+.nav-tab {
+  flex: 1; min-width: 130px; padding: 15px 12px; text-align: center;
+  cursor: pointer; font-size: 0.69rem; font-weight: 600; color: var(--muted2);
+  border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;
+}
+.nav-tab .tab-icon { display: block; font-size: 1.1rem; margin-bottom: 3px; }
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ── LAYOUT ── */
+.layout { display: grid; grid-template-columns: 230px 1fr; min-height: calc(100vh - 192px); }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--surface); border-right: 1px solid var(--border);
+  padding: 20px 0; position: sticky; top: 92px; height: fit-content;
+  max-height: calc(100vh - 92px); overflow-y: auto;
+}
+.sb-section { font-size: 0.54rem; color: var(--muted); text-transform: uppercase; letter-spacing: 2.5px; padding: 12px 18px 5px; }
+.sb-item {
+  display: flex; align-items: center; gap: 9px; padding: 9px 18px;
+  cursor: pointer; font-size: 0.71rem; color: var(--muted2);
+  border-left: 2px solid transparent; transition: all 0.15s;
+}
+.sb-item:hover { color: var(--text); background: rgba(255,255,255,0.025); }
+.sb-item.active { color: var(--gold); background: rgba(232,164,40,0.06); border-left-color: var(--gold); }
+.sb-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.sb-badge { margin-left: auto; font-size: 0.56rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+
+/* ── CONTENT ── */
+.content { padding: 28px; }
+.panel { display: none; }
+.panel.active { display: block; animation: fadeUp 0.22s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:translateY(0) } }
+
+/* ── SECTION PANEL ── */
+.sec-panel { display: none; }
+.sec-panel.active { display: block; animation: fadeUp 0.2s ease; }
+
+/* ── COMPONENTS ── */
+.s-eye { font-size: 0.57rem; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
+.s-title { font-family: Georgia, serif; font-size: 1.35rem; color: var(--text); margin-bottom: 8px; }
+.s-desc { font-size: 0.73rem; color: var(--muted2); line-height: 1.7; margin-bottom: 20px; }
+
+/* Box */
+.box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px; margin-bottom: 14px;
+}
+.box-title { font-size: 0.8rem; font-weight: 700; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.box p { font-size: 0.73rem; color: var(--muted2); line-height: 1.7; margin-bottom: 8px; }
+.box p:last-child { margin: 0; }
+
+/* Pillar cards */
+.pillars-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+.pillar-card {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px; border-left: 3px solid; cursor: pointer; transition: all 0.2s;
+}
+.pillar-card:hover { transform: translateY(-2px); }
+.pc-icon { font-size: 1.3rem; margin-bottom: 7px; }
+.pc-name { font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; }
+.pc-question { font-size: 0.63rem; color: var(--muted2); line-height: 1.5; }
+.pc-risk { font-size: 0.6rem; font-weight: 700; margin-top: 7px; display: inline-block; padding: 2px 8px; border-radius: 4px; }
+
+/* Risk badge */
+.risk-high { background: rgba(248,113,113,0.12); color: #f87171; }
+.risk-med  { background: rgba(251,146,60,0.12);  color: #fb923c; }
+.risk-low  { background: rgba(52,211,153,0.12);  color: #34d399; }
+.risk-none { background: rgba(107,110,133,0.15); color: var(--muted2); }
+
+/* Table */
+.tbl { width: 100%; border-collapse: collapse; font-size: 0.7rem; margin-bottom: 14px; }
+.tbl th { background: rgba(255,255,255,0.04); color: var(--muted); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+.tbl th:not(:first-child) { text-align: center; }
+.tbl td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; line-height: 1.5; }
+.tbl td:not(:first-child) { text-align: center; }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: rgba(255,255,255,0.018); }
+
+/* Steps */
+.step { display: flex; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--border); }
+.step:last-child { border-bottom: none; }
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(232,164,40,0.1); border: 1px solid rgba(232,164,40,0.25);
+  color: var(--gold); display: flex; align-items: center; justify-content: center;
+  font-size: 0.68rem; font-weight: 800; font-family: Georgia, serif;
+}
+.step-title { font-size: 0.79rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.step-desc  { font-size: 0.69rem; color: var(--muted2); line-height: 1.6; }
+.step-tag   { display: inline-block; margin-top: 6px; font-size: 0.6rem; color: var(--gold); background: rgba(232,164,40,0.08); border: 1px solid rgba(232,164,40,0.2); padding: 2px 9px; border-radius: 5px; font-weight: 600; }
+
+/* Alert */
+.alert { border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; font-size: 0.71rem; line-height: 1.65; display: flex; gap: 10px; }
+.a-gold  { background: rgba(232,164,40,0.07);  border: 1px solid rgba(232,164,40,0.2);  color: #f5c55a; }
+.a-green { background: rgba(52,211,153,0.07);  border: 1px solid rgba(52,211,153,0.2);  color: #34d399; }
+.a-blue  { background: rgba(96,165,250,0.07);  border: 1px solid rgba(96,165,250,0.2);  color: #60a5fa; }
+.a-red   { background: rgba(248,113,113,0.07); border: 1px solid rgba(248,113,113,0.2); color: #f87171; }
+
+/* Checklist */
+.checklist { list-style: none; }
+.chk-item {
+  display: flex; gap: 10px; align-items: flex-start; padding: 8px 0;
+  border-bottom: 1px solid var(--border); font-size: 0.71rem; color: var(--muted2);
+  cursor: pointer; transition: color 0.15s;
+}
+.chk-item:hover { color: var(--text); }
+.chk-item:last-child { border-bottom: none; }
+.chk-box {
+  width: 18px; height: 18px; border-radius: 5px; border: 1px solid var(--border2);
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 0.62rem; transition: all 0.2s; margin-top: 1px;
+}
+.chk-item.chked .chk-box { background: var(--gold); border-color: var(--gold); color: #09090d; font-weight: 800; }
+.chk-item.chked > span { text-decoration: line-through; color: var(--muted); }
+
+/* Progress track */
+.prog-row { display: flex; align-items: center; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.prog-row:last-child { border-bottom: none; }
+.prog-label { font-size: 0.69rem; color: var(--text); min-width: 170px; }
+.prog-track { flex: 1; height: 5px; background: rgba(255,255,255,0.05); border-radius: 5px; overflow: hidden; }
+.prog-fill  { height: 100%; border-radius: 5px; transition: width 0.7s ease; }
+.prog-val   { font-size: 0.63rem; color: var(--muted); min-width: 34px; text-align: right; font-family: Georgia, serif; }
+
+/* ── RADAR CHART (SVG) ── */
+.radar-wrap {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px; margin-bottom: 16px;
+  display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;
+}
+.radar-chart { flex-shrink: 0; }
+.radar-legend { flex: 1; min-width: 200px; }
+.rl-title { font-size: 0.63rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+.rl-item { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+.rl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.rl-name { font-size: 0.71rem; color: var(--text); font-weight: 600; flex: 1; }
+.rl-score { font-size: 0.68rem; color: var(--muted2); font-family: Georgia, serif; }
+.rl-bar-wrap { width: 70px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+.rl-bar { height: 100%; border-radius: 4px; }
+
+/* ── HEAT MAP GRID ── */
+.heat-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 4px; margin-bottom: 16px; }
+.heat-cell {
+  border-radius: 6px; padding: 8px 4px; text-align: center;
+  font-size: 0.58rem; font-weight: 700; cursor: pointer; transition: transform 0.15s;
+}
+.heat-cell:hover { transform: scale(1.06); }
+.heat-label { font-size: 0.55rem; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+.h-critical { background: rgba(248,113,113,0.25); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+.h-high     { background: rgba(251,146,60,0.2);  color: #fb923c; border: 1px solid rgba(251,146,60,0.25); }
+.h-med      { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+.h-low      { background: rgba(52,211,153,0.1);  color: #34d399; border: 1px solid rgba(52,211,153,0.15); }
+.h-none     { background: rgba(107,110,133,0.1); color: var(--muted2); border: 1px solid var(--border); }
+
+/* ── TEMPLATE EDITOR ── */
+.template-section {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden; margin-bottom: 12px;
+}
+.ts-header {
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer; transition: background 0.15s;
+}
+.ts-header:hover { background: rgba(255,255,255,0.02); }
+.ts-title { font-size: 0.8rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.ts-meta  { font-size: 0.62rem; color: var(--muted); }
+.ts-body  { padding: 16px 18px; }
+.ts-field {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 10px 12px; width: 100%; color: var(--text);
+  font-size: 0.74rem; font-family: inherit; outline: none; resize: vertical;
+  transition: border 0.2s; margin-bottom: 8px; min-height: 70px;
+}
+.ts-field:focus { border-color: var(--gold); }
+.ts-field::placeholder { color: var(--muted); }
+.ts-input {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 8px 12px; color: var(--text);
+  font-size: 0.74rem; font-family: inherit; outline: none; width: 100%;
+  transition: border 0.2s; margin-bottom: 8px;
+}
+.ts-input:focus { border-color: var(--gold); }
+.field-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; font-weight: 600; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+
+/* Risk selector */
+.risk-select { display: flex; gap: 6px; margin-bottom: 8px; }
+.risk-opt {
+  padding: 5px 12px; border-radius: 6px; font-size: 0.62rem; font-weight: 700;
+  cursor: pointer; border: 1px solid transparent; transition: all 0.15s;
+}
+.risk-opt.active-high { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.4); color: #f87171; }
+.risk-opt.active-med  { background: rgba(251,146,60,0.15);  border-color: rgba(251,146,60,0.4);  color: #fb923c; }
+.risk-opt.active-low  { background: rgba(52,211,153,0.15);  border-color: rgba(52,211,153,0.4);  color: #34d399; }
+.risk-opt:not([class*="active"]) { color: var(--muted2); border-color: var(--border2); background: rgba(255,255,255,0.03); }
+.risk-opt:hover { opacity: 0.8; }
+
+/* Buttons */
+.btn-primary {
+  padding: 9px 20px; border-radius: 8px; font-size: 0.72rem; font-weight: 700;
+  background: linear-gradient(135deg, #d4891c, var(--gold)); color: #09090d;
+  border: none; cursor: pointer; transition: opacity 0.2s; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.btn-primary:hover { opacity: 0.88; }
+.btn-ghost {
+  padding: 9px 18px; border-radius: 8px; font-size: 0.72rem; font-weight: 700;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border2);
+  color: var(--text); cursor: pointer; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 7px; transition: all 0.2s;
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.08); }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+/* ── SCORE DASHBOARD ── */
+.score-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
+.score-card {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px; text-align: center;
+}
+.sc-num   { font-family: Georgia, serif; font-size: 1.5rem; font-weight: 700; line-height: 1; }
+.sc-label { font-size: 0.58rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+.sc-sub   { font-size: 0.62rem; color: var(--muted2); margin-top: 3px; }
+
+/* ── DELIVERABLE SECTIONS ── */
+.section-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+footer { border-top: 1px solid var(--border); text-align: center; padding: 22px; font-size: 0.63rem; color: var(--muted); }
+footer span { color: var(--gold); }
+
+@media (max-width:720px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .pillars-grid { grid-template-columns: 1fr 1fr; }
+  .score-grid { grid-template-columns: 1fr 1fr; }
+  .heat-grid { grid-template-columns: repeat(3,1fr); }
+  .hero h1 { font-size: 1.8rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- BACK BAR -->
+<div class="back-bar">
+  <a href="index.html"><span class="arrow">←</span> Back to Home</a>
+  <span class="site-id">Mohammad Dassen · Cloud Portfolio</span>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">🏗️ Consulting Deliverable</div>
+  <h1>Well-Architected Review <em>Template</em></h1>
+  <p class="hero-desc">An executive-grade WAR deliverable — covering all 6 pillars, risk heat map, prioritized findings, and improvement roadmap. Built to present directly to CIOs and technical boards.</p>
+  <div class="hero-meta">
+    <div class="hero-stat"><div class="hs-num">6</div><div class="hs-label">WAF Pillars</div></div>
+    <div class="hero-stat"><div class="hs-num">300+</div><div class="hs-label">Review Questions</div></div>
+    <div class="hero-stat"><div class="hs-num">5</div><div class="hs-label">Deliverable Sections</div></div>
+    <div class="hero-stat"><div class="hs-num">SAR</div><div class="hs-label">Denominated Output</div></div>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <div class="nav-tab active" id="tab-overview"  onclick="switchTab('overview')"><span class="tab-icon">📋</span>Overview</div>
+  <div class="nav-tab"        id="tab-pillars"   onclick="switchTab('pillars')"><span class="tab-icon">🏛️</span>6 Pillars</div>
+  <div class="nav-tab"        id="tab-heatmap"   onclick="switchTab('heatmap')"><span class="tab-icon">🔥</span>Risk Heat Map</div>
+  <div class="nav-tab"        id="tab-template"  onclick="switchTab('template')"><span class="tab-icon">📝</span>Build Report</div>
+  <div class="nav-tab"        id="tab-roadmap"   onclick="switchTab('roadmap')"><span class="tab-icon">🗺️</span>Improvement Roadmap</div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <!-- OVERVIEW -->
+    <div id="sb-overview">
+      <div class="sb-section">Overview</div>
+      <div class="sb-item active" onclick="showSec('overview','intro')"><div class="sb-dot" style="background:var(--gold)"></div>What is a WAR?</div>
+      <div class="sb-item" onclick="showSec('overview','process')"><div class="sb-dot" style="background:var(--gold)"></div>Engagement Process</div>
+      <div class="sb-item" onclick="showSec('overview','deliverables')"><div class="sb-dot" style="background:var(--gold)"></div>Deliverable Structure</div>
+      <div class="sb-item" onclick="showSec('overview','checklist')"><div class="sb-dot" style="background:var(--gold)"></div>Pre-Engagement Checklist</div>
+    </div>
+    <!-- PILLARS -->
+    <div id="sb-pillars" style="display:none">
+      <div class="sb-section">Pillars</div>
+      <div class="sb-item active" onclick="showSec('pillars','all')"><div class="sb-dot" style="background:var(--gold)"></div>All 6 Pillars</div>
+      <div class="sb-item" onclick="showSec('pillars','op')"><div class="sb-dot" style="background:var(--op)"></div>Operational Excellence</div>
+      <div class="sb-item" onclick="showSec('pillars','sec')"><div class="sb-dot" style="background:var(--sec)"></div>Security</div>
+      <div class="sb-item" onclick="showSec('pillars','rel')"><div class="sb-dot" style="background:var(--rel)"></div>Reliability</div>
+      <div class="sb-item" onclick="showSec('pillars','per')"><div class="sb-dot" style="background:var(--per)"></div>Performance</div>
+      <div class="sb-item" onclick="showSec('pillars','cost')"><div class="sb-dot" style="background:var(--cost)"></div>Cost Optimization</div>
+      <div class="sb-item" onclick="showSec('pillars','sus')"><div class="sb-dot" style="background:var(--sus)"></div>Sustainability</div>
+    </div>
+    <!-- HEATMAP -->
+    <div id="sb-heatmap" style="display:none">
+      <div class="sb-section">Risk Analysis</div>
+      <div class="sb-item active" onclick="showSec('heatmap','radar')"><div class="sb-dot" style="background:var(--gold)"></div>Radar Score Chart</div>
+      <div class="sb-item" onclick="showSec('heatmap','grid')"><div class="sb-dot" style="background:var(--gold)"></div>Risk Heat Map Grid</div>
+      <div class="sb-item" onclick="showSec('heatmap','hri')"><div class="sb-dot" style="background:var(--gold)"></div>High Risk Items (HRIs)</div>
+    </div>
+    <!-- TEMPLATE -->
+    <div id="sb-template" style="display:none">
+      <div class="sb-section">Report Builder</div>
+      <div class="sb-item active" onclick="showSec('template','exec')"><div class="sb-dot" style="background:var(--gold)"></div>Executive Summary</div>
+      <div class="sb-item" onclick="showSec('template','findings')"><div class="sb-dot" style="background:var(--gold)"></div>Pillar Findings</div>
+      <div class="sb-item" onclick="showSec('template','invest')"><div class="sb-dot" style="background:var(--gold)"></div>Investment Summary</div>
+    </div>
+    <!-- ROADMAP -->
+    <div id="sb-roadmap" style="display:none">
+      <div class="sb-section">Roadmap</div>
+      <div class="sb-item active" onclick="showSec('roadmap','phases')"><div class="sb-dot" style="background:var(--gold)"></div>Improvement Phases</div>
+      <div class="sb-item" onclick="showSec('roadmap','matrix')"><div class="sb-dot" style="background:var(--gold)"></div>Impact vs Effort Matrix</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- CONTENT                                 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="content">
+
+    <!-- ════════ OVERVIEW ════════ -->
+    <div class="panel active" id="panel-overview">
+
+      <!-- INTRO -->
+      <div class="sec-panel active" id="overview-intro">
+        <div class="s-eye" style="color:var(--gold)">Overview · Foundation</div>
+        <div class="s-title">What is a Well-Architected Review?</div>
+        <div class="s-desc">A Well-Architected Review (WAR) is AWS's structured framework for evaluating cloud workloads against industry best practices. It is the single most powerful consulting engagement available to an AWS cloud advisor — generating immediate, demonstrable client value while creating a roadmap for ongoing advisory work.</div>
+
+        <div class="alert a-gold">🏛️ <span><strong>The AWS Well-Architected Framework</strong> was developed by AWS Solutions Architects to help customers build secure, high-performing, resilient, and efficient infrastructure. It defines 6 pillars, 58 design principles, and 300+ review questions.</span></div>
+
+        <div class="box">
+          <div class="box-title">⚡ Why Every Engagement Should Begin With a WAR</div>
+          <p>A Well-Architected Review performs three consulting functions simultaneously: it establishes your credibility as an AWS expert, creates a comprehensive current-state assessment the client can reference independently, and generates a prioritized improvement backlog that translates directly into subsequent advisory engagements. No other consulting tool delivers this return in a comparable time investment.</p>
+        </div>
+
+        <div class="pillars-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="pillar-card" style="border-left-color:var(--op)" onclick="switchTab('pillars');showSec('pillars','op')">
+            <div class="pc-icon">⚡</div>
+            <div class="pc-name" style="color:var(--op)">Operational Excellence</div>
+            <div class="pc-question">"Can you run, monitor, and continually improve your systems?"</div>
+          </div>
+          <div class="pillar-card" style="border-left-color:var(--sec)" onclick="switchTab('pillars');showSec('pillars','sec')">
+            <div class="pc-icon">🔐</div>
+            <div class="pc-name" style="color:var(--sec)">Security</div>
+            <div class="pc-question">"Can you protect data, systems, and assets?"</div>
+          </div>
+          <div class="pillar-card" style="border-left-color:var(--rel)" onclick="switchTab('pillars');showSec('pillars','rel')">
+            <div class="pc-icon">🔄</div>
+            <div class="pc-name" style="color:var(--rel)">Reliability</div>
+            <div class="pc-question">"Can you recover from failures and meet demand?"</div>
+          </div>
+          <div class="pillar-card" style="border-left-color:var(--per)" onclick="switchTab('pillars');showSec('pillars','per')">
+            <div class="pc-icon">📈</div>
+            <div class="pc-name" style="color:var(--per)">Performance Efficiency</div>
+            <div class="pc-question">"Are you using resources efficiently as needs evolve?"</div>
+          </div>
+          <div class="pillar-card" style="border-left-color:var(--cost)" onclick="switchTab('pillars');showSec('pillars','cost')">
+            <div class="pc-icon">💰</div>
+            <div class="pc-name" style="color:var(--cost)">Cost Optimization</div>
+            <div class="pc-question">"Are you spending on the right things at the right amount?"</div>
+          </div>
+          <div class="pillar-card" style="border-left-color:var(--sus)" onclick="switchTab('pillars');showSec('pillars','sus')">
+            <div class="pc-icon">🌱</div>
+            <div class="pc-name" style="color:var(--sus)">Sustainability</div>
+            <div class="pc-question">"Are you minimizing environmental impact of your workloads?"</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROCESS -->
+      <div class="sec-panel" id="overview-process">
+        <div class="s-eye" style="color:var(--gold)">Overview · Methodology</div>
+        <div class="s-title">WAR Engagement Process — Step by Step</div>
+        <div class="s-desc">A standard Well-Architected Review engagement runs 3–5 consultant days. This process applies whether you are conducting a review for a Saudi university, government ministry, or enterprise client.</div>
+
+        <div class="box">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              <div class="step-title">Pre-Engagement Scoping (Half Day)</div>
+              <div class="step-desc">Define the workload under review — a specific application, platform, or business unit. Confirm the workload owner, technical lead, and business sponsor. Clarify objectives: are you looking for security posture, cost baseline, or full 6-pillar assessment? Document scope boundaries explicitly.</div>
+              <span class="step-tag">Deliverable: Scoping Document</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              <div class="step-title">AWS Well-Architected Tool Setup (1 Hour)</div>
+              <div class="step-desc">Log into AWS Console → Well-Architected Tool → Define Workload. Enter workload name, AWS regions, environment type, and team contacts. This tool provides the complete question set and auto-generates the findings report. Ensure you have read-only access to the client's AWS account for evidence gathering.</div>
+              <span class="step-tag">Tool: console.aws.amazon.com/wellarchitected</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              <div class="step-title">Pillar Workshops — 90 Minutes Each (3 Days)</div>
+              <div class="step-desc">Run structured workshops for each pillar with the client's technical team. For each question: document current state, identify evidence, assign risk level (HIGH / MEDIUM / LOW / NONE). Keep workshops focused — do not allow scope creep into solution design. Record all responses in the AWS Well-Architected Tool.</div>
+              <span class="step-tag">6 workshops × 90 min = 9 hours facilitation</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div>
+              <div class="step-title">Findings Analysis & Prioritization (Half Day)</div>
+              <div class="step-desc">Export the AWS Well-Architected Tool report. Categorize all findings as High Risk Items (HRIs) or Medium Risk Items (MRIs). Build an Impact × Effort prioritization matrix. Identify the top 5 HRIs that pose the greatest business risk and the top 3 quick wins achievable within 30 days.</div>
+              <span class="step-tag">Output: Prioritized Risk Register</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div>
+              <div class="step-title">Executive Findings Presentation (Half Day)</div>
+              <div class="step-desc">Transform the technical findings into a business narrative. Lead with the headline risk exposure, not the technical detail. Present the radar chart, heat map, and improvement roadmap. Close with a clear investment summary and recommended next steps. Never present the raw AWS report — translate it into client language.</div>
+              <span class="step-tag">Deliverable: Executive Briefing (this template)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DELIVERABLES -->
+      <div class="sec-panel" id="overview-deliverables">
+        <div class="s-eye" style="color:var(--gold)">Overview · Structure</div>
+        <div class="s-title">Deliverable Structure — 5 Sections</div>
+        <div class="s-desc">Every WAR executive report follows this structure. Each section serves a specific audience and purpose. Do not reorder them — the sequence builds logical momentum toward the investment ask.</div>
+        <table class="tbl">
+          <thead><tr><th>Section</th><th>Audience</th><th>Length</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><strong>1. Executive Summary</strong></td><td>CIO / CEO</td><td>1 page</td><td>Business context, top 3 findings, recommended action</td></tr>
+            <tr><td><strong>2. Current State Assessment</strong></td><td>CIO + Tech Lead</td><td>2–3 pages</td><td>Workload description, radar chart, risk heat map, HRI count</td></tr>
+            <tr><td><strong>3. Pillar-by-Pillar Findings</strong></td><td>Tech Lead + Architects</td><td>6–12 pages</td><td>Per-pillar: design principle gaps, HRIs, evidence, business impact</td></tr>
+            <tr><td><strong>4. Prioritized Improvement Roadmap</strong></td><td>CIO + Tech Lead</td><td>2 pages</td><td>90-day / 6-month / 12-month phases, owner, estimated effort</td></tr>
+            <tr><td><strong>5. Investment Summary</strong></td><td>CIO / CFO</td><td>1 page</td><td>Remediation cost estimate, risk reduction value, ROI framing</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- CHECKLIST -->
+      <div class="sec-panel" id="overview-checklist">
+        <div class="s-eye" style="color:var(--gold)">Overview · Preparation</div>
+        <div class="s-title">Pre-Engagement Checklist</div>
+        <div class="s-desc">Complete every item before your first client workshop. Missing preparation items cause delays mid-engagement and reduce consultant credibility.</div>
+        <div class="box">
+          <ul class="checklist">
+            <li class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><span>Client scoping document signed and workload boundaries agreed</span></li>
+            <li class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><span>AWS Well-Architected Tool workload created in client's AWS account</span></li>
+            <li class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><span>Read-only AWS account access obtained for evidence gathering</span></li>
+            <li class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><span>Workload owner, technical lead, and business sponsor identified</span></li>
+            <li class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><span>All 6 pillar workshop sessions scheduled (90 min each)</span></li>
+            <li class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><span>Architecture diagrams obtained from client team</span></li>
+            <li class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><span>Current incident/outage history reviewed (last 12 months)</span></li>
+            <li class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><span>NCA / PDPL / regulatory scope documented (Saudi clients)</span></li>
+            <li class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><span>Executive presentation slot confirmed post-review (within 1 week)</span></li>
+            <li class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><span>Report template customized with client logo, colors, and workload name</span></li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- /panel-overview -->
+
+    <!-- ════════ PILLARS ════════ -->
+    <div class="panel" id="panel-pillars">
+
+      <!-- ALL PILLARS OVERVIEW -->
+      <div class="sec-panel active" id="pillars-all">
+        <div class="s-eye" style="color:var(--gold)">6 Pillars · Summary View</div>
+        <div class="s-title">The 6 Well-Architected Pillars</div>
+        <div class="s-desc">Each pillar represents a domain of architectural excellence. Together they form a complete picture of a workload's maturity. Click any pillar to explore its design principles, key questions, and AWS service mappings.</div>
+
+        <div class="score-grid" style="grid-template-columns:repeat(6,1fr);margin-bottom:20px;">
+          <div class="score-card"><div class="sc-num" style="color:var(--op)">⚡</div><div class="sc-label">Op. Excellence</div><div class="sc-sub">10 design principles</div></div>
+          <div class="score-card"><div class="sc-num" style="color:var(--sec)">🔐</div><div class="sc-label">Security</div><div class="sc-sub">11 design principles</div></div>
+          <div class="score-card"><div class="sc-num" style="color:var(--rel)">🔄</div><div class="sc-label">Reliability</div><div class="sc-sub">9 design principles</div></div>
+          <div class="score-card"><div class="sc-num" style="color:var(--per)">📈</div><div class="sc-label">Performance</div><div class="sc-sub">8 design principles</div></div>
+          <div class="score-card"><div class="sc-num" style="color:var(--cost)">💰</div><div class="sc-label">Cost</div><div class="sc-sub">10 design principles</div></div>
+          <div class="score-card"><div class="sc-num" style="color:var(--sus)">🌱</div><div class="sc-label">Sustainability</div><div class="sc-sub">10 design principles</div></div>
+        </div>
+
+        <table class="tbl">
+          <thead><tr><th>Pillar</th><th>Core Question</th><th>Most Common HRI</th><th>AWS Primary Tool</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--op);font-weight:700;">⚡ Operational Excellence</td><td style="text-align:left">Can you run, monitor, and improve operations?</td><td style="text-align:left">No runbooks or operational procedures documented</td><td style="text-align:left">CloudWatch, Systems Manager</td></tr>
+            <tr><td style="color:var(--sec);font-weight:700;">🔐 Security</td><td style="text-align:left">Can you protect data, systems, and assets?</td><td style="text-align:left">Overly permissive IAM roles / no MFA on root</td><td style="text-align:left">GuardDuty, Security Hub, IAM</td></tr>
+            <tr><td style="color:var(--rel);font-weight:700;">🔄 Reliability</td><td style="text-align:left">Can you recover from failures and meet demand?</td><td style="text-align:left">Single-AZ deployment / no DR plan tested</td><td style="text-align:left">Auto Scaling, Multi-AZ, Route53</td></tr>
+            <tr><td style="color:var(--per);font-weight:700;">📈 Performance</td><td style="text-align:left">Are you using resources efficiently?</td><td style="text-align:left">Oversized instances / no caching layer</td><td style="text-align:left">Compute Optimizer, CloudFront</td></tr>
+            <tr><td style="color:var(--cost);font-weight:700;">💰 Cost Optimization</td><td style="text-align:left">Are you spending on the right things?</td><td style="text-align:left">On-Demand for everything / untagged resources</td><td style="text-align:left">Cost Explorer, Savings Plans</td></tr>
+            <tr><td style="color:var(--sus);font-weight:700;">🌱 Sustainability</td><td style="text-align:left">Are you minimizing environmental impact?</td><td style="text-align:left">Over-provisioned compute / no efficiency metrics</td><td style="text-align:left">Graviton, Compute Optimizer</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- OP EXCELLENCE -->
+      <div class="sec-panel" id="pillars-op">
+        <div class="s-eye" style="color:var(--op)">Pillar 1 · Operational Excellence</div>
+        <div class="s-title">Operational Excellence</div>
+        <div class="s-desc">The ability to support development and run workloads effectively, gain insight into operations, and continually improve supporting processes and procedures.</div>
+        <div class="alert a-blue">⚡ <span><strong>Key WAR Focus:</strong> This pillar is frequently underweighted by clients who focus only on infrastructure. Poor operational practices are the root cause of most production incidents.</span></div>
+        <div class="box">
+          <div class="box-title">Core Design Principles</div>
+          <div class="prog-row"><div class="prog-label">Perform operations as code</div><div class="prog-track"><div class="prog-fill" style="width:85%;background:var(--op)"></div></div><div class="prog-val">Critical</div></div>
+          <div class="prog-row"><div class="prog-label">Make frequent, small, reversible changes</div><div class="prog-track"><div class="prog-fill" style="width:75%;background:var(--op)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Refine operations procedures frequently</div><div class="prog-track"><div class="prog-fill" style="width:60%;background:var(--op)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Anticipate failure</div><div class="prog-track"><div class="prog-fill" style="width:70%;background:var(--op)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Learn from all operational failures</div><div class="prog-track"><div class="prog-fill" style="width:50%;background:var(--op)"></div></div><div class="prog-val">Med</div></div>
+        </div>
+        <div class="box">
+          <div class="box-title">Key Review Questions — Top 5</div>
+          <table class="tbl" style="margin:0">
+            <thead><tr><th style="text-align:left">Question</th><th>Risk if Missing</th></tr></thead>
+            <tbody>
+              <tr><td style="text-align:left">Do you have runbooks for all operational procedures?</td><td><span class="risk-high risk-badge">HIGH</span></td></tr>
+              <tr><td style="text-align:left">Is all infrastructure defined as code (IaC)?</td><td><span class="risk-high risk-badge">HIGH</span></td></tr>
+              <tr><td style="text-align:left">Do you have a defined process for handling operational events?</td><td><span class="risk-high risk-badge">HIGH</span></td></tr>
+              <tr><td style="text-align:left">Are workloads instrumented with metrics, logs, and traces?</td><td><span class="risk-med risk-badge">MED</span></td></tr>
+              <tr><td style="text-align:left">Do you conduct post-incident reviews after every P1/P2 event?</td><td><span class="risk-med risk-badge">MED</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SECURITY -->
+      <div class="sec-panel" id="pillars-sec">
+        <div class="s-eye" style="color:var(--sec)">Pillar 2 · Security</div>
+        <div class="s-title">Security</div>
+        <div class="s-desc">The ability to protect data, systems, and assets while taking advantage of cloud technologies to improve your overall security posture.</div>
+        <div class="alert a-red">🔐 <span><strong>Highest-priority pillar</strong> for Saudi clients. NCA CCC, PDPL, and NDMO requirements map directly to Security pillar controls. Every HRI here carries regulatory risk, not just technical risk.</span></div>
+        <div class="box">
+          <div class="box-title">Core Design Principles</div>
+          <div class="prog-row"><div class="prog-label">Implement strong identity foundation</div><div class="prog-track"><div class="prog-fill" style="width:95%;background:var(--sec)"></div></div><div class="prog-val">Critical</div></div>
+          <div class="prog-row"><div class="prog-label">Apply security at all layers</div><div class="prog-track"><div class="prog-fill" style="width:90%;background:var(--sec)"></div></div><div class="prog-val">Critical</div></div>
+          <div class="prog-row"><div class="prog-label">Automate security best practices</div><div class="prog-track"><div class="prog-fill" style="width:80%;background:var(--sec)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Protect data in transit and at rest</div><div class="prog-track"><div class="prog-fill" style="width:90%;background:var(--sec)"></div></div><div class="prog-val">Critical</div></div>
+          <div class="prog-row"><div class="prog-label">Keep people away from data</div><div class="prog-track"><div class="prog-fill" style="width:70%;background:var(--sec)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Prepare for security events</div><div class="prog-track"><div class="prog-fill" style="width:65%;background:var(--sec)"></div></div><div class="prog-val">High</div></div>
+        </div>
+        <div class="box">
+          <div class="box-title">Key Review Questions — Top 5</div>
+          <table class="tbl" style="margin:0">
+            <thead><tr><th style="text-align:left">Question</th><th>Risk if Missing</th></tr></thead>
+            <tbody>
+              <tr><td style="text-align:left">Is MFA enforced for all human IAM users including root?</td><td><span class="risk-high risk-badge">HIGH</span></td></tr>
+              <tr><td style="text-align:left">Is all data encrypted at rest using KMS CMKs?</td><td><span class="risk-high risk-badge">HIGH</span></td></tr>
+              <tr><td style="text-align:left">Is S3 Block Public Access enabled at account level?</td><td><span class="risk-high risk-badge">HIGH</span></td></tr>
+              <tr><td style="text-align:left">Is GuardDuty enabled in all accounts and regions?</td><td><span class="risk-high risk-badge">HIGH</span></td></tr>
+              <tr><td style="text-align:left">Is there a documented incident response plan?</td><td><span class="risk-high risk-badge">HIGH</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RELIABILITY -->
+      <div class="sec-panel" id="pillars-rel">
+        <div class="s-eye" style="color:var(--rel)">Pillar 3 · Reliability</div>
+        <div class="s-title">Reliability</div>
+        <div class="s-desc">The ability of a workload to perform its intended function correctly and consistently — including the ability to operate and test the workload through its total lifecycle.</div>
+        <div class="box">
+          <div class="box-title">Core Design Principles</div>
+          <div class="prog-row"><div class="prog-label">Automatically recover from failure</div><div class="prog-track"><div class="prog-fill" style="width:90%;background:var(--rel)"></div></div><div class="prog-val">Critical</div></div>
+          <div class="prog-row"><div class="prog-label">Test recovery procedures</div><div class="prog-track"><div class="prog-fill" style="width:85%;background:var(--rel)"></div></div><div class="prog-val">Critical</div></div>
+          <div class="prog-row"><div class="prog-label">Scale horizontally to increase availability</div><div class="prog-track"><div class="prog-fill" style="width:75%;background:var(--rel)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Stop guessing capacity</div><div class="prog-track"><div class="prog-fill" style="width:70%;background:var(--rel)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Manage change through automation</div><div class="prog-track"><div class="prog-fill" style="width:65%;background:var(--rel)"></div></div><div class="prog-val">Med</div></div>
+        </div>
+      </div>
+
+      <!-- PERFORMANCE -->
+      <div class="sec-panel" id="pillars-per">
+        <div class="s-eye" style="color:var(--per)">Pillar 4 · Performance Efficiency</div>
+        <div class="s-title">Performance Efficiency</div>
+        <div class="s-desc">The ability to use computing resources efficiently to meet system requirements, and to maintain that efficiency as demand changes and technologies evolve.</div>
+        <div class="box">
+          <div class="box-title">Core Design Principles</div>
+          <div class="prog-row"><div class="prog-label">Democratize advanced technologies</div><div class="prog-track"><div class="prog-fill" style="width:60%;background:var(--per)"></div></div><div class="prog-val">Med</div></div>
+          <div class="prog-row"><div class="prog-label">Go global in minutes</div><div class="prog-track"><div class="prog-fill" style="width:55%;background:var(--per)"></div></div><div class="prog-val">Med</div></div>
+          <div class="prog-row"><div class="prog-label">Use serverless architectures</div><div class="prog-track"><div class="prog-fill" style="width:65%;background:var(--per)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Experiment more often</div><div class="prog-track"><div class="prog-fill" style="width:40%;background:var(--per)"></div></div><div class="prog-val">Low</div></div>
+          <div class="prog-row"><div class="prog-label">Consider mechanical sympathy</div><div class="prog-track"><div class="prog-fill" style="width:50%;background:var(--per)"></div></div><div class="prog-val">Med</div></div>
+        </div>
+      </div>
+
+      <!-- COST -->
+      <div class="sec-panel" id="pillars-cost">
+        <div class="s-eye" style="color:var(--cost)">Pillar 5 · Cost Optimization</div>
+        <div class="s-title">Cost Optimization</div>
+        <div class="s-desc">The ability to run systems to deliver business value at the lowest price point — eliminating unneeded costs and suboptimal resources throughout the cloud lifecycle.</div>
+        <div class="box">
+          <div class="box-title">Core Design Principles</div>
+          <div class="prog-row"><div class="prog-label">Implement cloud financial management</div><div class="prog-track"><div class="prog-fill" style="width:90%;background:var(--cost)"></div></div><div class="prog-val">Critical</div></div>
+          <div class="prog-row"><div class="prog-label">Adopt a consumption model</div><div class="prog-track"><div class="prog-fill" style="width:80%;background:var(--cost)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Measure overall efficiency</div><div class="prog-track"><div class="prog-fill" style="width:70%;background:var(--cost)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Stop spending on undifferentiated heavy lifting</div><div class="prog-track"><div class="prog-fill" style="width:75%;background:var(--cost)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Analyze and attribute expenditure</div><div class="prog-track"><div class="prog-fill" style="width:85%;background:var(--cost)"></div></div><div class="prog-val">Critical</div></div>
+        </div>
+      </div>
+
+      <!-- SUSTAINABILITY -->
+      <div class="sec-panel" id="pillars-sus">
+        <div class="s-eye" style="color:var(--sus)">Pillar 6 · Sustainability</div>
+        <div class="s-title">Sustainability</div>
+        <div class="s-desc">The ability to continually improve sustainability impacts by reducing energy consumption and increasing efficiency across all components of a workload, by maximizing the benefits from the provisioned resources.</div>
+        <div class="box">
+          <div class="box-title">Core Design Principles</div>
+          <div class="prog-row"><div class="prog-label">Understand your impact</div><div class="prog-track"><div class="prog-fill" style="width:70%;background:var(--sus)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Establish sustainability goals</div><div class="prog-track"><div class="prog-fill" style="width:55%;background:var(--sus)"></div></div><div class="prog-val">Med</div></div>
+          <div class="prog-row"><div class="prog-label">Maximize utilization</div><div class="prog-track"><div class="prog-fill" style="width:80%;background:var(--sus)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Use managed services</div><div class="prog-track"><div class="prog-fill" style="width:65%;background:var(--sus)"></div></div><div class="prog-val">High</div></div>
+          <div class="prog-row"><div class="prog-label">Reduce downstream impact</div><div class="prog-track"><div class="prog-fill" style="width:45%;background:var(--sus)"></div></div><div class="prog-val">Low</div></div>
+        </div>
+      </div>
+    </div><!-- /panel-pillars -->
+
+    <!-- ════════ HEAT MAP ════════ -->
+    <div class="panel" id="panel-heatmap">
+
+      <!-- RADAR -->
+      <div class="sec-panel active" id="heatmap-radar">
+        <div class="s-eye" style="color:var(--gold)">Risk Analysis · Radar Chart</div>
+        <div class="s-title">Well-Architected Maturity Radar</div>
+        <div class="s-desc">The signature deliverable of every WAR report. This chart gives a CIO an instant read on which pillars are strong, which require attention, and where investment will have the greatest impact. Enter scores below to generate a customized radar for your client.</div>
+
+        <div class="alert a-gold">⚙️ <span>Adjust the sliders below to reflect your client's assessed maturity (0–100) for each pillar. The radar updates in real time.</span></div>
+
+        <!-- INTERACTIVE RADAR -->
+        <div class="radar-wrap">
+          <div class="radar-chart">
+            <svg id="radar-svg" width="280" height="280" viewBox="0 0 280 280">
+              <defs>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="2" result="blur"/>
+                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <!-- Grid rings -->
+              <g id="radar-rings"></g>
+              <!-- Axes -->
+              <g id="radar-axes"></g>
+              <!-- Data polygon -->
+              <polygon id="radar-poly" fill="rgba(232,164,40,0.12)" stroke="#e8a428" stroke-width="1.5" filter="url(#glow)"/>
+              <!-- Axis labels -->
+              <g id="radar-labels"></g>
+              <!-- Data points -->
+              <g id="radar-dots"></g>
+            </svg>
+          </div>
+          <div class="radar-legend">
+            <div class="rl-title">Pillar Maturity Scores</div>
+            <div id="radar-controls"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRID -->
+      <div class="sec-panel" id="heatmap-grid">
+        <div class="s-eye" style="color:var(--gold)">Risk Analysis · Heat Map</div>
+        <div class="s-title">Risk Heat Map Grid</div>
+        <div class="s-desc">The heat map shows risk concentration across pillars. Critical findings (deep red) require immediate remediation — they represent material business risk. Click any cell to toggle between risk levels.</div>
+
+        <div class="box" style="padding:14px;">
+          <div style="display:grid;grid-template-columns:80px repeat(6,1fr);gap:4px;margin-bottom:8px;font-size:0.58rem;text-align:center;color:var(--muted);">
+            <div></div>
+            <div style="color:var(--op)">⚡ Op. Ex.</div>
+            <div style="color:var(--sec)">🔐 Sec.</div>
+            <div style="color:var(--rel)">🔄 Rel.</div>
+            <div style="color:var(--per)">📈 Perf.</div>
+            <div style="color:var(--cost)">💰 Cost</div>
+            <div style="color:var(--sus)">🌱 Sus.</div>
+          </div>
+          <div id="heat-grid-rows"></div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;font-size:0.65rem;">
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:rgba(248,113,113,0.4);display:inline-block"></span>Critical</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:rgba(251,146,60,0.35);display:inline-block"></span>High</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:rgba(251,191,36,0.3);display:inline-block"></span>Medium</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:rgba(52,211,153,0.2);display:inline-block"></span>Low</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:rgba(107,110,133,0.2);display:inline-block"></span>None</span>
+        </div>
+      </div>
+
+      <!-- HRI LIST -->
+      <div class="sec-panel" id="heatmap-hri">
+        <div class="s-eye" style="color:var(--gold)">Risk Analysis · High Risk Items</div>
+        <div class="s-title">High Risk Items (HRIs) — Sample Register</div>
+        <div class="s-desc">HRIs are findings that represent significant risk to your workload's reliability, security, or cost efficiency. Customize this register with your client's actual findings from the AWS Well-Architected Tool export.</div>
+
+        <div class="score-grid">
+          <div class="score-card"><div class="sc-num" style="color:var(--sec)" id="hri-count">0</div><div class="sc-label">High Risk Items</div><div class="sc-sub">Require immediate action</div></div>
+          <div class="score-card"><div class="sc-num" style="color:var(--cost)" id="mri-count">0</div><div class="sc-label">Medium Risk Items</div><div class="sc-sub">Plan within 90 days</div></div>
+          <div class="score-card"><div class="sc-num" style="color:var(--rel)" id="resolved-count">0</div><div class="sc-label">Resolved</div><div class="sc-sub">Already compliant</div></div>
+          <div class="score-card"><div class="sc-num" style="color:var(--gold)" id="total-count">0</div><div class="sc-label">Total Findings</div><div class="sc-sub">Across all pillars</div></div>
+        </div>
+
+        <table class="tbl">
+          <thead><tr><th>Ref.</th><th style="text-align:left">Finding</th><th>Pillar</th><th>Risk</th><th>Business Impact</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:monospace;color:var(--muted)">HRI-001</td><td style="text-align:left">Root account has no MFA enabled</td><td><span style="color:var(--sec)">Security</span></td><td><span class="risk-high" style="padding:2px 7px;border-radius:4px;font-size:0.6rem;font-weight:700">HIGH</span></td><td style="text-align:left;color:var(--muted2)">Full account compromise if credentials leaked</td></tr>
+            <tr><td style="font-family:monospace;color:var(--muted)">HRI-002</td><td style="text-align:left">Production workload deployed in single AZ</td><td><span style="color:var(--rel)">Reliability</span></td><td><span class="risk-high" style="padding:2px 7px;border-radius:4px;font-size:0.6rem;font-weight:700">HIGH</span></td><td style="text-align:left;color:var(--muted2)">Complete service unavailability during AZ failure</td></tr>
+            <tr><td style="font-family:monospace;color:var(--muted)">HRI-003</td><td style="text-align:left">No IAM Access Analyzer enabled</td><td><span style="color:var(--sec)">Security</span></td><td><span class="risk-high" style="padding:2px 7px;border-radius:4px;font-size:0.6rem;font-weight:700">HIGH</span></td><td style="text-align:left;color:var(--muted2)">Unknown external access to S3 / IAM resources</td></tr>
+            <tr><td style="font-family:monospace;color:var(--muted)">HRI-004</td><td style="text-align:left">EBS volumes unencrypted</td><td><span style="color:var(--sec)">Security</span></td><td><span class="risk-high" style="padding:2px 7px;border-radius:4px;font-size:0.6rem;font-weight:700">HIGH</span></td><td style="text-align:left;color:var(--muted2)">PDPL / NCA non-compliance — regulatory risk</td></tr>
+            <tr><td style="font-family:monospace;color:var(--muted)">MRI-001</td><td style="text-align:left">No cost allocation tags on resources</td><td><span style="color:var(--cost)">Cost</span></td><td><span class="risk-med" style="padding:2px 7px;border-radius:4px;font-size:0.6rem;font-weight:700">MED</span></td><td style="text-align:left;color:var(--muted2)">Cannot allocate cloud costs to projects or teams</td></tr>
+            <tr><td style="font-family:monospace;color:var(--muted)">MRI-002</td><td style="text-align:left">No DR runbook tested in last 12 months</td><td><span style="color:var(--rel)">Reliability</span></td><td><span class="risk-med" style="padding:2px 7px;border-radius:4px;font-size:0.6rem;font-weight:700">MED</span></td><td style="text-align:left;color:var(--muted2)">Unknown actual recovery time — RTO/RPO unvalidated</td></tr>
+            <tr><td style="font-family:monospace;color:var(--muted)">MRI-003</td><td style="text-align:left">On-Demand pricing for all compute</td><td><span style="color:var(--cost)">Cost</span></td><td><span class="risk-med" style="padding:2px 7px;border-radius:4px;font-size:0.6rem;font-weight:700">MED</span></td><td style="text-align:left;color:var(--muted2)">Estimated SAR 840,000 excess annual spend</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /panel-heatmap -->
+
+    <!-- ════════ TEMPLATE BUILDER ════════ -->
+    <div class="panel" id="panel-template">
+
+      <!-- EXEC SUMMARY -->
+      <div class="sec-panel active" id="template-exec">
+        <div class="s-eye" style="color:var(--gold)">Report Builder · Section 1</div>
+        <div class="s-title">Executive Summary Template</div>
+        <div class="s-desc">Complete the fields below. The executive summary is the most important page of your report — it must communicate the headline finding, business risk, and recommended action in under 3 minutes of reading time.</div>
+
+        <div class="template-section">
+          <div class="ts-header" onclick="toggleSection(this)">
+            <div class="ts-title">📋 1.1 Engagement Context</div>
+            <div class="ts-meta">Client · Date · Scope</div>
+          </div>
+          <div class="ts-body">
+            <div class="field-row">
+              <div><div class="field-label">Client Organization</div><input class="ts-input" placeholder="e.g. Princess Nourah bint Abdulrahman University"></div>
+              <div><div class="field-label">Review Date</div><input class="ts-input" type="date"></div>
+            </div>
+            <div class="field-row">
+              <div><div class="field-label">Workload Name</div><input class="ts-input" placeholder="e.g. Student Portal · ERP Platform"></div>
+              <div><div class="field-label">AWS Primary Region</div><input class="ts-input" placeholder="e.g. me-south-1 (Bahrain)"></div>
+            </div>
+            <div class="field-label">Workload Description</div>
+            <textarea class="ts-field" placeholder="Briefly describe what this workload does, who uses it, and its business criticality..."></textarea>
+          </div>
+        </div>
+
+        <div class="template-section">
+          <div class="ts-header" onclick="toggleSection(this)">
+            <div class="ts-title">⚠️ 1.2 Headline Findings</div>
+            <div class="ts-meta">Top 3 critical findings for the executive</div>
+          </div>
+          <div class="ts-body">
+            <div class="field-label">Finding 1 — Most Critical</div>
+            <input class="ts-input" placeholder="e.g. 4 High Risk Items identified in Security pillar — including unencrypted storage and no MFA on root account">
+            <div class="field-label">Finding 2</div>
+            <input class="ts-input" placeholder="e.g. Single-AZ deployment creates a single point of failure with potential 8+ hours recovery time">
+            <div class="field-label">Finding 3</div>
+            <input class="ts-input" placeholder="e.g. Estimated SAR 1.2M annual cloud waste from unoptimized compute and unused resources">
+            <div class="field-label">Recommended Immediate Action</div>
+            <textarea class="ts-field" style="min-height:50px;" placeholder="e.g. Approve immediate remediation of 4 Security HRIs. Estimated 3-week effort, SAR 45,000 consulting investment."></textarea>
+          </div>
+        </div>
+
+        <div class="template-section">
+          <div class="ts-header" onclick="toggleSection(this)">
+            <div class="ts-title">📊 1.3 Risk Summary</div>
+            <div class="ts-meta">Overall posture by pillar</div>
+          </div>
+          <div class="ts-body">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+              <div>
+                <div class="field-label">Operational Excellence</div>
+                <div class="risk-select">
+                  <button class="risk-opt" onclick="selectRisk(this,'high')">HIGH</button>
+                  <button class="risk-opt active-med" onclick="selectRisk(this,'med')">MED</button>
+                  <button class="risk-opt" onclick="selectRisk(this,'low')">LOW</button>
+                </div>
+              </div>
+              <div>
+                <div class="field-label">Security</div>
+                <div class="risk-select">
+                  <button class="risk-opt active-high" onclick="selectRisk(this,'high')">HIGH</button>
+                  <button class="risk-opt" onclick="selectRisk(this,'med')">MED</button>
+                  <button class="risk-opt" onclick="selectRisk(this,'low')">LOW</button>
+                </div>
+              </div>
+              <div>
+                <div class="field-label">Reliability</div>
+                <div class="risk-select">
+                  <button class="risk-opt active-high" onclick="selectRisk(this,'high')">HIGH</button>
+                  <button class="risk-opt" onclick="selectRisk(this,'med')">MED</button>
+                  <button class="risk-opt" onclick="selectRisk(this,'low')">LOW</button>
+                </div>
+              </div>
+              <div>
+                <div class="field-label">Performance</div>
+                <div class="risk-select">
+                  <button class="risk-opt" onclick="selectRisk(this,'high')">HIGH</button>
+                  <button class="risk-opt active-med" onclick="selectRisk(this,'med')">MED</button>
+                  <button class="risk-opt" onclick="selectRisk(this,'low')">LOW</button>
+                </div>
+              </div>
+              <div>
+                <div class="field-label">Cost Optimization</div>
+                <div class="risk-select">
+                  <button class="risk-opt" onclick="selectRisk(this,'high')">HIGH</button>
+                  <button class="risk-opt active-med" onclick="selectRisk(this,'med')">MED</button>
+                  <button class="risk-opt" onclick="selectRisk(this,'low')">LOW</button>
+                </div>
+              </div>
+              <div>
+                <div class="field-label">Sustainability</div>
+                <div class="risk-select">
+                  <button class="risk-opt" onclick="selectRisk(this,'high')">HIGH</button>
+                  <button class="risk-opt" onclick="selectRisk(this,'med')">MED</button>
+                  <button class="risk-opt active-low" onclick="selectRisk(this,'low')">LOW</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" onclick="switchTemplate('findings')">Continue to Pillar Findings →</button>
+          <button class="btn-ghost" onclick="window.print()">🖨️ Print / Export</button>
+        </div>
+      </div>
+
+      <!-- FINDINGS -->
+      <div class="sec-panel" id="template-findings">
+        <div class="s-eye" style="color:var(--gold)">Report Builder · Section 3</div>
+        <div class="s-title">Pillar Findings Template</div>
+        <div class="s-desc">For each pillar, document the specific findings from your AWS Well-Architected Tool review. Use exact question IDs from the tool export — this adds credibility and traceability to your report.</div>
+
+        <div class="template-section">
+          <div class="ts-header" onclick="toggleSection(this)">
+            <div class="ts-title" style="color:var(--sec)">🔐 Security Findings</div>
+            <div class="ts-meta">Most common source of HRIs</div>
+          </div>
+          <div class="ts-body">
+            <div class="field-label">Key Findings (one per line)</div>
+            <textarea class="ts-field" style="min-height:100px;" placeholder="SEC 1: Root account credentials not protected by MFA — Risk: HIGH
+SEC 2: IAM users with console access lack MFA enforcement — Risk: HIGH
+SEC 3: S3 buckets allow public read access — Risk: HIGH
+SEC 4: CloudTrail not enabled in all regions — Risk: MED"></textarea>
+            <div class="field-label">Business Impact Statement</div>
+            <textarea class="ts-field" style="min-height:50px;" placeholder="These findings expose the organization to potential data breach, regulatory non-compliance with NCA CCC and PDPL, and reputational damage. Estimated regulatory penalty exposure: SAR 500,000–2,000,000."></textarea>
+            <div class="field-label">Recommended Remediation Actions</div>
+            <textarea class="ts-field" style="min-height:60px;" placeholder="1. Enable MFA on root account immediately (2 hours effort)
+2. Enforce MFA policy for all IAM users via IAM policy condition (1 day)
+3. Enable S3 Block Public Access at account level (1 hour)
+4. Enable CloudTrail multi-region trail (2 hours)"></textarea>
+          </div>
+        </div>
+
+        <div class="template-section">
+          <div class="ts-header" onclick="toggleSection(this)">
+            <div class="ts-title" style="color:var(--rel)">🔄 Reliability Findings</div>
+            <div class="ts-meta">Architecture resilience gaps</div>
+          </div>
+          <div class="ts-body">
+            <div class="field-label">Key Findings</div>
+            <textarea class="ts-field" style="min-height:80px;" placeholder="REL 1: All EC2 instances deployed in single AZ — Risk: HIGH
+REL 2: No defined RTO/RPO targets documented — Risk: HIGH
+REL 3: Manual failover procedure (not automated) — Risk: MED
+REL 4: No load testing conducted in past 12 months — Risk: MED"></textarea>
+            <div class="field-label">Business Impact Statement</div>
+            <textarea class="ts-field" style="min-height:50px;" placeholder="Single-AZ deployment creates a complete service outage risk during AZ failure. Estimated revenue impact per hour of downtime: SAR [X]. Current RTO of [X hours] exceeds acceptable business threshold of [Y hours]."></textarea>
+          </div>
+        </div>
+
+        <div class="template-section">
+          <div class="ts-header" onclick="toggleSection(this)">
+            <div class="ts-title" style="color:var(--cost)">💰 Cost Optimization Findings</div>
+            <div class="ts-meta">Financial waste and optimization opportunities</div>
+          </div>
+          <div class="ts-body">
+            <div class="field-label">Key Findings</div>
+            <textarea class="ts-field" style="min-height:80px;" placeholder="COST 1: 100% On-Demand pricing — no Savings Plans or Reserved Instances — Risk: MED
+COST 2: No cost allocation tags on any resources — Risk: MED
+COST 3: 12 idle EC2 instances identified (avg 3% CPU utilization) — Risk: MED
+COST 4: No AWS Budgets configured — anomalous spend not alerted — Risk: MED"></textarea>
+            <div class="field-label">Estimated Annual Saving Opportunity</div>
+            <input class="ts-input" placeholder="e.g. SAR 840,000 / year through Savings Plans + rightsizing + idle resource cleanup">
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" onclick="switchTemplate('invest')">Continue to Investment Summary →</button>
+        </div>
+      </div>
+
+      <!-- INVESTMENT -->
+      <div class="sec-panel" id="template-invest">
+        <div class="s-eye" style="color:var(--gold)">Report Builder · Section 5</div>
+        <div class="s-title">Investment Summary Template</div>
+        <div class="s-desc">The investment summary frames your remediation recommendations in financial terms. Every CIO and CFO needs to see cost to fix vs risk of not fixing, with a clear SAR-denominated ROI picture.</div>
+
+        <div class="template-section">
+          <div class="ts-header" onclick="toggleSection(this)">
+            <div class="ts-title">💰 Remediation Investment Estimate</div>
+            <div class="ts-meta">Consulting + implementation effort in SAR</div>
+          </div>
+          <div class="ts-body">
+            <div class="field-row">
+              <div><div class="field-label">Security HRI Remediation (SAR)</div><input class="ts-input" type="number" placeholder="45000"></div>
+              <div><div class="field-label">Reliability Improvements (SAR)</div><input class="ts-input" type="number" placeholder="120000"></div>
+            </div>
+            <div class="field-row">
+              <div><div class="field-label">Cost Optimization Engagement (SAR)</div><input class="ts-input" type="number" placeholder="35000"></div>
+              <div><div class="field-label">Operational Excellence (SAR)</div><input class="ts-input" type="number" placeholder="55000"></div>
+            </div>
+            <div class="field-label">Annual Cost Saving Identified (SAR)</div>
+            <input class="ts-input" type="number" placeholder="840000">
+            <div class="field-label">Regulatory Risk Exposure Mitigated (SAR)</div>
+            <input class="ts-input" type="number" placeholder="2000000">
+            <div class="field-label">Executive Investment Summary Statement</div>
+            <textarea class="ts-field" placeholder="A total remediation investment of SAR [X] eliminates SAR [Y] in regulatory exposure and generates SAR [Z] in annual cloud cost savings. Payback period: [N] months. Recommended to proceed with Phase 1 (Security + Reliability) immediately."></textarea>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" onclick="window.print()">🖨️ Export Full Report</button>
+          <button class="btn-ghost" onclick="switchTab('roadmap')">View Improvement Roadmap →</button>
+        </div>
+      </div>
+    </div><!-- /panel-template -->
+
+    <!-- ════════ ROADMAP ════════ -->
+    <div class="panel" id="panel-roadmap">
+
+      <!-- PHASES -->
+      <div class="sec-panel active" id="roadmap-phases">
+        <div class="s-eye" style="color:var(--gold)">Roadmap · Improvement Plan</div>
+        <div class="s-title">Prioritized Improvement Roadmap</div>
+        <div class="s-desc">Structure all WAR improvement items into three phases: 90-day quick wins (high impact, low effort), 6-month core improvements (architectural changes), and 12-month strategic initiatives (governance and optimization maturity).</div>
+
+        <div class="alert a-green">✅ <span><strong>Consulting Tip:</strong> Never present more than 5 items per phase to the executive team. Group smaller items and lead with the one that creates the most visible business value. Each phase should have a named owner and a clear success metric.</span></div>
+
+        <!-- PHASE 1 -->
+        <div class="box" style="border-left:3px solid var(--sec)">
+          <div class="box-title" style="color:var(--sec)">🚨 Phase 1 — Immediate Action (Days 1–90)</div>
+          <p style="margin-bottom:14px;">High-impact, low-effort items that eliminate the most critical business risk. These require no architectural redesign — they are configuration and policy changes.</p>
+          <table class="tbl" style="margin:0">
+            <thead><tr><th style="text-align:left">Action Item</th><th>Effort</th><th>Risk Eliminated</th><th>Owner</th></tr></thead>
+            <tbody>
+              <tr><td style="text-align:left">Enable MFA on root + all IAM users</td><td>2 days</td><td><span style="color:var(--sec)">Security HIGH</span></td><td>Cloud Team</td></tr>
+              <tr><td style="text-align:left">Enable GuardDuty + Security Hub</td><td>1 day</td><td><span style="color:var(--sec)">Security HIGH</span></td><td>Cloud Team</td></tr>
+              <tr><td style="text-align:left">Enable CloudTrail in all regions</td><td>1 day</td><td><span style="color:var(--sec)">Security MED</span></td><td>Cloud Team</td></tr>
+              <tr><td style="text-align:left">Tag all resources (mandatory tags)</td><td>1 week</td><td><span style="color:var(--cost)">Cost MED</span></td><td>All Teams</td></tr>
+              <tr><td style="text-align:left">Set up AWS Budgets + anomaly alerts</td><td>2 days</td><td><span style="color:var(--cost)">Cost MED</span></td><td>FinOps</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PHASE 2 -->
+        <div class="box" style="border-left:3px solid var(--gold)">
+          <div class="box-title" style="color:var(--gold)">⚡ Phase 2 — Core Improvements (Months 3–6)</div>
+          <p style="margin-bottom:14px;">Architectural improvements that require planning, testing, and coordination. These address the systemic reliability and performance gaps identified in the WAR.</p>
+          <table class="tbl" style="margin:0">
+            <thead><tr><th style="text-align:left">Action Item</th><th>Effort</th><th>Pillar</th><th>Owner</th></tr></thead>
+            <tbody>
+              <tr><td style="text-align:left">Migrate to Multi-AZ deployment</td><td>3–4 weeks</td><td><span style="color:var(--rel)">Reliability</span></td><td>Architecture</td></tr>
+              <tr><td style="text-align:left">Implement Auto Scaling Groups</td><td>2 weeks</td><td><span style="color:var(--rel)">Reliability</span></td><td>Architecture</td></tr>
+              <tr><td style="text-align:left">Enable encryption on all EBS / RDS</td><td>2 weeks</td><td><span style="color:var(--sec)">Security</span></td><td>Cloud Team</td></tr>
+              <tr><td style="text-align:left">Purchase Savings Plans (1-year)</td><td>1 week</td><td><span style="color:var(--cost)">Cost</span></td><td>FinOps + CIO</td></tr>
+              <tr><td style="text-align:left">Deploy WAF in front of public ALBs</td><td>2 weeks</td><td><span style="color:var(--sec)">Security</span></td><td>Architecture</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PHASE 3 -->
+        <div class="box" style="border-left:3px solid var(--rel)">
+          <div class="box-title" style="color:var(--rel)">🌱 Phase 3 — Strategic Optimization (Months 6–12)</div>
+          <p style="margin-bottom:14px;">Governance, maturity, and continuous improvement initiatives. These establish the operational model that sustains long-term cloud excellence.</p>
+          <table class="tbl" style="margin:0">
+            <thead><tr><th style="text-align:left">Action Item</th><th>Effort</th><th>Pillar</th><th>Owner</th></tr></thead>
+            <tbody>
+              <tr><td style="text-align:left">Implement Infrastructure as Code (CDK/CloudFormation)</td><td>2–3 months</td><td><span style="color:var(--op)">Op. Excellence</span></td><td>Dev Team</td></tr>
+              <tr><td style="text-align:left">Establish Cloud Center of Excellence (CCoE)</td><td>3 months</td><td><span style="color:var(--op)">Op. Excellence</span></td><td>CIO Office</td></tr>
+              <tr><td style="text-align:left">Deploy AWS Control Tower + Landing Zone</td><td>6 weeks</td><td><span style="color:var(--sec)">Security</span></td><td>Architecture</td></tr>
+              <tr><td style="text-align:left">Implement FinOps practice + unit economics</td><td>3 months</td><td><span style="color:var(--cost)">Cost</span></td><td>FinOps Team</td></tr>
+              <tr><td style="text-align:left">Schedule annual Well-Architected Review cycle</td><td>Ongoing</td><td><span style="color:var(--gold)">All Pillars</span></td><td>Cloud Advisor</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MATRIX -->
+      <div class="sec-panel" id="roadmap-matrix">
+        <div class="s-eye" style="color:var(--gold)">Roadmap · Prioritization</div>
+        <div class="s-title">Impact vs Effort Matrix</div>
+        <div class="s-desc">Every finding from the WAR maps to a quadrant on this matrix. Prioritize the top-left quadrant (high impact, low effort) for Phase 1. This visual is what you show in the executive presentation — not a list of findings.</div>
+
+        <div class="box" style="padding:16px;">
+          <svg viewBox="0 0 520 380" width="100%" style="max-width:520px;display:block;margin:0 auto;">
+            <!-- Background quadrants -->
+            <rect x="50" y="20"  width="210" height="165" fill="rgba(52,211,153,0.05)"  rx="8"/>
+            <rect x="260" y="20" width="210" height="165" fill="rgba(251,191,36,0.05)"  rx="8"/>
+            <rect x="50" y="195" width="210" height="165" fill="rgba(251,146,60,0.05)"  rx="8"/>
+            <rect x="260" y="195" width="210" height="165" fill="rgba(248,113,113,0.05)" rx="8"/>
+
+            <!-- Quadrant borders -->
+            <line x1="50" y1="182" x2="470" y2="182" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <line x1="260" y1="20" x2="260" y2="362" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+            <!-- Axes -->
+            <line x1="50" y1="362" x2="470" y2="362" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" marker-end="url(#arr)"/>
+            <line x1="50" y1="362" x2="50"  y2="20"  stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+            <defs>
+              <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,255,255,0.3)"/>
+              </marker>
+            </defs>
+
+            <!-- Axis labels -->
+            <text x="260" y="378" text-anchor="middle" fill="#6b6e85" font-size="10" font-family="'Segoe UI',sans-serif">Effort →  Low                                                                  High</text>
+            <text x="18" y="190" text-anchor="middle" fill="#6b6e85" font-size="10" font-family="'Segoe UI',sans-serif" transform="rotate(-90 18 190)">Impact ↑  Low                              High</text>
+
+            <!-- Quadrant labels -->
+            <text x="155" y="40"  text-anchor="middle" fill="#34d399" font-size="9.5" font-weight="700" font-family="'Segoe UI',sans-serif">🚀 QUICK WINS — DO FIRST</text>
+            <text x="365" y="40"  text-anchor="middle" fill="#fbbf24" font-size="9.5" font-weight="700" font-family="'Segoe UI',sans-serif">📋 PLAN CAREFULLY</text>
+            <text x="155" y="215" text-anchor="middle" fill="#fb923c" font-size="9.5" font-weight="700" font-family="'Segoe UI',sans-serif">⚡ FILL-IN ITEMS</text>
+            <text x="365" y="215" text-anchor="middle" fill="#f87171" font-size="9.5" font-weight="700" font-family="'Segoe UI',sans-serif">⚠️ REASSESS PRIORITY</text>
+
+            <!-- Data points — Quick Wins -->
+            <circle cx="100" cy="60"  r="18" fill="rgba(52,211,153,0.15)" stroke="#34d399" stroke-width="1.5"/>
+            <text x="100" y="64" text-anchor="middle" fill="#34d399" font-size="8.5" font-family="'Segoe UI',sans-serif">MFA</text>
+
+            <circle cx="160" cy="85"  r="18" fill="rgba(52,211,153,0.15)" stroke="#34d399" stroke-width="1.5"/>
+            <text x="160" y="89" text-anchor="middle" fill="#34d399" font-size="8" font-family="'Segoe UI',sans-serif">GuardDuty</text>
+
+            <circle cx="130" cy="130" r="18" fill="rgba(52,211,153,0.15)" stroke="#34d399" stroke-width="1.5"/>
+            <text x="130" y="134" text-anchor="middle" fill="#34d399" font-size="8" font-family="'Segoe UI',sans-serif">CloudTrail</text>
+
+            <circle cx="210" cy="100" r="18" fill="rgba(52,211,153,0.15)" stroke="#34d399" stroke-width="1.5"/>
+            <text x="210" y="104" text-anchor="middle" fill="#34d399" font-size="8" font-family="'Segoe UI',sans-serif">Budgets</text>
+
+            <!-- Plan Carefully -->
+            <circle cx="310" cy="60"  r="20" fill="rgba(251,191,36,0.12)" stroke="#fbbf24" stroke-width="1.5"/>
+            <text x="310" y="58" text-anchor="middle" fill="#fbbf24" font-size="8" font-family="'Segoe UI',sans-serif">Multi-AZ</text>
+            <text x="310" y="70" text-anchor="middle" fill="#fbbf24" font-size="8" font-family="'Segoe UI',sans-serif">Deploy</text>
+
+            <circle cx="390" cy="90"  r="20" fill="rgba(251,191,36,0.12)" stroke="#fbbf24" stroke-width="1.5"/>
+            <text x="390" y="88" text-anchor="middle" fill="#fbbf24" font-size="8" font-family="'Segoe UI',sans-serif">Control</text>
+            <text x="390" y="100" text-anchor="middle" fill="#fbbf24" font-size="8" font-family="'Segoe UI',sans-serif">Tower</text>
+
+            <circle cx="340" cy="140" r="18" fill="rgba(251,191,36,0.12)" stroke="#fbbf24" stroke-width="1.5"/>
+            <text x="340" y="144" text-anchor="middle" fill="#fbbf24" font-size="8" font-family="'Segoe UI',sans-serif">IaC CDK</text>
+
+            <!-- Fill-in Items -->
+            <circle cx="110" cy="270" r="18" fill="rgba(251,146,60,0.1)" stroke="#fb923c" stroke-width="1.5"/>
+            <text x="110" y="268" text-anchor="middle" fill="#fb923c" font-size="8" font-family="'Segoe UI',sans-serif">Cost</text>
+            <text x="110" y="280" text-anchor="middle" fill="#fb923c" font-size="8" font-family="'Segoe UI',sans-serif">Tags</text>
+
+            <circle cx="175" cy="300" r="18" fill="rgba(251,146,60,0.1)" stroke="#fb923c" stroke-width="1.5"/>
+            <text x="175" y="298" text-anchor="middle" fill="#fb923c" font-size="8" font-family="'Segoe UI',sans-serif">S3</text>
+            <text x="175" y="310" text-anchor="middle" fill="#fb923c" font-size="8" font-family="'Segoe UI',sans-serif">Encrypt</text>
+
+            <!-- Reassess -->
+            <circle cx="380" cy="300" r="22" fill="rgba(248,113,113,0.1)" stroke="#f87171" stroke-width="1.5"/>
+            <text x="380" y="298" text-anchor="middle" fill="#f87171" font-size="8" font-family="'Segoe UI',sans-serif">DR Full</text>
+            <text x="380" y="310" text-anchor="middle" fill="#f87171" font-size="8" font-family="'Segoe UI',sans-serif">Rebuild</text>
+          </svg>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" onclick="window.print()">🖨️ Export Full WAR Report</button>
+          <button class="btn-ghost" onclick="switchTab('template')">← Build the Report</button>
+        </div>
+      </div>
+    </div><!-- /panel-roadmap -->
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<footer>☁️ Well-Architected Review Template · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+
+<script>
+/* ─── TAB & SECTION ROUTING ─── */
+const tabs = ['overview','pillars','heatmap','template','roadmap'];
+
+function switchTab(t) {
+  tabs.forEach(x => {
+    document.getElementById('tab-' + x).classList.toggle('active', x === t);
+    document.getElementById('panel-' + x).classList.toggle('active', x === t);
+    document.getElementById('sb-' + x).style.display = x === t ? 'block' : 'none';
+  });
+  // Activate first sec-panel in new tab
+  const panel = document.getElementById('panel-' + t);
+  panel.querySelectorAll('.sec-panel').forEach((p,i) => p.classList.toggle('active', i === 0));
+  // Activate first sb-item
+  const sb = document.getElementById('sb-' + t);
+  sb.querySelectorAll('.sb-item').forEach((i,idx) => i.classList.toggle('active', idx === 0));
+}
+
+function showSec(tab, sec) {
+  const panel = document.getElementById('panel-' + tab);
+  panel.querySelectorAll('.sec-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(tab + '-' + sec).classList.add('active');
+  const sb = document.getElementById('sb-' + tab);
+  sb.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  if (event && event.currentTarget) event.currentTarget.classList.add('active');
+}
+
+function switchTemplate(sec) {
+  showSec('template', sec);
+  document.querySelectorAll('#sb-template .sb-item').forEach((i,idx) => {
+    if (i.textContent.toLowerCase().includes(sec)) i.classList.add('active');
+    else i.classList.remove('active');
+  });
+}
+
+/* ─── CHECKLIST ─── */
+function toggleChk(li) {
+  li.classList.toggle('chked');
+  li.querySelector('.chk-box').textContent = li.classList.contains('chked') ? '✓' : '';
+}
+
+/* ─── TEMPLATE SECTIONS (collapse) ─── */
+function toggleSection(header) {
+  const body = header.nextElementSibling;
+  body.style.display = body.style.display === 'none' ? 'block' : 'none';
+}
+
+/* ─── RISK SELECTOR ─── */
+function selectRisk(btn, level) {
+  const row = btn.closest('.risk-select');
+  row.querySelectorAll('.risk-opt').forEach(b => {
+    b.className = 'risk-opt';
+  });
+  btn.classList.add('active-' + level);
+}
+
+/* ─── RADAR CHART ─── */
+const pillars = [
+  { name:'Op. Excellence', color:'#60a5fa', score:55 },
+  { name:'Security',       color:'#f87171', score:30 },
+  { name:'Reliability',    color:'#34d399', score:40 },
+  { name:'Performance',    color:'#a78bfa', score:65 },
+  { name:'Cost',           color:'#fb923c', score:45 },
+  { name:'Sustainability', color:'#2dd4bf', score:70 },
+];
+
+function buildRadar() {
+  const cx=140, cy=140, r=100, n=pillars.length;
+  const svg = document.getElementById('radar-svg');
+
+  // Rings
+  const ringsG = document.getElementById('radar-rings');
+  [20,40,60,80,100].forEach(pct => {
+    const cr = r * pct/100;
+    const ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    ring.setAttribute('cx',cx); ring.setAttribute('cy',cy);
+    ring.setAttribute('r',cr); ring.setAttribute('fill','none');
+    ring.setAttribute('stroke','rgba(255,255,255,0.05)'); ring.setAttribute('stroke-width','1');
+    ringsG.appendChild(ring);
+    if (pct % 40 === 0) {
+      const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+      label.setAttribute('x',cx+4); label.setAttribute('y',cy-cr+4);
+      label.setAttribute('fill','rgba(255,255,255,0.2)'); label.setAttribute('font-size','7');
+      label.textContent = pct+'%';
+      ringsG.appendChild(label);
+    }
+  });
+
+  // Axes + labels
+  const axesG  = document.getElementById('radar-axes');
+  const labelsG = document.getElementById('radar-labels');
+  pillars.forEach((p,i) => {
+    const angle = (i * 2 * Math.PI / n) - Math.PI/2;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',cx); line.setAttribute('y1',cy);
+    line.setAttribute('x2',x); line.setAttribute('y2',y);
+    line.setAttribute('stroke','rgba(255,255,255,0.08)'); line.setAttribute('stroke-width','1');
+    axesG.appendChild(line);
+    const lx = cx + (r+20) * Math.cos(angle);
+    const ly = cy + (r+20) * Math.sin(angle);
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x',lx); lbl.setAttribute('y',ly);
+    lbl.setAttribute('text-anchor','middle'); lbl.setAttribute('dominant-baseline','middle');
+    lbl.setAttribute('fill',p.color); lbl.setAttribute('font-size','8.5');
+    lbl.setAttribute('font-weight','700'); lbl.setAttribute('font-family',"'Segoe UI',sans-serif");
+    lbl.textContent = p.name.split(' ').join('\n');
+    labelsG.appendChild(lbl);
+  });
+
+  updateRadar();
+  buildLegend();
+}
+
+function updateRadar() {
+  const cx=140, cy=140, r=100, n=pillars.length;
+  const pts = pillars.map((p,i) => {
+    const angle = (i * 2 * Math.PI / n) - Math.PI/2;
+    const dist = r * p.score/100;
+    return [cx + dist*Math.cos(angle), cy + dist*Math.sin(angle)];
+  });
+  document.getElementById('radar-poly').setAttribute('points', pts.map(p=>p.join(',')).join(' '));
+  const dotsG = document.getElementById('radar-dots');
+  dotsG.innerHTML = '';
+  pts.forEach((pt,i) => {
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx',pt[0]); circle.setAttribute('cy',pt[1]); circle.setAttribute('r',4);
+    circle.setAttribute('fill',pillars[i].color); circle.setAttribute('stroke',pillars[i].color);
+    circle.setAttribute('filter','url(#glow)');
+    dotsG.appendChild(circle);
+  });
+}
+
+function buildLegend() {
+  document.getElementById('radar-controls').innerHTML = pillars.map((p,i) => `
+    <div class="rl-item">
+      <div class="rl-dot" style="background:${p.color}"></div>
+      <div class="rl-name">${p.name}</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="range" min="0" max="100" value="${p.score}"
+          style="width:80px;accent-color:${p.color}"
+          oninput="pillars[${i}].score=+this.value;document.getElementById('score-lbl-${i}').textContent=this.value+'%';updateRadar();">
+        <div class="rl-score" id="score-lbl-${i}">${p.score}%</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ─── HEAT MAP GRID ─── */
+const heatRows = [
+  'Identity & Access','Encryption','Network Security','Monitoring',
+  'Incident Response','Resilience','Recovery','Scalability',
+  'Cost Visibility','Rightsizing','Tagging','Efficiency'
+];
+const riskLevels = ['h-critical','h-high','h-med','h-low','h-none'];
+const riskNames  = ['Critical','High','Med','Low','None'];
+
+function buildHeatGrid() {
+  const grid = document.getElementById('heat-grid-rows');
+  const data = [
+    [1,1,1,2,3,'h-none'],
+    [0,0,2,3,3,'h-none'],
+    [1,2,3,3,'h-none','h-none'],
+    [1,1,2,3,'h-none','h-none'],
+    [0,2,2,3,3,'h-none'],
+    [0,0,1,2,3,'h-none'],
+    [0,1,2,2,3,'h-none'],
+    [1,2,2,3,'h-none','h-none'],
+    [1,1,2,2,3,'h-none'],
+    [1,2,3,3,'h-none','h-none'],
+    [0,1,2,3,3,'h-none'],
+    [2,3,3,'h-none','h-none','h-none']
+  ];
+  grid.innerHTML = heatRows.map((row,ri) => `
+    <div style="display:grid;grid-template-columns:80px repeat(6,1fr);gap:4px;margin-bottom:4px;align-items:center;">
+      <div style="font-size:0.59rem;color:var(--muted2);text-align:right;padding-right:6px;">${row}</div>
+      ${pillars.map((_,ci) => {
+        const lvl = typeof data[ri][ci] === 'number' ? riskLevels[data[ri][ci]] : data[ri][ci];
+        const lvlIdx = typeof data[ri][ci] === 'number' ? data[ri][ci] : riskLevels.indexOf(data[ri][ci]);
+        return `<div class="heat-cell ${lvl}" onclick="cycleRisk(this)" title="${riskNames[lvlIdx]||'None'}: ${row} × ${pillars[ci].name}">${riskNames[lvlIdx]||'—'}</div>`;
+      }).join('')}
+    </div>`).join('');
+  updateHRICounts();
+}
+
+function cycleRisk(cell) {
+  const idx = riskLevels.findIndex(r => cell.classList.contains(r));
+  riskLevels.forEach(r => cell.classList.remove(r));
+  const next = riskLevels[(idx+1) % riskLevels.length];
+  cell.classList.add(next);
+  cell.textContent = riskNames[(idx+1) % riskLevels.length] || '—';
+  cell.title = riskNames[(idx+1) % riskLevels.length];
+  updateHRICounts();
+}
+
+function updateHRICounts() {
+  const all  = document.querySelectorAll('.heat-cell');
+  const hri  = [...all].filter(c => c.classList.contains('h-critical') || c.classList.contains('h-high')).length;
+  const mri  = [...all].filter(c => c.classList.contains('h-med')).length;
+  const none = [...all].filter(c => c.classList.contains('h-none')).length;
+  const el1 = document.getElementById('hri-count');
+  const el2 = document.getElementById('mri-count');
+  const el3 = document.getElementById('resolved-count');
+  const el4 = document.getElementById('total-count');
+  if (el1) el1.textContent = hri;
+  if (el2) el2.textContent = mri;
+  if (el3) el3.textContent = none;
+  if (el4) el4.textContent = all.length;
+}
+
+/* ─── INIT ─── */
+buildRadar();
+buildHeatGrid();
+
+// Init sidebar visibility
+['pillars','heatmap','template','roadmap'].forEach(t => {
+  document.getElementById('sb-'+t).style.display = 'none';
+});
+document.getElementById('sb-overview').style.display = 'block';
+</script>
+</body>
+</html>

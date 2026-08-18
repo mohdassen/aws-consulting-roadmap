@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud Governance Framework Builder — Mohammad Dassen</title>
+<meta name="description" content="Interactive tool for designing and documenting a cloud governance framework — covering FinOps, security, tagging strategy, and multi-account design. Outputs a client-ready governance document.">
+<meta name="keywords" content="cloud governance framework, AWS Control Tower, landing zone design, FinOps Saudi Arabia, cloud tagging strategy, multi-account AWS, NCA cloud governance, cloud governance document">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/cloud-governance.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/cloud-governance.html">
+<meta property="og:title" content="Cloud Governance Framework Builder — Interactive Tool">
+<meta property="og:description" content="Design and document your cloud governance framework interactively: FinOps, security guardrails, tagging strategy, multi-account structure, and Control Tower. Outputs a client-ready document.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cloud Governance Framework Builder">
+<meta name="twitter:description" content="Interactive cloud governance framework builder — FinOps, security, tagging, multi-account design. Export client-ready document.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Cloud Governance Framework Builder",
+  "description": "Interactive tool for designing and documenting a cloud governance framework covering FinOps, security, tagging strategy, and multi-account design.",
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/cloud-governance.html",
+  "author": {
+    "@type": "Person",
+    "name": "Mohammad Dassen",
+    "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+    "address": {"@type": "PostalAddress", "addressLocality": "Riyadh", "addressCountry": "SA"},
+    "url": "https://mohdassen.github.io/aws-consulting-roadmap"
+  }
+}
+</script>
+<style>
+:root {
+  --bg:#07090f; --surface:#0e1219; --s2:#141820; --s3:#1a1f2e;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --text:#e8edf5; --muted:#6b7a94; --muted2:#9093aa;
+  --gold:#f59e0b; --gold2:#fbbf24;
+  --green:#34d399; --blue:#60a5fa; --purple:#c084fc;
+  --red:#f87171; --orange:#fb923c; --teal:#2dd4bf;
+  /* Domain colours */
+  --d-finops:#f59e0b;
+  --d-security:#f87171;
+  --d-tagging:#34d399;
+  --d-accounts:#60a5fa;
+  --d-ops:#c084fc;
+  --d-compliance:#2dd4bf;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;line-height:1.6;}
+a{color:inherit;text-decoration:none;}
+textarea,input,select{font-family:inherit;}
+
+/* ── BACK BAR ── */
+.back-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:46px;display:flex;align-items:center;position:sticky;top:0;z-index:200;}
+.back-bar a{display:flex;align-items:center;gap:7px;font-size:0.71rem;font-weight:600;color:var(--muted2);transition:color .2s;}
+.back-bar a:hover{color:var(--gold);}
+.back-bar .arrow{transition:transform .2s;}
+.back-bar a:hover .arrow{transform:translateX(-3px);}
+.back-bar .site-id{margin-left:auto;font-size:0.61rem;color:var(--muted);}
+
+/* ── HERO ── */
+.hero{padding:60px 32px 48px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border);}
+.hero::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 55% 50% at 50% 0%,rgba(245,158,11,.10) 0%,transparent 70%),
+             radial-gradient(ellipse 30% 60% at 10% 100%,rgba(96,165,250,.05) 0%,transparent 60%),
+             radial-gradient(ellipse 30% 60% at 90% 80%,rgba(52,211,153,.05) 0%,transparent 60%);
+  pointer-events:none;}
+.hero-eye{display:inline-flex;align-items:center;gap:8px;font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-weight:700;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);padding:5px 16px;border-radius:20px;margin-bottom:20px;}
+.hero h1{font-family:Georgia,'Times New Roman',serif;font-size:2.6rem;font-weight:700;line-height:1.12;margin-bottom:12px;max-width:700px;margin-inline:auto;}
+.hero h1 em{color:var(--gold);font-style:italic;}
+.hero-desc{font-size:0.8rem;color:var(--muted2);max-width:540px;margin:0 auto 32px;line-height:1.75;}
+.hero-chips{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;}
+.chip{font-size:0.62rem;padding:4px 12px;border-radius:12px;font-weight:600;border:1px solid;}
+
+/* ── LAYOUT ── */
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 180px);}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:16px 0;position:sticky;top:46px;height:calc(100vh - 46px);overflow-y:auto;}
+.sb-label{font-size:0.54rem;color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;padding:12px 16px 4px;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;font-size:0.7rem;color:var(--muted2);border-left:2px solid transparent;transition:all .15s;}
+.sb-item:hover{color:var(--text);background:rgba(255,255,255,.025);}
+.sb-item.active{color:var(--gold);background:rgba(245,158,11,.06);border-left-color:var(--gold);}
+.sb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sb-score{margin-left:auto;font-size:0.6rem;font-weight:700;padding:2px 6px;border-radius:4px;}
+.sb-divider{height:1px;background:var(--border);margin:8px 16px;}
+.sb-export{margin:12px 16px;padding:9px;border-radius:8px;background:linear-gradient(135deg,#d4891c,var(--gold));color:#09090d;font-size:0.7rem;font-weight:700;text-align:center;cursor:pointer;border:none;width:calc(100% - 32px);transition:opacity .2s;}
+.sb-export:hover{opacity:.88;}
+.sb-progress-wrap{padding:8px 16px;}
+.sb-progress-label{font-size:0.6rem;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between;}
+.sb-progress-track{height:4px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;}
+.sb-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--green));border-radius:4px;transition:width .5s ease;}
+
+/* ── CONTENT ── */
+.content{padding:0;}
+.section{display:none;animation:fadeUp .22s ease;}
+.section.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SECTION HERO ── */
+.sec-hero{padding:28px 32px 20px;border-bottom:1px solid var(--border);}
+.sec-eye{font-size:0.56rem;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;margin-bottom:5px;}
+.sec-title{font-family:Georgia,serif;font-size:1.4rem;color:var(--text);margin-bottom:6px;}
+.sec-desc{font-size:0.73rem;color:var(--muted2);line-height:1.7;max-width:620px;}
+.sec-complete{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:0.62rem;font-weight:700;color:var(--green);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);padding:3px 10px;border-radius:10px;}
+
+/* ── CARDS & BOXES ── */
+.sec-body{padding:24px 32px;}
+.box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;}
+.box-title{font-size:0.8rem;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.box-desc{font-size:0.72rem;color:var(--muted2);line-height:1.7;margin-bottom:12px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
+
+/* ── FORM ELEMENTS ── */
+.field-label{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;font-weight:600;}
+.field-input{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-size:0.74rem;width:100%;outline:none;transition:border .2s;margin-bottom:10px;}
+.field-input:focus{border-color:var(--gold);}
+.field-input::placeholder{color:var(--muted);}
+.field-textarea{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-size:0.73rem;width:100%;outline:none;resize:vertical;min-height:72px;transition:border .2s;margin-bottom:10px;line-height:1.6;}
+.field-textarea:focus{border-color:var(--gold);}
+.field-textarea::placeholder{color:var(--muted);}
+.field-select{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-size:0.73rem;width:100%;outline:none;margin-bottom:10px;appearance:none;cursor:pointer;}
+.field-select:focus{border-color:var(--gold);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px;}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+/* ── TOGGLE OPTIONS ── */
+.opt-group{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.opt{padding:6px 14px;border-radius:8px;font-size:0.67rem;font-weight:600;cursor:pointer;border:1px solid var(--border2);color:var(--muted2);background:rgba(255,255,255,.03);transition:all .15s;user-select:none;}
+.opt:hover{color:var(--text);border-color:var(--border2);}
+.opt.on{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.4);color:var(--gold);}
+.opt.on-green{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.4);color:var(--green);}
+.opt.on-blue{background:rgba(96,165,250,.1);border-color:rgba(96,165,250,.4);color:var(--blue);}
+.opt.on-red{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.4);color:var(--red);}
+.opt.on-purple{background:rgba(192,132,252,.1);border-color:rgba(192,132,252,.4);color:var(--purple);}
+
+/* ── ACCOUNT DESIGNER ── */
+.acct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:14px;}
+.acct-card{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all .15s;text-align:center;}
+.acct-card:hover{border-color:var(--border2);}
+.acct-card.enabled{border-color:rgba(96,165,250,.4);background:rgba(96,165,250,.06);}
+.acct-icon{font-size:1.4rem;margin-bottom:6px;}
+.acct-name{font-size:0.72rem;font-weight:700;color:var(--text);margin-bottom:3px;}
+.acct-desc{font-size:0.62rem;color:var(--muted2);}
+.acct-badge{font-size:0.58rem;padding:2px 7px;border-radius:5px;font-weight:700;margin-top:5px;display:inline-block;}
+
+/* ── TAG BUILDER ── */
+.tag-table{width:100%;border-collapse:collapse;font-size:0.7rem;margin-bottom:10px;}
+.tag-table th{background:rgba(255,255,255,.04);color:var(--muted);font-size:0.6rem;text-transform:uppercase;letter-spacing:.8px;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.tag-table td{padding:7px 10px;border-bottom:1px solid var(--border);}
+.tag-table tr:last-child td{border-bottom:none;}
+.tag-table tr:hover td{background:rgba(255,255,255,.015);}
+.tag-key{font-family:monospace;color:var(--green);font-size:0.72rem;}
+.tag-required{font-size:0.58rem;padding:2px 7px;border-radius:4px;font-weight:700;}
+.tag-add-row{display:flex;gap:8px;margin-bottom:4px;}
+.tag-add-input{flex:1;}
+.tag-add-btn{padding:8px 16px;border-radius:8px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:var(--green);font-size:0.68rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .2s;}
+.tag-add-btn:hover{opacity:.8;}
+.tag-del{cursor:pointer;color:var(--muted);font-size:0.75rem;padding:2px 6px;border-radius:4px;transition:color .15s;}
+.tag-del:hover{color:var(--red);}
+
+/* ── GUARDRAIL ITEMS ── */
+.guardrail{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--s2);border:1px solid var(--border);border-radius:9px;margin-bottom:8px;cursor:pointer;transition:all .15s;}
+.guardrail:hover{border-color:var(--border2);}
+.guardrail.on{border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.05);}
+.guardrail.on-warn{border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.05);}
+.gr-check{width:20px;height:20px;border-radius:5px;border:1px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.7rem;transition:all .2s;}
+.guardrail.on .gr-check,.guardrail.on-warn .gr-check{background:var(--green);border-color:var(--green);color:#07090f;font-weight:800;}
+.gr-body{flex:1;}
+.gr-title{font-size:0.73rem;font-weight:700;color:var(--text);}
+.gr-desc{font-size:0.63rem;color:var(--muted2);line-height:1.5;}
+.gr-badge{font-size:0.58rem;padding:2px 8px;border-radius:5px;font-weight:700;white-space:nowrap;flex-shrink:0;}
+
+/* ── COST THRESHOLDS ── */
+.threshold-row{display:grid;grid-template-columns:1fr 150px 120px;gap:10px;align-items:end;margin-bottom:8px;}
+.threshold-row:first-child{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;}
+
+/* ── MATURITY RADAR ── */
+.radar-section{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;}
+
+/* ── OUTPUT PREVIEW ── */
+.output-box{background:#0a0c10;border:1px solid var(--border);border-radius:12px;padding:24px;font-family:monospace;font-size:0.71rem;line-height:1.9;color:#c8d3e0;overflow:auto;max-height:520px;margin-bottom:14px;}
+.output-section-head{color:var(--gold);font-weight:700;font-size:0.78rem;}
+.output-key{color:var(--blue);}
+.output-val{color:var(--green);}
+.output-comment{color:var(--muted);}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+.btn-primary{padding:9px 20px;border-radius:8px;font-size:0.72rem;font-weight:700;background:linear-gradient(135deg,#d4891c,var(--gold));color:#09090d;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:opacity .2s;font-family:inherit;}
+.btn-primary:hover{opacity:.88;}
+.btn-ghost{padding:9px 18px;border-radius:8px;font-size:0.72rem;font-weight:700;background:rgba(255,255,255,.04);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;transition:all .2s;}
+.btn-ghost:hover{background:rgba(255,255,255,.08);}
+.btn-next{margin-top:20px;padding:10px 24px;border-radius:8px;font-size:0.73rem;font-weight:700;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:var(--gold);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s;font-family:inherit;width:fit-content;}
+.btn-next:hover{background:rgba(245,158,11,.18);}
+
+/* ── ALERTS ── */
+.alert{border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.71rem;line-height:1.65;display:flex;gap:10px;}
+.a-gold{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);color:#f5c55a;}
+.a-green{background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);color:#34d399;}
+.a-blue{background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.2);color:#60a5fa;}
+.a-red{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);color:#f87171;}
+
+/* ── SCORE CARDS ── */
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.score-card{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;}
+.score-num{font-family:Georgia,serif;font-size:1.6rem;font-weight:700;line-height:1;}
+.score-label{font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+.score-sub{font-size:0.62rem;color:var(--muted2);margin-top:3px;}
+
+/* ── DOMAIN NAV ── */
+.domain-nav{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);background:var(--surface);}
+.domain-nav::-webkit-scrollbar{display:none;}
+.domain-tab{flex:1;min-width:120px;padding:14px 10px;text-align:center;cursor:pointer;font-size:0.67rem;font-weight:600;color:var(--muted2);border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.domain-tab .d-icon{display:block;font-size:1rem;margin-bottom:3px;}
+.domain-tab:hover{color:var(--text);}
+.domain-tab.active{border-bottom-color:var(--gold);color:var(--gold);}
+
+/* ── STEP WIZARD ── */
+.wizard-steps{display:flex;align-items:center;gap:0;padding:0 32px;margin-bottom:0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);background:var(--surface);}
+.wizard-steps::-webkit-scrollbar{display:none;}
+.wstep{display:flex;align-items:center;gap:8px;padding:14px 12px;cursor:pointer;white-space:nowrap;font-size:0.67rem;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s;}
+.wstep:hover{color:var(--muted2);}
+.wstep.active{color:var(--gold);border-bottom-color:var(--gold);}
+.wstep.done{color:var(--green);}
+.wstep .wnum{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:0.62rem;font-weight:800;flex-shrink:0;transition:all .2s;}
+.wstep.active .wnum{background:var(--gold);color:#09090d;}
+.wstep.done .wnum{background:var(--green);color:#09090d;}
+
+/* ── CONTROL TOWER VISUAL ── */
+.ct-visual{background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;}
+.ct-tree{display:flex;flex-direction:column;gap:8px;}
+.ct-root{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;}
+.ct-ou{margin-left:24px;display:flex;flex-direction:column;gap:6px;}
+.ct-ou-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.15);border-radius:7px;position:relative;}
+.ct-ou-item::before{content:'';position:absolute;left:-16px;top:50%;width:10px;height:1px;background:var(--border2);}
+.ct-acct{margin-left:24px;margin-top:4px;display:flex;flex-direction:column;gap:4px;}
+.ct-acct-item{display:flex;align-items:center;gap:7px;padding:6px 10px;background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.12);border-radius:6px;font-size:0.66rem;position:relative;}
+.ct-acct-item::before{content:'';position:absolute;left:-16px;top:50%;width:10px;height:1px;background:var(--border);}
+
+/* ── FINOPS DASHBOARD ── */
+.budget-bar{height:8px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,.05);margin-top:4px;}
+.budget-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+
+footer{border-top:1px solid var(--border);text-align:center;padding:20px;font-size:0.63rem;color:var(--muted);}
+footer span{color:var(--gold);}
+
+@media(max-width:720px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .field-row,.field-row-3,.two-col,.three-col{grid-template-columns:1fr;}
+  .hero h1{font-size:1.7rem;}
+  .score-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- BACK BAR -->
+<div class="back-bar">
+  <a href="index.html"><span class="arrow">←</span> Back to Home</a>
+  <span class="site-id">Mohammad Dassen · Cloud Portfolio</span>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eye">🌱 Governance Tool</div>
+  <h1>Cloud Governance <em>Framework Builder</em></h1>
+  <p class="hero-desc">Design and document your organization's cloud governance framework — covering multi-account structure, FinOps, security guardrails, tagging strategy, and Control Tower. Outputs a client-ready governance document in minutes.</p>
+  <div class="hero-chips">
+    <span class="chip" style="color:var(--blue);border-color:rgba(96,165,250,.3);background:rgba(96,165,250,.08)">Control Tower</span>
+    <span class="chip" style="color:var(--gold);border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08)">FinOps</span>
+    <span class="chip" style="color:var(--red);border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.08)">Security Guardrails</span>
+    <span class="chip" style="color:var(--green);border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.08)">Tagging Strategy</span>
+    <span class="chip" style="color:var(--purple);border-color:rgba(192,132,252,.3);background:rgba(192,132,252,.08)">Landing Zone</span>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-progress-wrap">
+      <div class="sb-progress-label"><span>Framework completion</span><span id="sb-pct">0%</span></div>
+      <div class="sb-progress-track"><div class="sb-progress-fill" id="sb-fill" style="width:0%"></div></div>
+    </div>
+    <div class="sb-divider"></div>
+
+    <div class="sb-label">Framework Domains</div>
+    <div class="sb-item active" onclick="showSection('overview',this)"><div class="sb-dot" style="background:var(--gold)"></div>Overview & Context<span class="sb-score" id="sc-overview" style="background:rgba(107,122,148,.1);color:var(--muted)">—</span></div>
+    <div class="sb-item" onclick="showSection('accounts',this)"><div class="sb-dot" style="background:var(--d-accounts)"></div>Multi-Account Design<span class="sb-score" id="sc-accounts" style="background:rgba(107,122,148,.1);color:var(--muted)">—</span></div>
+    <div class="sb-item" onclick="showSection('security',this)"><div class="sb-dot" style="background:var(--d-security)"></div>Security Guardrails<span class="sb-score" id="sc-security" style="background:rgba(107,122,148,.1);color:var(--muted)">—</span></div>
+    <div class="sb-item" onclick="showSection('finops',this)"><div class="sb-dot" style="background:var(--d-finops)"></div>FinOps & Cost<span class="sb-score" id="sc-finops" style="background:rgba(107,122,148,.1);color:var(--muted)">—</span></div>
+    <div class="sb-item" onclick="showSection('tagging',this)"><div class="sb-dot" style="background:var(--d-tagging)"></div>Tagging Strategy<span class="sb-score" id="sc-tagging" style="background:rgba(107,122,148,.1);color:var(--muted)">—</span></div>
+    <div class="sb-item" onclick="showSection('ops',this)"><div class="sb-dot" style="background:var(--d-ops)"></div>Operational Governance<span class="sb-score" id="sc-ops" style="background:rgba(107,122,148,.1);color:var(--muted)">—</span></div>
+    <div class="sb-item" onclick="showSection('output',this)"><div class="sb-dot" style="background:var(--teal)"></div>Export Document<span class="sb-score" id="sc-output" style="background:rgba(45,212,191,.1);color:var(--teal)">→</span></div>
+
+    <div class="sb-divider"></div>
+    <button class="sb-export" onclick="showSection('output',null);document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));document.querySelectorAll('.sb-item')[6].classList.add('active');">📄 Generate Document</button>
+  </div>
+
+  <!-- CONTENT AREA -->
+  <div class="content">
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION: OVERVIEW                          -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section active" id="section-overview">
+      <div class="sec-hero">
+        <div class="sec-eye" style="color:var(--gold)">Domain 1 · Foundation</div>
+        <div class="sec-title">Organization Overview & Context</div>
+        <div class="sec-desc">Define the organizational context for this governance framework. This information appears on the cover page of the generated document and scopes all subsequent decisions.</div>
+      </div>
+      <div class="sec-body">
+        <div class="alert a-gold">🏛️ <span><strong>Governance starts with context.</strong> A framework designed for a Saudi public university has fundamentally different constraints than one for a fintech startup — NCA regulatory obligations, Saudi data residency requirements, and Ministry of Communications oversight all shape the governance posture.</span></div>
+
+        <div class="box">
+          <div class="box-title">🏢 Organization Details</div>
+          <div class="field-row">
+            <div><div class="field-label">Organization Name</div><input class="field-input" id="org-name" placeholder="e.g. Princess Nourah bint Abdulrahman University" oninput="updateScore('overview')"></div>
+            <div><div class="field-label">Short Name / Acronym</div><input class="field-input" id="org-short" placeholder="e.g. PNU"></div>
+          </div>
+          <div class="field-row">
+            <div>
+              <div class="field-label">Sector</div>
+              <select class="field-select" id="org-sector" onchange="updateScore('overview')">
+                <option value="">Select sector...</option>
+                <option>Higher Education</option>
+                <option>Government Ministry</option>
+                <option>Healthcare</option>
+                <option>Financial Services</option>
+                <option>Energy & Utilities</option>
+                <option>Telecommunications</option>
+                <option>Retail & E-Commerce</option>
+                <option>Real Estate</option>
+                <option>Manufacturing</option>
+                <option>Private Enterprise</option>
+              </select>
+            </div>
+            <div>
+              <div class="field-label">Cloud Maturity Level</div>
+              <select class="field-select" id="org-maturity" onchange="updateScore('overview')">
+                <option value="">Select maturity...</option>
+                <option>Exploring (0–10% cloud)</option>
+                <option>Adopting (10–30% cloud)</option>
+                <option>Scaling (30–60% cloud)</option>
+                <option>Optimizing (60%+ cloud)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-label">Primary Cloud Objectives (select all that apply)</div>
+          <div class="opt-group" id="objectives">
+            <div class="opt" onclick="toggleOpt(this,'on')">Cost Reduction</div>
+            <div class="opt" onclick="toggleOpt(this,'on')">Security & Compliance</div>
+            <div class="opt" onclick="toggleOpt(this,'on')">Digital Transformation</div>
+            <div class="opt" onclick="toggleOpt(this,'on')">Scalability</div>
+            <div class="opt" onclick="toggleOpt(this,'on')">Innovation & AI</div>
+            <div class="opt" onclick="toggleOpt(this,'on')">Business Continuity</div>
+            <div class="opt" onclick="toggleOpt(this,'on')">Data Sovereignty</div>
+            <div class="opt" onclick="toggleOpt(this,'on')">Vision 2030 Alignment</div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">⚖️ Regulatory & Compliance Context</div>
+          <div class="box-desc">Select all regulatory frameworks that apply to this organization. Each selection adds relevant guardrails and controls to the governance framework.</div>
+          <div class="field-label">Applicable Saudi Regulations</div>
+          <div class="opt-group" id="regulations">
+            <div class="opt" onclick="toggleOpt(this,'on-red')">NCA CCC (Cybersecurity Controls)</div>
+            <div class="opt" onclick="toggleOpt(this,'on-red')">PDPL (Personal Data Protection)</div>
+            <div class="opt" onclick="toggleOpt(this,'on-red')">NDMO Cloud Policy</div>
+            <div class="opt" onclick="toggleOpt(this,'on-red')">Digital Government Standard 5.13.2</div>
+            <div class="opt" onclick="toggleOpt(this,'on-red')">SAMA Cloud Framework</div>
+            <div class="opt" onclick="toggleOpt(this,'on-red')">MOH Data Policy</div>
+            <div class="opt" onclick="toggleOpt(this,'on-red')">Vision 2030 Digital Strategy</div>
+          </div>
+          <div class="field-label">Primary AWS Region</div>
+          <div class="opt-group" id="aws-region">
+            <div class="opt on-blue" onclick="setRegion(this)">me-south-1 · Bahrain</div>
+            <div class="opt" onclick="setRegion(this)">me-central-1 · UAE</div>
+            <div class="opt" onclick="setRegion(this)">us-east-1 · Virginia</div>
+            <div class="opt" onclick="setRegion(this)">eu-west-1 · Ireland</div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">👥 Governance Stakeholders</div>
+          <div class="field-row">
+            <div><div class="field-label">Executive Sponsor</div><input class="field-input" id="exec-sponsor" placeholder="e.g. CIO / VP Technology"></div>
+            <div><div class="field-label">Cloud Owner</div><input class="field-input" id="cloud-owner" placeholder="e.g. Head of Cloud Infrastructure"></div>
+          </div>
+          <div class="field-row">
+            <div><div class="field-label">Security Owner</div><input class="field-input" id="sec-owner" placeholder="e.g. CISO / IT Security Manager"></div>
+            <div><div class="field-label">FinOps Owner</div><input class="field-input" id="finops-owner" placeholder="e.g. IT Finance Controller"></div>
+          </div>
+          <div class="field-label">Governance Review Cadence</div>
+          <div class="opt-group" id="review-cadence">
+            <div class="opt" onclick="setSingle(this,'review-cadence','on')">Monthly</div>
+            <div class="opt on" onclick="setSingle(this,'review-cadence','on')">Quarterly</div>
+            <div class="opt" onclick="setSingle(this,'review-cadence','on')">Semi-Annually</div>
+            <div class="opt" onclick="setSingle(this,'review-cadence','on')">Annually</div>
+          </div>
+        </div>
+        <button class="btn-next" onclick="showSection('accounts',null);document.querySelectorAll('.sb-item').forEach((i,idx)=>{i.classList.toggle('active',idx===1)});">Next: Multi-Account Design →</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION: ACCOUNTS                          -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section" id="section-accounts">
+      <div class="sec-hero">
+        <div class="sec-eye" style="color:var(--d-accounts)">Domain 2 · Structure</div>
+        <div class="sec-title">Multi-Account Design & Landing Zone</div>
+        <div class="sec-desc">Define your AWS Organizations structure, Organizational Units (OUs), and account vending model. A well-designed multi-account structure is the foundation of secure, scalable cloud governance.</div>
+      </div>
+      <div class="sec-body">
+        <div class="alert a-blue">🏗️ <span><strong>AWS best practice:</strong> Separate accounts for security, logging, production, development, and shared services. This isolates blast radius, simplifies cost attribution, and enables fine-grained SCPs per OU.</span></div>
+
+        <div class="box">
+          <div class="box-title">🏛️ Landing Zone Approach</div>
+          <div class="field-label">Landing Zone Model</div>
+          <div class="opt-group" id="lz-model">
+            <div class="opt on-blue" onclick="setSingle(this,'lz-model','on-blue');updateLZVisual()">AWS Control Tower</div>
+            <div class="opt" onclick="setSingle(this,'lz-model','on-blue');updateLZVisual()">Custom (CloudFormation)</div>
+            <div class="opt" onclick="setSingle(this,'lz-model','on-blue');updateLZVisual()">Terraform Landing Zone</div>
+            <div class="opt" onclick="setSingle(this,'lz-model','on-blue');updateLZVisual()">Manual / Planned</div>
+          </div>
+          <div class="field-label">Organization Structure</div>
+          <div class="opt-group" id="org-structure">
+            <div class="opt on-blue" onclick="setSingle(this,'org-structure','on-blue')">OU by Environment (Prod/Dev/Test)</div>
+            <div class="opt" onclick="setSingle(this,'org-structure','on-blue')">OU by Business Unit</div>
+            <div class="opt" onclick="setSingle(this,'org-structure','on-blue')">OU by Workload Type</div>
+            <div class="opt" onclick="setSingle(this,'org-structure','on-blue')">Hybrid (Env + BU)</div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">🗂️ Account Inventory — Select Accounts to Include</div>
+          <div class="box-desc">Enable the accounts that will form your landing zone. Each enabled account generates configuration guidance in the output document.</div>
+          <div class="acct-grid" id="acct-grid">
+            <div class="acct-card enabled" onclick="toggleAcct(this)" data-acct="management"><div class="acct-icon">👑</div><div class="acct-name">Management</div><div class="acct-desc">Root org, billing, SCPs</div><div class="acct-badge" style="background:rgba(245,158,11,.1);color:var(--gold)">Required</div></div>
+            <div class="acct-card enabled" onclick="toggleAcct(this)" data-acct="security"><div class="acct-icon">🔐</div><div class="acct-name">Security Tooling</div><div class="acct-desc">GuardDuty, Security Hub</div><div class="acct-badge" style="background:rgba(248,113,113,.1);color:var(--red)">Recommended</div></div>
+            <div class="acct-card enabled" onclick="toggleAcct(this)" data-acct="logging"><div class="acct-icon">📋</div><div class="acct-name">Log Archive</div><div class="acct-desc">CloudTrail, S3 logs</div><div class="acct-badge" style="background:rgba(248,113,113,.1);color:var(--red)">Recommended</div></div>
+            <div class="acct-card" onclick="toggleAcct(this)" data-acct="shared"><div class="acct-icon">🔗</div><div class="acct-name">Shared Services</div><div class="acct-desc">DNS, AD, Transit GW</div><div class="acct-badge" style="background:rgba(107,122,148,.1);color:var(--muted)">Optional</div></div>
+            <div class="acct-card enabled" onclick="toggleAcct(this)" data-acct="prod"><div class="acct-icon">🚀</div><div class="acct-name">Production</div><div class="acct-desc">Live workloads</div><div class="acct-badge" style="background:rgba(52,211,153,.1);color:var(--green)">Core</div></div>
+            <div class="acct-card enabled" onclick="toggleAcct(this)" data-acct="dev"><div class="acct-icon">🛠️</div><div class="acct-name">Development</div><div class="acct-desc">Dev environments</div><div class="acct-badge" style="background:rgba(52,211,153,.1);color:var(--green)">Core</div></div>
+            <div class="acct-card" onclick="toggleAcct(this)" data-acct="test"><div class="acct-icon">🧪</div><div class="acct-name">Testing / QA</div><div class="acct-desc">Staging, UAT</div><div class="acct-badge" style="background:rgba(107,122,148,.1);color:var(--muted)">Optional</div></div>
+            <div class="acct-card" onclick="toggleAcct(this)" data-acct="sandbox"><div class="acct-icon">🏖️</div><div class="acct-name">Sandbox</div><div class="acct-desc">Experiments, PoC</div><div class="acct-badge" style="background:rgba(107,122,148,.1);color:var(--muted)">Optional</div></div>
+            <div class="acct-card" onclick="toggleAcct(this)" data-acct="network"><div class="acct-icon">🌐</div><div class="acct-name">Network Hub</div><div class="acct-desc">VPC, Transit GW, DX</div><div class="acct-badge" style="background:rgba(107,122,148,.1);color:var(--muted)">Optional</div></div>
+          </div>
+        </div>
+
+        <div class="ct-visual">
+          <div class="box-title" style="margin-bottom:14px">📊 Account Hierarchy Preview</div>
+          <div class="ct-tree" id="ct-tree">
+            <div class="ct-root"><span style="color:var(--gold);font-weight:700;font-size:.8rem">👑</span><div><div style="font-size:.75rem;font-weight:700;color:var(--gold)">Root — Management Account</div><div style="font-size:.63rem;color:var(--muted2)">AWS Organizations root — SCPs, consolidated billing, IAM Identity Center</div></div></div>
+            <div class="ct-ou">
+              <div class="ct-ou-item"><span style="color:var(--red);font-size:.8rem">🔐</span><div><div style="font-size:.72rem;font-weight:700;color:var(--blue)">OU: Security</div><div style="font-size:.62rem;color:var(--muted2)">Security Tooling + Log Archive accounts</div></div></div>
+              <div class="ct-ou-item"><span style="color:var(--green);font-size:.8rem">🚀</span><div><div style="font-size:.72rem;font-weight:700;color:var(--blue)">OU: Workloads</div><div style="font-size:.62rem;color:var(--muted2)">Production + Development accounts</div></div></div>
+              <div class="ct-ou-item"><span style="color:var(--muted);font-size:.8rem">🔗</span><div><div style="font-size:.72rem;font-weight:700;color:var(--blue)">OU: Infrastructure</div><div style="font-size:.62rem;color:var(--muted2)">Shared Services + Network Hub (if enabled)</div></div></div>
+              <div class="ct-ou-item"><span style="color:var(--muted);font-size:.8rem">🏖️</span><div><div style="font-size:.72rem;font-weight:700;color:var(--blue)">OU: Sandbox</div><div style="font-size:.62rem;color:var(--muted2)">Sandbox account — restricted SCPs, no production access</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">📜 Service Control Policies (SCPs)</div>
+          <div class="box-desc">SCPs applied at the OU level act as permission guardrails — they restrict what can be done even by account administrators. Select the SCPs to include in your framework.</div>
+          <div class="field-label">Recommended SCPs</div>
+          <div class="opt-group">
+            <div class="opt on-red" onclick="toggleOpt(this,'on-red')">Deny root user actions</div>
+            <div class="opt on-red" onclick="toggleOpt(this,'on-red')">Deny region restriction (KSA/Bahrain only)</div>
+            <div class="opt on-red" onclick="toggleOpt(this,'on-red')">Require MFA for console access</div>
+            <div class="opt on-red" onclick="toggleOpt(this,'on-red')">Deny disabling CloudTrail</div>
+            <div class="opt on-red" onclick="toggleOpt(this,'on-red')">Deny S3 public access at org level</div>
+            <div class="opt" onclick="toggleOpt(this,'on-red')">Restrict EC2 instance types</div>
+            <div class="opt" onclick="toggleOpt(this,'on-red')">Deny leaving organization</div>
+            <div class="opt" onclick="toggleOpt(this,'on-red')">Restrict IAM actions in prod OU</div>
+          </div>
+        </div>
+        <button class="btn-next" onclick="showSection('security',null);document.querySelectorAll('.sb-item').forEach((i,idx)=>{i.classList.toggle('active',idx===2)});updateScore('accounts')">Next: Security Guardrails →</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION: SECURITY                          -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section" id="section-security">
+      <div class="sec-hero">
+        <div class="sec-eye" style="color:var(--d-security)">Domain 3 · Protection</div>
+        <div class="sec-title">Security Guardrails & Controls</div>
+        <div class="sec-desc">Define preventive and detective security controls for your cloud environment. Controls are mapped to NCA CCC, PDPL, and AWS security best practices.</div>
+      </div>
+      <div class="sec-body">
+        <div class="alert a-red">🔐 <span><strong>NCA & PDPL alignment:</strong> All security guardrails below are mapped to Saudi National Cybersecurity Authority (NCA) controls and Personal Data Protection Law (PDPL) requirements. Enabled controls generate compliance evidence in the exported document.</span></div>
+
+        <div class="box">
+          <div class="box-title">🛡️ Identity & Access Management</div>
+          <div id="gr-iam">
+            <div class="guardrail on" onclick="toggleGuardrail(this)"><div class="gr-check">✓</div><div class="gr-body"><div class="gr-title">IAM Identity Center (SSO) — Single sign-on for all accounts</div><div class="gr-desc">Centralised human access via IAM Identity Center. No IAM users with long-term credentials.</div></div><span class="gr-badge" style="background:rgba(248,113,113,.1);color:var(--red)">NCA-1.1</span></div>
+            <div class="guardrail on" onclick="toggleGuardrail(this)"><div class="gr-check">✓</div><div class="gr-body"><div class="gr-title">MFA required for all human access</div><div class="gr-desc">Enforce MFA via IAM policy condition or Identity Center MFA settings.</div></div><span class="gr-badge" style="background:rgba(248,113,113,.1);color:var(--red)">NCA-1.2</span></div>
+            <div class="guardrail on" onclick="toggleGuardrail(this)"><div class="gr-check">✓</div><div class="gr-body"><div class="gr-title">Least-privilege IAM roles — No wildcard permissions</div><div class="gr-desc">All roles scoped by resource ARN and condition. IAM Access Analyzer validates policy scope.</div></div><span class="gr-badge" style="background:rgba(248,113,113,.1);color:var(--red)">NCA-1.3</span></div>
+            <div class="guardrail" onclick="toggleGuardrail(this)"><div class="gr-check"></div><div class="gr-body"><div class="gr-title">Privileged Access Workstation (PAW) for admin access</div><div class="gr-desc">Dedicated hardened workstations for privileged AWS console access.</div></div><span class="gr-badge" style="background:rgba(107,122,148,.1);color:var(--muted)">Optional</span></div>
+            <div class="guardrail" onclick="toggleGuardrail(this)"><div class="gr-check"></div><div class="gr-body"><div class="gr-title">Service account rotation — Automated key rotation via Secrets Manager</div><div class="gr-desc">All programmatic access keys rotated automatically, stored in Secrets Manager.</div></div><span class="gr-badge" style="background:rgba(107,122,148,.1);color:var(--muted)">Recommended</span></div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">🔍 Detective Controls</div>
+          <div id="gr-detective">
+            <div class="guardrail on" onclick="toggleGuardrail(this)"><div class="gr-check">✓</div><div class="gr-body"><div class="gr-title">AWS CloudTrail — Organisation-level, multi-region trail</div><div class="gr-desc">All API activity logged to S3 in the Log Archive account. 7-year retention.</div></div><span class="gr-badge" style="background:rgba(248,113,113,.1);color:var(--red)">NCA-3.1</span></div>
+            <div class="guardrail on" onclick="toggleGuardrail(this)"><div class="gr-check">✓</div><div class="gr-body"><div class="gr-title">Amazon GuardDuty — Threat detection in all accounts</div><div class="gr-desc">GuardDuty enabled organization-wide via delegated admin in Security account.</div></div><span class="gr-badge" style="background:rgba(248,113,113,.1);color:var(--red)">NCA-3.2</span></div>
+            <div class="guardrail on" onclick="toggleGuardrail(this)"><div class="gr-check">✓</div><div class="gr-body"><div class="gr-title">AWS Security Hub — Aggregated security findings</div><div class="gr-desc">CIS AWS Foundations benchmark + AWS Foundational Security Standard enabled.</div></div><span class="gr-badge" style="background:rgba(248,113,113,.1);color:var(--red)">NCA-3.3</span></div>
+            <div class="guardrail" onclick="toggleGuardrail(this)"><div class="gr-check"></div><div class="gr-body"><div class="gr-title">AWS Config — Configuration compliance recording</div><div class="gr-desc">Config rules track resource compliance. Org-level aggregator in Security account.</div></div><span class="gr-badge" style="background:rgba(245,158,11,.1);color:var(--gold)">Recommended</span></div>
+            <div class="guardrail" onclick="toggleGuardrail(this)"><div class="gr-check"></div><div class="gr-body"><div class="gr-title">Amazon Macie — S3 sensitive data discovery (PDPL)</div><div class="gr-desc">Automatically discovers and protects sensitive data. Required for PDPL compliance.</div></div><span class="gr-badge" style="background:rgba(248,113,113,.1);color:var(--red)">PDPL</span></div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">🔒 Data Protection</div>
+          <div id="gr-data">
+            <div class="guardrail on" onclick="toggleGuardrail(this)"><div class="gr-check">✓</div><div class="gr-body"><div class="gr-title">Encryption at rest — All services using AWS KMS CMKs</div><div class="gr-desc">EBS, S3, RDS, and DynamoDB encrypted with customer-managed KMS keys. SCP enforces encryption.</div></div><span class="gr-badge" style="background:rgba(248,113,113,.1);color:var(--red)">PDPL-4.1</span></div>
+            <div class="guardrail on" onclick="toggleGuardrail(this)"><div class="gr-check">✓</div><div class="gr-body"><div class="gr-title">Encryption in transit — TLS 1.2+ enforced</div><div class="gr-desc">S3 bucket policies deny HTTP. ACM manages certificates. TLS policy on load balancers.</div></div><span class="gr-badge" style="background:rgba(248,113,113,.1);color:var(--red)">PDPL-4.2</span></div>
+            <div class="guardrail on" onclick="toggleGuardrail(this)"><div class="gr-check">✓</div><div class="gr-body"><div class="gr-title">S3 Block Public Access — Organisation-level</div><div class="gr-desc">Public access blocked at AWS Organizations level via SCP. Cannot be overridden by member accounts.</div></div><span class="gr-badge" style="background:rgba(248,113,113,.1);color:var(--red)">NCA-2.1</span></div>
+            <div class="guardrail" onclick="toggleGuardrail(this)"><div class="gr-check"></div><div class="gr-body"><div class="gr-title">AWS Backup — Centralised backup governance</div><div class="gr-desc">Backup policies defined at OU level via Backup Vault and backup compliance reports.</div></div><span class="gr-badge" style="background:rgba(245,158,11,.1);color:var(--gold)">Recommended</span></div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">🌐 Network Security</div>
+          <div id="gr-network">
+            <div class="guardrail on" onclick="toggleGuardrail(this)"><div class="gr-check">✓</div><div class="gr-body"><div class="gr-title">No publicly exposed instances — All EC2 in private subnets</div><div class="gr-desc">Public subnet only for ALBs and NAT Gateways. EC2 accessed via Systems Manager Session Manager.</div></div><span class="gr-badge" style="background:rgba(248,113,113,.1);color:var(--red)">NCA-2.3</span></div>
+            <div class="guardrail" onclick="toggleGuardrail(this)"><div class="gr-check"></div><div class="gr-body"><div class="gr-title">AWS WAF — Web Application Firewall on all ALBs</div><div class="gr-desc">Managed rule groups for OWASP Top 10. Rate limiting and geo-restriction enabled.</div></div><span class="gr-badge" style="background:rgba(245,158,11,.1);color:var(--gold)">Recommended</span></div>
+            <div class="guardrail" onclick="toggleGuardrail(this)"><div class="gr-check"></div><div class="gr-body"><div class="gr-title">AWS Network Firewall — Centralised egress inspection</div><div class="gr-desc">Centralised outbound filtering via Network Firewall in the Network Hub account.</div></div><span class="gr-badge" style="background:rgba(107,122,148,.1);color:var(--muted)">Optional</span></div>
+          </div>
+        </div>
+        <button class="btn-next" onclick="showSection('finops',null);document.querySelectorAll('.sb-item').forEach((i,idx)=>{i.classList.toggle('active',idx===3)});updateScore('security')">Next: FinOps & Cost →</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION: FINOPS                            -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section" id="section-finops">
+      <div class="sec-hero">
+        <div class="sec-eye" style="color:var(--d-finops)">Domain 4 · Financial</div>
+        <div class="sec-title">FinOps & Cost Governance</div>
+        <div class="sec-desc">Define cost allocation, budget controls, optimization levers, and financial accountability for your cloud environment. Every SAR should be tracked, attributed, and optimized.</div>
+      </div>
+      <div class="sec-body">
+        <div class="alert a-gold">💰 <span><strong>Saudi cloud context:</strong> AWS billing is in USD but reporting and budgets should be configured in SAR for stakeholder communication. Exchange rate: approximately SAR 3.75 = USD 1.00.</span></div>
+
+        <div class="box">
+          <div class="box-title">📊 Cost Allocation Model</div>
+          <div class="field-label">Primary Cost Allocation Method</div>
+          <div class="opt-group" id="cost-alloc">
+            <div class="opt on" onclick="setSingle(this,'cost-alloc','on')">Tag-based allocation</div>
+            <div class="opt" onclick="setSingle(this,'cost-alloc','on')">Account-per-team</div>
+            <div class="opt" onclick="setSingle(this,'cost-alloc','on')">OU-level rollup</div>
+            <div class="opt" onclick="setSingle(this,'cost-alloc','on')">Hybrid</div>
+          </div>
+          <div class="field-label">Chargeback Model</div>
+          <div class="opt-group" id="chargeback">
+            <div class="opt on" onclick="setSingle(this,'chargeback','on')">Showback only (visibility)</div>
+            <div class="opt" onclick="setSingle(this,'chargeback','on')">Full chargeback to BU</div>
+            <div class="opt" onclick="setSingle(this,'chargeback','on')">Partial chargeback</div>
+            <div class="opt" onclick="setSingle(this,'chargeback','on')">No chargeback</div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">💵 Budget & Alert Thresholds</div>
+          <div class="box-desc">Define monthly spend thresholds. Alerts are sent via SNS to the FinOps owner when thresholds are breached.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px;">
+            <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;">Budget Name</div>
+            <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;">Monthly Limit (SAR)</div>
+            <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;">Alert At (%)</div>
+          </div>
+          <div id="budgets-list">
+            <div class="threshold-row" style="grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:8px;">
+              <input class="field-input" value="Total Cloud Spend" style="margin:0">
+              <input class="field-input" type="number" placeholder="e.g. 150000" style="margin:0">
+              <select class="field-select" style="margin:0"><option>70%</option><option selected>80%</option><option>90%</option><option>100%</option></select>
+            </div>
+            <div class="threshold-row" style="grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:8px;">
+              <input class="field-input" value="Production OU" style="margin:0">
+              <input class="field-input" type="number" placeholder="e.g. 100000" style="margin:0">
+              <select class="field-select" style="margin:0"><option>70%</option><option>80%</option><option selected>90%</option><option>100%</option></select>
+            </div>
+            <div class="threshold-row" style="grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:8px;">
+              <input class="field-input" value="Development OU" style="margin:0">
+              <input class="field-input" type="number" placeholder="e.g. 30000" style="margin:0">
+              <select class="field-select" style="margin:0"><option selected>70%</option><option>80%</option><option>90%</option><option>100%</option></select>
+            </div>
+          </div>
+          <button class="tag-add-btn" style="margin-top:4px;" onclick="addBudgetRow()">+ Add Budget</button>
+        </div>
+
+        <div class="box">
+          <div class="box-title">📉 Cost Optimization Commitments</div>
+          <div class="field-label">Compute Savings Plans</div>
+          <div class="opt-group" id="savings-plans">
+            <div class="opt" onclick="setSingle(this,'savings-plans','on')">None (all On-Demand)</div>
+            <div class="opt" onclick="setSingle(this,'savings-plans','on')">1-Year Compute SP</div>
+            <div class="opt on" onclick="setSingle(this,'savings-plans','on')">1-Year EC2 Instance SP</div>
+            <div class="opt" onclick="setSingle(this,'savings-plans','on')">3-Year Compute SP</div>
+          </div>
+          <div class="field-label">Rightsizing Policy</div>
+          <div class="opt-group" id="rightsizing">
+            <div class="opt on" onclick="toggleOpt(this,'on')">Compute Optimizer enabled</div>
+            <div class="opt on" onclick="toggleOpt(this,'on')">Quarterly rightsizing reviews</div>
+            <div class="opt" onclick="toggleOpt(this,'on')">Automated rightsizing (Graviton)</div>
+            <div class="opt on" onclick="toggleOpt(this,'on')">Instance scheduler (non-prod)</div>
+            <div class="opt" onclick="toggleOpt(this,'on')">Spot instances for batch workloads</div>
+          </div>
+          <div class="field-label">FinOps Tools</div>
+          <div class="opt-group" id="finops-tools">
+            <div class="opt on" onclick="toggleOpt(this,'on')">AWS Cost Explorer</div>
+            <div class="opt on" onclick="toggleOpt(this,'on')">AWS Budgets</div>
+            <div class="opt" onclick="toggleOpt(this,'on')">AWS Cost & Usage Report (CUR)</div>
+            <div class="opt" onclick="toggleOpt(this,'on')">AWS Cost Anomaly Detection</div>
+            <div class="opt" onclick="toggleOpt(this,'on')">QuickSight (FinOps Dashboard)</div>
+            <div class="opt" onclick="toggleOpt(this,'on')">CloudHealth / Spot.io</div>
+          </div>
+        </div>
+        <button class="btn-next" onclick="showSection('tagging',null);document.querySelectorAll('.sb-item').forEach((i,idx)=>{i.classList.toggle('active',idx===4)});updateScore('finops')">Next: Tagging Strategy →</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION: TAGGING                           -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section" id="section-tagging">
+      <div class="sec-hero">
+        <div class="sec-eye" style="color:var(--d-tagging)">Domain 5 · Metadata</div>
+        <div class="sec-title">Tagging Strategy & Taxonomy</div>
+        <div class="sec-desc">Define mandatory and optional resource tags. A consistent tagging taxonomy is the foundation of cost attribution, security classification, and operational management.</div>
+      </div>
+      <div class="sec-body">
+        <div class="alert a-green">🏷️ <span><strong>Enforcement:</strong> Mandatory tags enforced via AWS Config rule <code>required-tags</code> and SCP denying resource creation without mandatory tags. Non-compliant resources flagged in Security Hub.</span></div>
+
+        <div class="box">
+          <div class="box-title">🏷️ Mandatory Tag Taxonomy</div>
+          <div class="box-desc">These tags are required on all AWS resources. Missing mandatory tags trigger a Config rule violation.</div>
+          <table class="tag-table">
+            <thead><tr><th>Tag Key</th><th>Description</th><th>Example Values</th><th>Required</th><th></th></tr></thead>
+            <tbody id="mandatory-tags">
+              <tr><td><span class="tag-key">Environment</span></td><td>Deployment environment</td><td>production, development, staging</td><td><span class="tag-required" style="background:rgba(248,113,113,.1);color:var(--red)">Mandatory</span></td><td><span class="tag-del" onclick="delTagRow(this)">✕</span></td></tr>
+              <tr><td><span class="tag-key">CostCenter</span></td><td>Cost allocation centre</td><td>IT-001, HR-002, FINANCE-003</td><td><span class="tag-required" style="background:rgba(248,113,113,.1);color:var(--red)">Mandatory</span></td><td><span class="tag-del" onclick="delTagRow(this)">✕</span></td></tr>
+              <tr><td><span class="tag-key">Owner</span></td><td>Team or individual responsible</td><td>cloud-team, app-dev, security</td><td><span class="tag-required" style="background:rgba(248,113,113,.1);color:var(--red)">Mandatory</span></td><td><span class="tag-del" onclick="delTagRow(this)">✕</span></td></tr>
+              <tr><td><span class="tag-key">Project</span></td><td>Project or workload name</td><td>erp-migration, student-portal</td><td><span class="tag-required" style="background:rgba(248,113,113,.1);color:var(--red)">Mandatory</span></td><td><span class="tag-del" onclick="delTagRow(this)">✕</span></td></tr>
+              <tr><td><span class="tag-key">DataClassification</span></td><td>Data sensitivity level</td><td>public, internal, confidential, restricted</td><td><span class="tag-required" style="background:rgba(248,113,113,.1);color:var(--red)">Mandatory</span></td><td><span class="tag-del" onclick="delTagRow(this)">✕</span></td></tr>
+              <tr><td><span class="tag-key">Terraform</span></td><td>IaC-managed resource flag</td><td>true, false</td><td><span class="tag-required" style="background:rgba(245,158,11,.1);color:var(--gold)">Recommended</span></td><td><span class="tag-del" onclick="delTagRow(this)">✕</span></td></tr>
+            </tbody>
+          </table>
+          <div class="tag-add-row">
+            <input class="field-input tag-add-input" id="new-tag-key" placeholder="Tag key (e.g. Department)" style="margin:0">
+            <input class="field-input tag-add-input" id="new-tag-desc" placeholder="Description" style="margin:0">
+            <button class="tag-add-btn" onclick="addTag()">+ Add Tag</button>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">🔍 Tag Compliance Policy</div>
+          <div class="field-label">Enforcement Method</div>
+          <div class="opt-group" id="tag-enforce">
+            <div class="opt on-green" onclick="toggleOpt(this,'on-green')">AWS Config required-tags rule</div>
+            <div class="opt on-green" onclick="toggleOpt(this,'on-green')">SCP deny on missing tags</div>
+            <div class="opt" onclick="toggleOpt(this,'on-green')">Tag policies via AWS Organizations</div>
+            <div class="opt" onclick="toggleOpt(this,'on-green')">Lambda auto-tagger</div>
+            <div class="opt" onclick="toggleOpt(this,'on-green')">Terraform validation (CI/CD)</div>
+          </div>
+          <div class="field-label">Non-Compliant Resource Action</div>
+          <div class="opt-group" id="tag-action">
+            <div class="opt" onclick="setSingle(this,'tag-action','on-green')">Alert only</div>
+            <div class="opt on-green" onclick="setSingle(this,'tag-action','on-green')">Alert + auto-stop after 72h</div>
+            <div class="opt" onclick="setSingle(this,'tag-action','on-green')">Immediate termination</div>
+          </div>
+          <div class="field-label">Tag Compliance Target</div>
+          <div class="opt-group" id="tag-target">
+            <div class="opt" onclick="setSingle(this,'tag-target','on-green')">80% within 30 days</div>
+            <div class="opt on-green" onclick="setSingle(this,'tag-target','on-green')">95% within 60 days</div>
+            <div class="opt" onclick="setSingle(this,'tag-target','on-green')">100% (zero tolerance)</div>
+          </div>
+        </div>
+        <button class="btn-next" onclick="showSection('ops',null);document.querySelectorAll('.sb-item').forEach((i,idx)=>{i.classList.toggle('active',idx===5)});updateScore('tagging')">Next: Operational Governance →</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION: OPS                               -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section" id="section-ops">
+      <div class="sec-hero">
+        <div class="sec-eye" style="color:var(--d-ops)">Domain 6 · Operations</div>
+        <div class="sec-title">Operational Governance</div>
+        <div class="sec-desc">Define change management, incident response, and operational standards that keep your cloud environment healthy, auditable, and continuously improving.</div>
+      </div>
+      <div class="sec-body">
+
+        <div class="box">
+          <div class="box-title">🔄 Change Management</div>
+          <div class="field-label">Infrastructure Delivery Model</div>
+          <div class="opt-group" id="iac-model">
+            <div class="opt on-purple" onclick="toggleOpt(this,'on-purple')">Terraform (IaC)</div>
+            <div class="opt" onclick="toggleOpt(this,'on-purple')">AWS CloudFormation</div>
+            <div class="opt" onclick="toggleOpt(this,'on-purple')">AWS CDK</div>
+            <div class="opt" onclick="toggleOpt(this,'on-purple')">Pulumi</div>
+            <div class="opt" onclick="toggleOpt(this,'on-purple')">Manual (console/CLI)</div>
+          </div>
+          <div class="field-label">CI/CD Pipeline</div>
+          <div class="opt-group" id="cicd">
+            <div class="opt" onclick="toggleOpt(this,'on-purple')">AWS CodePipeline</div>
+            <div class="opt on-purple" onclick="toggleOpt(this,'on-purple')">GitHub Actions</div>
+            <div class="opt" onclick="toggleOpt(this,'on-purple')">GitLab CI</div>
+            <div class="opt" onclick="toggleOpt(this,'on-purple')">Jenkins</div>
+          </div>
+          <div class="field-label">Change Approval Process</div>
+          <div class="opt-group" id="change-approval">
+            <div class="opt" onclick="setSingle(this,'change-approval','on-purple')">No formal process</div>
+            <div class="opt" onclick="setSingle(this,'change-approval','on-purple')">Peer review (PR approval)</div>
+            <div class="opt on-purple" onclick="setSingle(this,'change-approval','on-purple')">CAB approval for prod changes</div>
+            <div class="opt" onclick="setSingle(this,'change-approval','on-purple')">Full ITIL change management</div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">🚨 Incident Response</div>
+          <div class="field-label">Incident Classification</div>
+          <div id="ir-levels">
+            <div class="guardrail on" onclick="toggleGuardrail(this)"><div class="gr-check">✓</div><div class="gr-body"><div class="gr-title">P1 — Critical (30-min response): Service unavailable, data breach</div><div class="gr-desc">Auto-escalation to CISO and CIO. War room activated. Post-mortem required.</div></div><span class="gr-badge" style="background:rgba(248,113,113,.1);color:var(--red)">Required</span></div>
+            <div class="guardrail on" onclick="toggleGuardrail(this)"><div class="gr-check">✓</div><div class="gr-body"><div class="gr-title">P2 — High (2-hour response): Degraded service, security alert</div><div class="gr-desc">On-call team notified. Bridge call opened. RCA within 24h.</div></div><span class="gr-badge" style="background:rgba(245,158,11,.1);color:var(--gold)">Required</span></div>
+            <div class="guardrail on" onclick="toggleGuardrail(this)"><div class="gr-check">✓</div><div class="gr-body"><div class="gr-title">P3 — Medium (8-hour response): Performance issue, minor outage</div><div class="gr-desc">Team lead notified. Resolution tracked in ticketing system.</div></div><span class="gr-badge" style="background:rgba(96,165,250,.1);color:var(--blue)">Standard</span></div>
+          </div>
+          <div class="field-label" style="margin-top:10px">AWS Support Plan</div>
+          <div class="opt-group" id="support-plan">
+            <div class="opt" onclick="setSingle(this,'support-plan','on-purple')">Basic</div>
+            <div class="opt" onclick="setSingle(this,'support-plan','on-purple')">Developer</div>
+            <div class="opt on-purple" onclick="setSingle(this,'support-plan','on-purple')">Business</div>
+            <div class="opt" onclick="setSingle(this,'support-plan','on-purple')">Enterprise On-Ramp</div>
+            <div class="opt" onclick="setSingle(this,'support-plan','on-purple')">Enterprise</div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">📈 Monitoring & Observability</div>
+          <div class="opt-group">
+            <div class="opt on-purple" onclick="toggleOpt(this,'on-purple')">CloudWatch dashboards</div>
+            <div class="opt on-purple" onclick="toggleOpt(this,'on-purple')">CloudWatch alarms</div>
+            <div class="opt" onclick="toggleOpt(this,'on-purple')">AWS X-Ray (distributed tracing)</div>
+            <div class="opt" onclick="toggleOpt(this,'on-purple')">Amazon Managed Grafana</div>
+            <div class="opt" onclick="toggleOpt(this,'on-purple')">AWS Health (service events)</div>
+            <div class="opt on-purple" onclick="toggleOpt(this,'on-purple')">SNS alert routing</div>
+          </div>
+        </div>
+        <button class="btn-next" onclick="showSection('output',null);document.querySelectorAll('.sb-item').forEach((i,idx)=>{i.classList.toggle('active',idx===6)});updateScore('ops');generateDocument()">Generate Framework Document →</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION: OUTPUT                            -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section" id="section-output">
+      <div class="sec-hero">
+        <div class="sec-eye" style="color:var(--teal)">Export · Deliverable</div>
+        <div class="sec-title">Cloud Governance Framework Document</div>
+        <div class="sec-desc">Your completed governance framework — ready to present to the client's CIO, security team, or board. Copy or download as Markdown for further refinement in Word.</div>
+      </div>
+      <div class="sec-body">
+
+        <div class="score-grid">
+          <div class="score-card"><div class="score-num" style="color:var(--gold)" id="out-domains">0/6</div><div class="score-label">Domains Completed</div></div>
+          <div class="score-card"><div class="score-num" style="color:var(--green)" id="out-guardrails">0</div><div class="score-label">Guardrails Enabled</div></div>
+          <div class="score-card"><div class="score-num" style="color:var(--blue)" id="out-accounts">0</div><div class="score-label">Accounts Designed</div></div>
+        </div>
+
+        <div class="alert a-green">✅ <span>Document generated from your selections. Review each section and copy into your client presentation template. All controls reflect NCA/PDPL alignment where applicable.</span></div>
+
+        <div class="output-box" id="doc-output">
+          <span style="color:var(--muted)">← Complete the framework sections, then click "Generate Framework Document" to build your client document here.</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" onclick="generateDocument();copyDoc()">📋 Copy Document</button>
+          <button class="btn-ghost" onclick="generateDocument()">🔄 Regenerate</button>
+          <button class="btn-ghost" onclick="downloadDoc()">⬇️ Download .md</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<footer>🌱 Cloud Governance Framework Builder · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+
+<script>
+// ─── NAVIGATION ───
+function showSection(id, sbEl) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-'+id).classList.add('active');
+  if (sbEl) {
+    document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+    sbEl.classList.add('active');
+  }
+  if (id === 'output') generateDocument();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ─── TOGGLE HELPERS ───
+function toggleOpt(el, cls) {
+  if (el.classList.contains(cls)) el.className = 'opt';
+  else { el.classList.add(cls); }
+  updateAllScores();
+}
+function setSingle(el, groupId, cls) {
+  const grp = document.getElementById(groupId);
+  if (grp) grp.querySelectorAll('.opt').forEach(o => o.className = 'opt');
+  else el.closest('.opt-group').querySelectorAll('.opt').forEach(o => o.className = 'opt');
+  el.classList.add(cls);
+  updateAllScores();
+}
+function toggleGuardrail(el) {
+  el.classList.toggle('on');
+  updateAllScores();
+}
+function toggleAcct(el) {
+  const req = el.dataset.acct === 'management';
+  if (!req) el.classList.toggle('enabled');
+  updateAllScores();
+}
+function toggleChk(el) {
+  el.classList.toggle('chked');
+  el.querySelector('.gr-check').textContent = el.classList.contains('chked') ? '✓' : '';
+}
+function setRegion(el) {
+  document.getElementById('aws-region').querySelectorAll('.opt').forEach(o => o.className = 'opt');
+  el.classList.add('on-blue');
+}
+
+// ─── SCORE CALCULATION ───
+function sectionScore(secId) {
+  const sec = document.getElementById('section-' + secId);
+  if (!sec) return 0;
+  const opts = sec.querySelectorAll('.opt.on,.opt.on-green,.opt.on-blue,.opt.on-red,.opt.on-purple');
+  const guards = sec.querySelectorAll('.guardrail.on,.guardrail.on-warn');
+  const inputs = sec.querySelectorAll('input.field-input,select.field-select');
+  let filled = 0;
+  inputs.forEach(i => { if (i.value.trim()) filled++; });
+  const total = opts.length + guards.length + filled;
+  return Math.min(100, total * 8);
+}
+
+function updateScore(secId) {
+  const score = sectionScore(secId);
+  const el = document.getElementById('sc-' + secId);
+  if (!el) return;
+  const pct = Math.min(100, score);
+  el.textContent = pct + '%';
+  if (pct >= 70) { el.style.background = 'rgba(52,211,153,.1)'; el.style.color = 'var(--green)'; }
+  else if (pct >= 30) { el.style.background = 'rgba(245,158,11,.1)'; el.style.color = 'var(--gold)'; }
+  else { el.style.background = 'rgba(107,122,148,.1)'; el.style.color = 'var(--muted)'; }
+  updateProgress();
+}
+
+function updateAllScores() {
+  ['overview','accounts','security','finops','tagging','ops'].forEach(updateScore);
+}
+
+function updateProgress() {
+  const sections = ['overview','accounts','security','finops','tagging','ops'];
+  let total = 0;
+  sections.forEach(s => { total += Math.min(100, sectionScore(s)); });
+  const pct = Math.round(total / (sections.length * 100) * 100);
+  document.getElementById('sb-pct').textContent = pct + '%';
+  document.getElementById('sb-fill').style.width = pct + '%';
+}
+
+// ─── TAGS ───
+function addTag() {
+  const key = document.getElementById('new-tag-key').value.trim();
+  const desc = document.getElementById('new-tag-desc').value.trim();
+  if (!key) return;
+  const tbody = document.getElementById('mandatory-tags');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><span class="tag-key">${key}</span></td><td>${desc||'Custom tag'}</td><td>—</td><td><span class="tag-required" style="background:rgba(245,158,11,.1);color:var(--gold)">Custom</span></td><td><span class="tag-del" onclick="delTagRow(this)">✕</span></td>`;
+  tbody.appendChild(tr);
+  document.getElementById('new-tag-key').value = '';
+  document.getElementById('new-tag-desc').value = '';
+}
+function delTagRow(el) { el.closest('tr').remove(); }
+
+// ─── BUDGET ROWS ───
+function addBudgetRow() {
+  const list = document.getElementById('budgets-list');
+  const div = document.createElement('div');
+  div.className = 'threshold-row';
+  div.style.cssText = 'grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:8px;';
+  div.innerHTML = `<input class="field-input" placeholder="Budget name" style="margin:0">
+    <input class="field-input" type="number" placeholder="Amount (SAR)" style="margin:0">
+    <select class="field-select" style="margin:0"><option>70%</option><option>80%</option><option selected>90%</option><option>100%</option></select>`;
+  list.appendChild(div);
+}
+
+// ─── DOCUMENT GENERATOR ───
+function getSelectedOpts(groupId) {
+  const grp = document.getElementById(groupId);
+  if (!grp) return [];
+  return [...grp.querySelectorAll('.opt.on,.opt.on-green,.opt.on-blue,.opt.on-red,.opt.on-purple')].map(o => o.textContent.trim());
+}
+function getActiveGuardrails(containerId) {
+  const c = document.getElementById(containerId);
+  if (!c) return [];
+  return [...c.querySelectorAll('.guardrail.on,.guardrail.on-warn')].map(g => g.querySelector('.gr-title').textContent.trim());
+}
+function getEnabledAccts() {
+  return [...document.querySelectorAll('.acct-card.enabled')].map(c => c.querySelector('.acct-name').textContent.trim());
+}
+function getMandatoryTags() {
+  return [...document.querySelectorAll('#mandatory-tags tr')].map(r => {
+    const cells = r.querySelectorAll('td');
+    return cells[0] ? cells[0].textContent.trim() : '';
+  }).filter(Boolean);
+}
+
+function generateDocument() {
+  const org = document.getElementById('org-name')?.value || '[Organization Name]';
+  const short = document.getElementById('org-short')?.value || '';
+  const sector = document.getElementById('org-sector')?.value || '[Sector]';
+  const maturity = document.getElementById('org-maturity')?.value || '[Maturity]';
+  const sponsor = document.getElementById('exec-sponsor')?.value || '[TBD]';
+  const cloudOwner = document.getElementById('cloud-owner')?.value || '[TBD]';
+  const secOwner = document.getElementById('sec-owner')?.value || '[TBD]';
+  const finopsOwner = document.getElementById('finops-owner')?.value || '[TBD]';
+  const today = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+
+  const region = (document.getElementById('aws-region')?.querySelector('.opt.on-blue')?.textContent||'me-south-1 · Bahrain').trim();
+  const regs = getSelectedOpts('regulations');
+  const objs = getSelectedOpts('objectives');
+  const cadence = getSelectedOpts('review-cadence')[0] || 'Quarterly';
+  const accts = getEnabledAccts();
+  const scps = getSelectedOpts('');
+  const iamGuards = getActiveGuardrails('gr-iam');
+  const detectGuards = getActiveGuardrails('gr-detective');
+  const dataGuards = getActiveGuardrails('gr-data');
+  const netGuards = getActiveGuardrails('gr-network');
+  const costAlloc = getSelectedOpts('cost-alloc')[0] || '[TBD]';
+  const chargeback = getSelectedOpts('chargeback')[0] || '[TBD]';
+  const savingsPlans = getSelectedOpts('savings-plans')[0] || '[TBD]';
+  const finopsTools = getSelectedOpts('finops-tools');
+  const rightsizing = getSelectedOpts('rightsizing');
+  const tags = getMandatoryTags();
+  const tagEnforce = getSelectedOpts('tag-enforce');
+  const tagAction = getSelectedOpts('tag-action')[0] || '[TBD]';
+  const iacModel = getSelectedOpts('iac-model');
+  const cicd = getSelectedOpts('cicd');
+  const changeApproval = getSelectedOpts('change-approval')[0] || '[TBD]';
+  const supportPlan = getSelectedOpts('support-plan')[0] || '[TBD]';
+  const lzModel = getSelectedOpts('lz-model')[0] || 'AWS Control Tower';
+
+  // Count guardrails enabled
+  const totalGuardrails = document.querySelectorAll('.guardrail.on').length;
+
+  // Update score cards
+  const domainScores = ['overview','accounts','security','finops','tagging','ops'].filter(s => sectionScore(s) >= 30).length;
+  document.getElementById('out-domains').textContent = domainScores + '/6';
+  document.getElementById('out-guardrails').textContent = totalGuardrails;
+  document.getElementById('out-accounts').textContent = accts.length;
+
+  const doc = `# Cloud Governance Framework
+## ${org}${short ? ' ('+short+')' : ''}
+
+**Document Classification:** Internal — Confidential
+**Version:** 1.0 | **Date:** ${today}
+**Prepared by:** Mohammad Dassen — AWS Cloud Architect & Strategic Consultant
+
+---
+
+## 1. Executive Summary
+
+This Cloud Governance Framework defines the policies, standards, and controls that govern ${org}'s AWS cloud environment. It establishes clear ownership, accountability, and operational procedures to ensure the organization's cloud posture remains secure, cost-efficient, and compliant with applicable Saudi regulations.
+
+**Sector:** ${sector}
+**Cloud Maturity:** ${maturity}
+**Primary AWS Region:** ${region}
+**Governance Review Cadence:** ${cadence}
+
+### 1.1 Applicable Regulatory Frameworks
+${regs.length > 0 ? regs.map(r => '- ' + r).join('\n') : '- No specific regulatory frameworks selected'}
+
+### 1.2 Cloud Objectives
+${objs.length > 0 ? objs.map(o => '- ' + o).join('\n') : '- Objectives not yet defined'}
+
+---
+
+## 2. Governance Ownership
+
+| Role | Responsible Party | Accountability |
+|------|------------------|----------------|
+| Executive Sponsor | ${sponsor} | Strategic direction, budget approval |
+| Cloud Owner | ${cloudOwner} | Day-to-day cloud operations, architecture |
+| Security Owner | ${secOwner} | Security posture, compliance, incident response |
+| FinOps Owner | ${finopsOwner} | Cost allocation, budget management, optimization |
+| Cloud Governance Board | All of the above | ${cadence} review and policy updates |
+
+---
+
+## 3. Multi-Account Structure
+
+### 3.1 Landing Zone Approach
+**Model:** ${lzModel}
+
+A multi-account strategy is adopted to isolate blast radius, simplify compliance boundaries, and enable fine-grained permission control via Service Control Policies (SCPs) at the Organizational Unit (OU) level.
+
+### 3.2 Account Inventory
+${accts.length > 0 ? accts.map(a => '- **' + a + ' Account** — See Section 3.3 for configuration details').join('\n') : '- No accounts selected'}
+
+### 3.3 AWS Organizations Structure
+
+\`\`\`
+Root (Management Account)
+├── OU: Security
+│   ├── Security Tooling Account (GuardDuty, Security Hub, IAM Access Analyzer)
+│   └── Log Archive Account (CloudTrail, VPC Flow Logs, Config history)
+├── OU: Workloads
+│   ├── Production Account
+│   └── Development Account
+├── OU: Infrastructure
+│   └── Shared Services / Network Hub (if applicable)
+└── OU: Sandbox
+    └── Sandbox Account (restricted SCPs, no prod access)
+\`\`\`
+
+### 3.4 Service Control Policies (SCPs)
+SCPs are applied at the OU level and restrict actions even for account administrators:
+- Deny root user actions across all accounts
+- Restrict AWS regions to ${region} (Saudi data residency)
+- Deny disabling CloudTrail or Security Hub
+- Require MFA for console access
+- Deny S3 Block Public Access override
+
+---
+
+## 4. Security Guardrails
+
+### 4.1 Identity & Access Management
+${iamGuards.length > 0 ? iamGuards.map(g => '✅ ' + g).join('\n') : '- No IAM controls selected'}
+
+### 4.2 Detective Controls
+${detectGuards.length > 0 ? detectGuards.map(g => '✅ ' + g).join('\n') : '- No detective controls selected'}
+
+### 4.3 Data Protection
+${dataGuards.length > 0 ? dataGuards.map(g => '✅ ' + g).join('\n') : '- No data protection controls selected'}
+
+### 4.4 Network Security
+${netGuards.length > 0 ? netGuards.map(g => '✅ ' + g).join('\n') : '- No network controls selected'}
+
+### 4.5 NCA & PDPL Compliance Mapping
+All enabled controls are mapped to Saudi NCA Cybersecurity Controls (CCC) and Personal Data Protection Law (PDPL) requirements. See the NCA & PDPL Compliance Checklist for full control mapping.
+
+**Total Security Guardrails Enabled:** ${totalGuardrails}
+
+---
+
+## 5. FinOps & Cost Governance
+
+### 5.1 Cost Allocation Model
+**Method:** ${costAlloc}
+**Chargeback Model:** ${chargeback}
+
+All AWS resources must be tagged with a valid CostCenter tag to enable cost attribution. Untagged resources are flagged as non-compliant within 24 hours.
+
+### 5.2 Compute Cost Optimization
+**Savings Plans Commitment:** ${savingsPlans}
+
+**Rightsizing & Optimization:**
+${rightsizing.length > 0 ? rightsizing.map(r => '- ' + r).join('\n') : '- No optimization policies selected'}
+
+### 5.3 FinOps Tooling
+${finopsTools.length > 0 ? finopsTools.map(t => '- ' + t).join('\n') : '- No FinOps tools selected'}
+
+### 5.4 Budget Controls
+Monthly AWS Budgets configured with SNS alert notifications to the FinOps Owner. Budget alerts trigger at defined thresholds and escalate to the Executive Sponsor at 100%.
+
+---
+
+## 6. Tagging Strategy
+
+### 6.1 Mandatory Tag Taxonomy
+All AWS resources must carry the following tags at the time of creation:
+
+| Tag Key | Purpose |
+|---------|---------|
+${tags.length > 0 ? tags.map(t => '| `' + t + '` | Required for compliance |').join('\n') : '| — | No tags defined |'}
+
+### 6.2 Tag Enforcement
+**Enforcement Method:**
+${tagEnforce.length > 0 ? tagEnforce.map(e => '- ' + e).join('\n') : '- No enforcement methods selected'}
+
+**Non-Compliant Resource Action:** ${tagAction}
+
+---
+
+## 7. Operational Governance
+
+### 7.1 Infrastructure Delivery
+**IaC Model:**
+${iacModel.length > 0 ? iacModel.map(i => '- ' + i).join('\n') : '- Not defined'}
+
+**CI/CD Pipeline:**
+${cicd.length > 0 ? cicd.map(c => '- ' + c).join('\n') : '- Not defined'}
+
+**Change Approval:** ${changeApproval}
+
+### 7.2 Incident Response
+
+| Priority | Response Time | Trigger | Escalation |
+|----------|--------------|---------|------------|
+| P1 Critical | 30 minutes | Service down, data breach | CISO + CIO immediately |
+| P2 High | 2 hours | Degraded service, security alert | On-call team |
+| P3 Medium | 8 hours | Performance issue, minor outage | Team lead |
+
+**AWS Support Plan:** ${supportPlan}
+
+### 7.3 Governance Review Cadence
+This framework is reviewed ${cadence.toLowerCase()} by the Cloud Governance Board. Reviews assess:
+- Policy compliance posture
+- Cost optimization opportunities
+- Security posture and open findings
+- Architecture changes and new workload onboarding
+
+---
+
+## 8. Implementation Roadmap
+
+| Phase | Timeline | Focus |
+|-------|----------|-------|
+| Phase 1 — Foundation | Weeks 1–4 | Deploy landing zone, enable security tooling, enforce tagging |
+| Phase 2 — Hardening | Weeks 5–8 | Implement all mandatory guardrails, WAF, KMS encryption |
+| Phase 3 — Optimization | Weeks 9–12 | FinOps dashboard, Savings Plans, rightsizing |
+| Phase 4 — Maturity | Ongoing | Quarterly WAR reviews, governance board cadence |
+
+---
+
+## 9. Document Control
+
+| Attribute | Detail |
+|-----------|--------|
+| Framework Owner | ${cloudOwner} |
+| Review Date | ${cadence} from ${today} |
+| Prepared By | Mohammad Dassen — AWS Cloud Architect |
+| Contact | mohdassen.github.io/aws-consulting-roadmap |
+
+*This framework was built using the Cloud Governance Framework Builder — a free tool for Saudi enterprise cloud teams.*
+`;
+
+  document.getElementById('doc-output').innerHTML = escapeHtml(doc)
+    .replace(/^(# .+)$/m, '<span class="output-section-head">$1</span>')
+    .replace(/^(## .+)$/gm, '<span class="output-section-head">$1</span>')
+    .replace(/^(### .+)$/gm, '<span style="color:var(--blue);font-weight:700">$1</span>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--text)">$1</strong>')
+    .replace(/`([^`]+)`/g, '<span style="color:var(--green);font-family:monospace">$1</span>')
+    .replace(/✅ /g, '<span style="color:var(--green)">✅ </span>');
+
+  window._docText = doc;
+}
+
+function escapeHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function copyDoc() {
+  if (!window._docText) { generateDocument(); }
+  navigator.clipboard.writeText(window._docText || '').then(() => {
+    const btn = document.querySelector('.btn-primary');
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+function downloadDoc() {
+  if (!window._docText) generateDocument();
+  const org = document.getElementById('org-name')?.value || 'governance';
+  const filename = (org.replace(/[^a-z0-9]/gi,'_').toLowerCase() || 'cloud') + '_governance_framework.md';
+  const blob = new Blob([window._docText], {type:'text/markdown'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+// Init score update
+updateAllScores();
+</script>
+</body>
+</html>

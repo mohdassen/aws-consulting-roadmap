@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="NAJAT – Smart School Evacuation Simulator: build a school map, set fire and blockage scenarios, and compare a standard drill plan against risk-aware optimised routes.">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head><body>
+<title>NAJAT Evacuation Simulator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: control-room console — header band, map stage + numbered workflow rail, analysis deck below. */
+:root{
+  --bg:#f4f1f1; --surface:#ffffff; --surface-2:#faf7f7; --ink:#1f1618; --muted:#6e5f62; --line:#e4dadb;
+  --accent:#a8122c; --accent-ink:#ffffff; --gold:#b97a00;
+  --std:#c2297a; --naj:#1677d6; --good:#13854a; --warn:#b26a00; --bad:#b4232f;
+  --m-wall:#2b2225; --m-floor:#ece6e6; --m-room:#f7efe6; --m-stairs:#d9cfd0; --m-grid:rgba(60,30,35,.07);
+  --m-exit:#17a34a; --m-fire:#f05a1a; --m-smoke:rgba(90,70,70,.16); --m-block-a:#f2b705; --m-block-b:#1f1618;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#140f11; --surface:#1d1619; --surface-2:#231b1e; --ink:#f3ecec; --muted:#ab9a9d; --line:#352a2d;
+  --accent:#e0324f; --accent-ink:#ffffff; --gold:#e6a92a;
+  --std:#ec5fa6; --naj:#4aa3ff; --good:#3ccf7f; --warn:#f0a73a; --bad:#ff6b73;
+  --m-wall:#0a0708; --m-floor:#2c2427; --m-room:#382c2c; --m-stairs:#4a3d40; --m-grid:rgba(255,255,255,.04);
+  --m-exit:#22c55e; --m-fire:#ff6a1f; --m-smoke:rgba(200,190,190,.10); --m-block-a:#f2b705; --m-block-b:#0a0708;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#140f11; --surface:#1d1619; --surface-2:#231b1e; --ink:#f3ecec; --muted:#ab9a9d; --line:#352a2d;
+  --accent:#e0324f; --accent-ink:#ffffff; --gold:#e6a92a;
+  --std:#ec5fa6; --naj:#4aa3ff; --good:#3ccf7f; --warn:#f0a73a; --bad:#ff6b73;
+  --m-wall:#0a0708; --m-floor:#2c2427; --m-room:#382c2c; --m-stairs:#4a3d40; --m-grid:rgba(255,255,255,.04);
+  --m-exit:#22c55e; --m-fire:#ff6a1f; --m-smoke:rgba(200,190,190,.10); --m-block-a:#f2b705; --m-block-b:#0a0708;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
+.wrap{max-width:1360px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:.01em}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--naj);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* Header band */
+.band{background:linear-gradient(100deg,#5e0a19 0%,#8f1027 55%,#b0152f 100%);color:#fff}
+.band .wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding-block:18px}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand svg{flex:none}
+.brand h1{font-size:2.4rem;line-height:1;color:#ffd166;letter-spacing:.04em}
+.brand .sub{font-family:var(--f-display);font-size:1.15rem;font-weight:600;letter-spacing:.03em;opacity:.95}
+.brand .ar{font-size:.95rem;opacity:.85}
+.band .spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;font-size:.82rem;font-weight:600;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25)}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:#7CFFB2}
+.chip.stale .dot{background:#ffd166}
+
+/* App grid */
+.app{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;padding-block:18px}
+@media (max-width:980px){.app{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.stage{padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.tools{display:flex;flex-wrap:wrap;gap:6px}
+.tool{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:500}
+.tool:hover{border-color:var(--muted)}
+.tool[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.sw{width:14px;height:14px;border-radius:3px;flex:none;border:1px solid rgba(0,0,0,.2)}
+.tool kbd{font-family:var(--f-mono);font-size:.7rem;opacity:.6}
+.canvas-wrap{position:relative;width:100%;aspect-ratio:48/30;max-width:100%;border-radius:8px;overflow:hidden;background:var(--m-wall);touch-action:none}
+canvas{display:block;width:100%;height:100%;cursor:crosshair}
+.hover{font-size:.8rem;color:var(--muted);min-height:1.3em}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.78rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dotc{width:10px;height:10px;border-radius:50%}
+
+.player{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:6px 12px;cursor:pointer;font-weight:600;font-size:.85rem;display:inline-flex;align-items:center;gap:6px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.btn{border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.85rem}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-size:1rem;padding:10px 14px;width:100%;font-family:var(--f-display);letter-spacing:.06em;text-transform:uppercase}
+.btn.primary:hover{filter:brightness(1.08)}
+.scrub{flex:1;min-width:140px;accent-color:var(--accent)}
+.time{font-family:var(--f-mono);font-size:.95rem;min-width:9ch;text-align:right}
+.toggles{display:flex;gap:12px;flex-wrap:wrap;font-size:.82rem}
+.toggles label{display:inline-flex;gap:5px;align-items:center;cursor:pointer}
+
+/* Workflow rail */
+.rail{display:flex;flex-direction:column;gap:12px;min-width:0}
+.step{padding:14px}
+.step h2{font-size:1.25rem;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.num{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-family:var(--f-display);font-size:1rem}
+.hint{font-size:.8rem;color:var(--muted);margin:0 0 10px}
+.presets{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.preset{text-align:left;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:8px 10px;cursor:pointer;font-size:.82rem;line-height:1.3}
+.preset b{display:block;font-size:.86rem}
+.preset span{color:var(--muted)}
+.preset:hover{border-color:var(--accent)}
+.field{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;margin-bottom:10px;font-size:.85rem}
+.field input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent)}
+.field output{font-family:var(--f-mono);font-size:.82rem}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+select,input[type=number]{border:1px solid var(--line);background:var(--surface-2);border-radius:6px;padding:4px 8px}
+input[type=number]{width:80px}
+details summary{cursor:pointer;font-size:.85rem;font-weight:600}
+textarea{width:100%;min-height:90px;font-family:var(--f-mono);font-size:.72rem;border:1px solid var(--line);border-radius:6px;background:var(--surface-2);color:var(--ink);padding:6px}
+.note{font-size:.78rem;color:var(--muted);margin-top:6px}
+
+/* Results */
+.results{display:grid;gap:18px;padding-bottom:40px}
+.section-h{display:flex;align-items:center;gap:10px}
+.section-h h2{font-size:1.6rem}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:860px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{padding:14px 16px;position:relative;overflow:hidden}
+.kpi .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.kpi .val{font-family:var(--f-display);font-size:2.6rem;line-height:1.05;font-variant-numeric:tabular-nums}
+.kpi .sub{font-size:.8rem;color:var(--muted)}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--stripe,var(--line))}
+.kpi.std{--stripe:var(--std)} .kpi.naj{--stripe:var(--naj)} .kpi.good{--stripe:var(--good)} .kpi.warn{--stripe:var(--warn)}
+.kpi.good .val{color:var(--good)}
+.grid2{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px}
+@media (max-width:980px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.panel{padding:16px;min-width:0}
+.panel h3{font-size:1.2rem;margin-bottom:4px}
+.panel .cap{font-size:.8rem;color:var(--muted);margin:0 0 10px}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-family:var(--f-mono);font-size:11px}
+.chart .gridl{stroke:var(--line);stroke-width:1}
+.keys{display:flex;gap:14px;font-size:.8rem;margin-bottom:6px;flex-wrap:wrap}
+.keys span{display:inline-flex;gap:6px;align-items:center}
+.keys i{width:16px;height:3px;border-radius:2px;display:inline-block}
+.bars{display:grid;gap:12px}
+.bar-row{display:grid;grid-template-columns:90px minmax(0,1fr);gap:4px 10px;align-items:center;font-size:.82rem}
+.bar-row .nm{font-weight:600;grid-row:span 2}
+.bar{height:12px;border-radius:3px;min-width:2px}
+.bar-line{display:flex;align-items:center;gap:8px}
+.bar-line .mono{font-size:.75rem;color:var(--muted);min-width:6ch}
+.recs{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.rec{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
+.sev{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.sev.critical{color:var(--bad)} .sev.warning{color:var(--warn)} .sev.good{color:var(--good)} .sev.info{color:var(--naj)}
+.rec b{display:block;margin-bottom:2px}
+.rec p{margin:0;color:var(--muted);font-size:.85rem}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td.num-c{font-family:var(--f-mono);text-align:right}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.75rem;font-weight:600;border:1px solid var(--line)}
+.tag.chg{border-color:var(--naj);color:var(--naj)}
+.foot{font-size:.78rem;color:var(--muted);padding-bottom:24px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header class="band">
+  <div class="wrap">
+    <div class="brand">
+      <svg width="58" height="58" viewBox="0 0 58 58" aria-hidden="true">
+        <path d="M29 3 L52 11 V28 C52 42 42 51 29 55 C16 51 6 42 6 28 V11 Z" fill="#ffd166"/>
+        <path d="M29 7 L48 14 V28 C48 39.5 40 47 29 51 C18 47 10 39.5 10 28 V14 Z" fill="#7a0c1f"/>
+        <rect x="31" y="17" width="11" height="20" rx="1" fill="none" stroke="#7CFFB2" stroke-width="2.4"/>
+        <circle cx="22" cy="18" r="2.8" fill="#fff"/>
+        <path d="M21 22 L17 30 M21 22 L25 28 L29 27 M19 26 L23 33 L20 39 M21 31 L15 37" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+        <path d="M15 43 H38 M33 39 L38 43 L33 47" stroke="#7CFFB2" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <div>
+        <h1>NAJAT</h1>
+        <div class="sub">Smart School Evacuation Simulator</div>
+        <div class="ar" lang="ar" dir="rtl">نجاة — محاكي الإخلاء المدرسي الذكي</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <span class="chip" id="statusChip"><span class="dot"></span><span id="statusText">Results current</span></span>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="app">
+    <section class="card stage" aria-label="School map">
+      <div class="tools" role="toolbar" aria-label="Map tools" id="tools"></div>
+      <div class="canvas-wrap" id="cwrap"><canvas id="map" aria-label="School floor plan grid"></canvas></div>
+      <div class="hover" id="hover">Hover the map to inspect a cell. Each cell is about 1 m × 1 m.</div>
+      <div class="player">
+        <div class="seg" role="group" aria-label="Plan to replay">
+          <button id="viewStd" aria-pressed="false"><span class="dotc" style="background:var(--std)"></span>Standard plan</button>
+          <button id="viewNaj" aria-pressed="true"><span class="dotc" style="background:var(--naj)"></span>NAJAT plan</button>
+        </div>
+        <button class="btn" id="play" aria-label="Play">▶ Play</button>
+        <input class="scrub" type="range" id="scrub" min="0" max="0" value="0" aria-label="Timeline">
+        <span class="time" id="clock">0:00</span>
+        <select id="speed" aria-label="Playback speed">
+          <option value="4">4×</option><option value="10" selected>10×</option><option value="25">25×</option><option value="60">60×</option>
+        </select>
+      </div>
+      <div class="row" style="justify-content:space-between">
+        <div class="toggles">
+          <label><input type="checkbox" id="optHeat"> Congestion heatmap</label>
+          <label><input type="checkbox" id="optSmoke" checked> Danger zone</label>
+          <label><input type="checkbox" id="optTrail" checked> Movement trails</label>
+        </div>
+        <div class="legend">
+          <span><span class="sw" style="background:var(--m-room)"></span>Classroom</span>
+          <span><span class="sw" style="background:var(--m-floor)"></span>Corridor</span>
+          <span><span class="sw" style="background:var(--m-stairs)"></span>Stairs</span>
+          <span><span class="sw" style="background:var(--m-exit)"></span>Exit</span>
+          <span><span class="sw" style="background:var(--m-fire)"></span>Fire</span>
+          <span><span class="sw" style="background:repeating-linear-gradient(45deg,var(--m-block-a) 0 3px,var(--m-block-b) 3px 6px)"></span>Blocked</span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="rail">
+      <section class="card step">
+        <h2><span class="num">1</span>Create school map</h2>
+        <p class="hint">Pick a tool above and paint on the grid. Students start inside classroom cells.</p>
+        <div class="row">
+          <button class="btn" id="loadSample">Load sample school</button>
+          <button class="btn" id="clearMap">Blank map</button>
+        </div>
+        <details style="margin-top:10px">
+          <summary>Save or load a map (JSON)</summary>
+          <textarea id="mapJson" aria-label="Map JSON" spellcheck="false"></textarea>
+          <div class="row"><button class="btn" id="copyJson">Copy map</button><button class="btn" id="loadJson">Load from text</button></div>
+          <div class="note" id="jsonNote"></div>
+        </details>
+      </section>
+
+      <section class="card step">
+        <h2><span class="num">2</span>Set scenario</h2>
+        <div class="presets" id="presets"></div>
+        <p class="note">Or use the <b>Fire</b> and <b>Blocked</b> tools to place hazards anywhere.</p>
+      </section>
+
+      <section class="card step">
+        <h2><span class="num">3</span>Run simulation</h2>
+        <div class="field"><label for="pStudents">Students</label><output id="oStudents"></output><input type="range" id="pStudents" min="40" max="480" step="10" value="240"></div>
+        <div class="field"><label for="pReact">Max reaction delay after alarm</label><output id="oReact"></output><input type="range" id="pReact" min="0" max="90" step="5" value="30"></div>
+        <div class="field"><label for="pFire">Fire spread</label>
+          <select id="pFire"><option value="off">None</option><option value="slow" selected>Slow</option><option value="fast">Fast</option></select></div>
+        <div class="field"><label for="pSeed">Random seed</label>
+          <span class="row"><input type="number" id="pSeed" value="7" min="1" max="99999"><button class="btn" id="reseed" aria-label="New random seed">↻</button></span></div>
+        <button class="btn primary" id="run">Run both plans</button>
+        <p class="note">Both plans use the same students, start positions and reaction times, so the comparison is fair.</p>
+      </section>
+    </aside>
+  </div>
+
+  <section class="results" aria-label="Results">
+    <div class="section-h"><span class="num">4</span><h2>Analyze results</h2></div>
+    <div class="kpis">
+      <div class="card kpi std"><div class="lbl">Standard plan · evacuation time</div><div class="val mono" id="kStd">–</div><div class="sub" id="kStdSub"></div></div>
+      <div class="card kpi naj"><div class="lbl">NAJAT plan · evacuation time</div><div class="val mono" id="kNaj">–</div><div class="sub" id="kNajSub"></div></div>
+      <div class="card kpi good" id="kImpCard"><div class="lbl">Time improvement</div><div class="val mono" id="kImp">–</div><div class="sub" id="kImpSub"></div></div>
+      <div class="card kpi warn"><div class="lbl">Students near fire</div><div class="val mono" id="kExp">–</div><div class="sub" id="kExpSub"></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card panel">
+        <h3>Evacuation curve</h3>
+        <p class="cap">Share of students outside the building over time. A steeper, earlier curve is better.</p>
+        <div class="keys"><span><i style="background:var(--std)"></i>Standard plan</span><span><i style="background:var(--naj)"></i>NAJAT plan</span></div>
+        <svg class="chart" id="curve" viewBox="0 0 640 260" role="img" aria-label="Evacuation curve chart"></svg>
+      </div>
+      <div class="card panel">
+        <h3>Exit usage</h3>
+        <p class="cap">Students leaving through each exit. Balanced use shortens queues.</p>
+        <div class="bars" id="bars"></div>
+      </div>
+    </div>
+
+    <div class="section-h"><span class="num">5</span><h2>Recommendations</h2></div>
+    <div class="grid2">
+      <div class="card panel">
+        <h3>Findings</h3>
+        <p class="cap">Generated from the two runs above.</p>
+        <ul class="recs" id="recs"></ul>
+      </div>
+      <div class="card panel">
+        <h3>Route assignment per classroom</h3>
+        <p class="cap">The exit most students in each room used. Changed routes are highlighted.</p>
+        <div class="tbl-wrap"><table id="routes"></table></div>
+      </div>
+    </div>
+    <p class="foot">Model: cellular-automaton crowd simulation on a 48 × 30 grid (1 cell ≈ 1 m, 1 step ≈ 1 s, walking ≈ 1 m/s, stairs ≈ 0.55 m/s). Standard plan follows the pre-drilled nearest-exit route and re-routes only after seeing fire or a blockage. NAJAT plan uses a risk-aware Dijkstra shortest path (edge cost rises near fire, cells touching fire are near-forbidden) and searches what-if exit assignments per classroom by simulating each one, keeping the plan with the lowest time and exposure. Routes are re-planned whenever the fire spreads. Based on Dijkstra (1959) and Helbing et al. (2000).</p>
+  </section>
+</main>
+
+<script>
+"use strict";
+/* ================= Constants ================= */
+const W=48,H=30,N=W*H;
+const WALL=0,FLOOR=1,ROOM=2,STAIRS=3,EXIT=4;
+const DX=[1,-1,0,0,1,1,-1,-1],DY=[0,0,1,-1,1,-1,1,-1],SQ2=Math.SQRT2,STEP=[1,1,1,1,SQ2,SQ2,SQ2,SQ2];
+const idx=(x,y)=>y*W+x;
+const fmt=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+class Heap{
+  constructor(){this.k=[];this.v=[];this.lastKey=0}
+  get size(){return this.k.length}
+  push(key,val){const k=this.k,v=this.v;let i=k.length;k.push(key);v.push(val);
+    while(i>0){const p=(i-1)>>1;if(k[p]<=key)break;k[i]=k[p];v[i]=v[p];i=p}k[i]=key;v[i]=val}
+  pop(){const k=this.k,v=this.v;const top=v[0];this.lastKey=k[0];const lk=k.pop(),lv=v.pop();
+    if(k.length){let i=0;const n=k.length;for(;;){const l=2*i+1;if(l>=n)break;const r=l+1;const c=(r<n&&k[r]<k[l])?r:l;if(k[c]>=lk)break;k[i]=k[c];v[i]=v[c];i=c}k[i]=lk;v[i]=lv}
+    return top}
+}
+
+/* Dijkstra distance field from a set of exit cells, 8-neighbour, no corner cutting */
+function fieldFrom(cells,sources,pass,cost){
+  const d=new Float32Array(N).fill(Infinity),h=new Heap();
+  for(const s of sources){d[s]=0;h.push(0,s)}
+  while(h.size){
+    const u=h.pop(),du=h.lastKey;if(du>d[u])continue;
+    const ux=u%W,uy=(u/W)|0,cu=cost(u);
+    for(let k=0;k<8;k++){
+      const vx=ux+DX[k],vy=uy+DY[k];if(vx<0||vy<0||vx>=W||vy>=H)continue;
+      const v=vy*W+vx;if(!pass(v))continue;
+      if(k>=4&&(cells[uy*W+vx]===WALL||cells[vy*W+ux]===WALL))continue;
+      const nd=Math.fround(du+STEP[k]*(cu+cost(v))*0.5);
+      if(nd<d[v]){d[v]=nd;h.push(nd,v)}
+    }
+  }
+  return d;
+}
+
+/* 4-neighbour BFS distance from a set of cells over walkable cells */
+function bfsFrom(cells,flags){
+  const d=new Float32Array(N).fill(Infinity),q=new Int32Array(N);let qh=0,qt=0;
+  for(let i=0;i<N;i++)if(flags[i]){d[i]=0;q[qt++]=i}
+  while(qh<qt){const u=q[qh++],ux=u%W,uy=(u/W)|0;
+    for(let k=0;k<4;k++){const vx=ux+DX[k],vy=uy+DY[k];if(vx<0||vy<0||vx>=W||vy>=H)continue;const v=vy*W+vx;
+      if(cells[v]===WALL||d[v]!==Infinity)continue;d[v]=d[u]+1;q[qt++]=v}}
+  return d;
+}
+
+function components(cells,pred){
+  const of=new Int16Array(N).fill(-1),groups=[];
+  for(let i=0;i<N;i++){if(of[i]>=0||!pred(cells[i]))continue;
+    const g=[],st=[i];of[i]=groups.length;
+    while(st.length){const u=st.pop();g.push(u);const ux=u%W,uy=(u/W)|0;
+      for(let k=0;k<4;k++){const vx=ux+DX[k],vy=uy+DY[k];if(vx<0||vy<0||vx>=W||vy>=H)continue;const v=vy*W+vx;
+        if(of[v]<0&&pred(cells[v])){of[v]=groups.length;st.push(v)}}}
+    groups.push(g)}
+  return {of,groups};
+}
+
+/* ================= Sample school ================= */
+function buildSchool(){
+  const c=new Uint8Array(N);
+  const rect=(x0,y0,x1,y1,t)=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)c[idx(x,y)]=t};
+  const cols=[[1,10],[12,21],[26,35],[37,46]];
+  for(const [a,b] of cols){rect(a,1,b,11,ROOM);rect(a,18,b,28,ROOM)}
+  rect(1,14,46,15,FLOOR);            // main corridor
+  rect(23,1,24,28,FLOOR);            // central spine
+  rect(23,1,24,4,STAIRS);            // north stairwell
+  rect(23,25,24,28,STAIRS);          // south stairwell
+  for(const d of [5,16,30,41]){rect(d,12,d+1,13,FLOOR);rect(d,16,d+1,17,FLOOR)} // classroom doors
+  rect(22,6,22,7,FLOOR);rect(25,6,25,7,FLOOR);rect(22,22,22,23,FLOOR);rect(25,22,25,23,FLOOR); // side doors to spine
+  rect(0,14,0,15,EXIT);rect(47,14,47,15,EXIT);rect(23,0,24,0,EXIT);rect(23,29,24,29,EXIT);
+  return {cells:c,fire:new Set(),blocked:new Set()};
+}
+
+const PRESETS=[
+  {id:"east",name:"Fire · east corridor",desc:"Fire cuts the main corridor between the east classrooms",apply:m=>{m.fire=new Set([idx(36,14),idx(36,15)]);m.blocked=new Set()}},
+  {id:"spine",name:"Fire · central spine",desc:"Fire in the central corridor near the side doors",apply:m=>{m.fire=new Set([idx(23,9)]);m.blocked=new Set()}},
+  {id:"combo",name:"Fire + blocked exit",desc:"East corridor fire and the west exit blocked by debris",apply:m=>{m.fire=new Set([idx(36,14),idx(36,15)]);m.blocked=new Set([idx(3,14),idx(3,15)])}},
+  {id:"drill",name:"Routine drill",desc:"No hazards, congestion only",apply:m=>{m.fire=new Set();m.blocked=new Set()}},
+];
+
+/* ================= Setup (shared by both plans) ================= */
+function makeSetup(model,P){
+  const {cells}=model,rng=mulberry32(P.seed);
+  const ex=components(cells,t=>t===EXIT),rm=components(cells,t=>t===ROOM);
+  const sideName=g=>{let x0=W,x1=0,y0=H,y1=0;for(const i of g){const x=i%W,y=(i/W)|0;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
+    return x0===0?"West":x1===W-1?"East":y0===0?"North":y1===H-1?"South":"Inner"};
+  const exitNames=[],cnt={};ex.groups.forEach(g=>{const s=sideName(g);cnt[s]=(cnt[s]||0)+1;exitNames.push(s)});
+  const seen={};for(let i=0;i<exitNames.length;i++){const s=exitNames[i];if(cnt[s]>1){seen[s]=(seen[s]||0)+1;exitNames[i]=s+" "+seen[s]}else exitNames[i]=s+" exit"}
+  // order rooms top-left to bottom-right
+  const order=rm.groups.map((g,i)=>{let sx=0,sy=0;for(const c of g){sx+=c%W;sy+=(c/W)|0}return {i,cx:sx/g.length,cy:sy/g.length}})
+    .sort((a,b)=>Math.round(a.cy/6)-Math.round(b.cy/6)||a.cx-b.cx);
+  const roomName=new Array(rm.groups.length);order.forEach((o,k)=>roomName[o.i]="Classroom "+(k+1));
+  const elig=[];for(let i=0;i<N;i++)if(cells[i]===ROOM&&!model.fire.has(i)&&!model.blocked.has(i))elig.push(i);
+  for(let i=elig.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[elig[i],elig[j]]=[elig[j],elig[i]]}
+  const n=Math.min(P.students,elig.length),start=elig.slice(0,n),delay=start.map(()=>1+Math.floor(rng()*(P.react+1)));
+  return {exitGroups:ex.groups,exitOf:ex.of,exitNames,roomOf:rm.of,roomName,start,delay,requested:P.students};
+}
+
+/* ================= Simulation core ================= */
+const FIRE={off:null,slow:{every:12,p:.35,r:4},fast:{every:6,p:.5,r:7}};
+
+function simulate(model,S,mode,P,plan,record=true){
+  const cells=model.cells,rng=mulberry32(P.seed*7919+13),G=S.exitGroups.length,nA=S.start.length;
+  const fire=new Uint8Array(N),blocked=new Uint8Array(N);
+  for(const i of model.fire)if(cells[i]!==WALL&&cells[i]!==EXIT)fire[i]=1;
+  for(const i of model.blocked)if(cells[i]!==WALL)blocked[i]=1;
+  const originD=bfsFrom(cells,fire),fs=FIRE[P.fire];
+  let dF=bfsFrom(cells,fire);
+  const isWalk=i=>cells[i]!==WALL,passNow=i=>cells[i]!==WALL&&!blocked[i]&&!fire[i];
+  const baseCost=i=>cells[i]===STAIRS?1.8:1;
+  const width=S.exitGroups.map(g=>g.length);
+  const pos=Int32Array.from(S.start),delay=Int32Array.from(S.delay);
+  const done=new Int32Array(nA).fill(-1),target=new Int16Array(nA).fill(-1),aware=new Uint8Array(nA),hes=new Int32Array(nA),expo=new Int32Array(nA),used=new Int16Array(nA).fill(-1);
+  const occ=new Int32Array(N).fill(-1);for(let a=0;a<nA;a++)occ[pos[a]]=a;
+  const cong=new Float32Array(N),flow=new Float32Array(N),exitCount=new Int32Array(G);
+
+  // Standard: drill route planned with no knowledge of the incident
+  const drill=S.exitGroups.map(g=>fieldFrom(cells,g,isWalk,baseCost));
+  for(let a=0;a<nA;a++){let b=-1,bv=Infinity;for(let g=0;g<G;g++){const v=drill[g][pos[a]];if(v<bv){bv=v;b=g}}target[a]=b}
+  let aw=null,awDirty=true,nf=null;
+  const awareFields=()=>S.exitGroups.map(g=>fieldFrom(cells,g,passNow,baseCost));
+
+  // NAJAT: risk-aware Dijkstra (cost rises near fire) + a per-classroom exit plan
+  function najatFields(){
+    const cost=i=>{let c=baseCost(i);const f=dF[i];if(f<=1)c+=40;else if(f<=P.riskR)c+=P.riskW/f;return c};
+    return S.exitGroups.map(g=>fieldFrom(cells,g,passNow,cost));
+  }
+  function assign(){
+    for(let a=0;a<nA;a++){if(done[a]>=0)continue;const p=pos[a],r=S.roomOf[S.start[a]];
+      let g=plan&&r>=0?plan[r]:-1;
+      if(g>=0&&nf[g][p]===Infinity)g=-1;               // planned exit cut off: fall back to safest reachable
+      if(g<0){let bv=Infinity;for(let k=0;k<G;k++){const v=nf[k][p];if(v<bv){bv=v;g=k}}
+        const c=target[a];if(c>=0&&nf[c][p]<=bv*1.2+4)g=c;}   // hysteresis: don't flip-flop between exits
+      target[a]=g;
+    }
+  }
+
+  function fieldOf(b){
+    if(mode!=="std")return target[b]<0?null:nf[target[b]];
+    if(!aware[b])return drill[target[b]];
+    if(awDirty){aw=awareFields();awDirty=false}
+    let g=-1,bv=Infinity;for(let k=0;k<G;k++){const v=aw[k][pos[b]];if(v<bv){bv=v;g=k}}return g<0?null:aw[g];
+  }
+  const frames=[],fireFrames=[],series=[];let fireSnap=fire.slice();
+  const snap=()=>{series.push(evac);if(!record)return;const f=new Int16Array(nA);for(let a=0;a<nA;a++)f[a]=done[a]>=0?-1:pos[a];frames.push(f);fireFrames.push(fireSnap)};
+  let evac=0,t=0,lastMove=0;const order=[];for(let a=0;a<nA;a++)order.push(a);
+  snap();
+  if(mode==="najat"){nf=najatFields();assign()}
+
+  while(evac<nA&&t<P.maxT){
+    let fireChanged=false;
+    if(fs&&t>0&&t%fs.every===0){
+      const add=[];
+      for(let u=0;u<N;u++){if(!fire[u])continue;const ux=u%W,uy=(u/W)|0;
+        for(let k=0;k<4;k++){const vx=ux+DX[k],vy=uy+DY[k];if(vx<0||vy<0||vx>=W||vy>=H)continue;const v=vy*W+vx;
+          if(fire[v]||cells[v]===WALL||cells[v]===EXIT||blocked[v]||originD[v]>fs.r)continue;if(rng()<fs.p)add.push(v)}}
+      if(add.length){for(const v of add)fire[v]=1;fireChanged=true;dF=bfsFrom(cells,fire);fireSnap=fire.slice();awDirty=true}
+    }
+    if(mode==="najat"&&fireChanged){nf=najatFields();assign()}
+    for(let i=order.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));const tmp=order[i];order[i]=order[j];order[j]=tmp}
+    let moved=0,waiting=0;
+    for(const a of order){
+      if(done[a]>=0)continue;
+      const p=pos[a];
+      if(dF[p]<=1)expo[a]++;
+      if(delay[a]>0){delay[a]--;waiting++;continue}
+      if(hes[a]>0){hes[a]--;waiting++;continue}
+      let F;
+      if(mode==="std"){
+        if(!aware[a]&&dF[p]<=P.sight){aware[a]=1;hes[a]=3;continue}
+        if(aware[a]){if(awDirty){aw=awareFields();awDirty=false}
+          let b=-1,bv=Infinity;for(let g=0;g<G;g++){const v=aw[g][p];if(v<bv){bv=v;b=g}}if(b<0)continue;target[a]=b;F=aw[b]}
+        else F=drill[target[a]];
+      }else{if(target[a]<0)continue;F=nf[target[a]]}
+      const px=p%W,py=(p/W)|0,cur=F[p];
+      if(cells[p]===STAIRS&&rng()>0.55){cong[p]+=.25;continue}
+      let best=-1,bv=Infinity,anyBetter=false,hazard=false,ob=-1,obv=Infinity;
+      for(let k=0;k<8;k++){
+        const vx=px+DX[k],vy=py+DY[k];if(vx<0||vy<0||vx>=W||vy>=H)continue;const v=vy*W+vx;
+        if(cells[v]===WALL)continue;
+        if(k>=4&&(cells[py*W+vx]===WALL||cells[vy*W+px]===WALL))continue;
+        const fv=F[v];if(!(fv<cur))continue;
+        if(!passNow(v)){hazard=true;continue}
+        anyBetter=true;
+        if(occ[v]>=0){if(fv<obv){obv=fv;ob=v}continue}
+        const val=fv+rng()*0.08;if(val<bv){bv=val;best=v}
+      }
+      if(best<0){
+        if(mode==="std"&&!aware[a]&&hazard&&!anyBetter){aware[a]=1;hes[a]=3}
+        // counter-flow: squeeze past someone heading the opposite way
+        if(ob>=0){const b=occ[ob];if(b>=0&&delay[b]===0&&hes[b]===0){const Fb=fieldOf(b);
+          if(Fb&&Fb[p]<Fb[ob]){pos[a]=ob;pos[b]=p;occ[ob]=a;occ[p]=b;moved++;flow[ob]++;continue}}}
+        if(anyBetter)cong[p]++;
+        continue;
+      }
+      occ[p]=-1;pos[a]=best;moved++;flow[best]++;
+      if(cells[best]===EXIT){done[a]=t+1;evac++;const g=S.exitOf[best];used[a]=g;exitCount[g]++}
+      else occ[best]=a;
+    }
+    t++;if(moved)lastMove=t;
+    snap();
+    if(!moved&&!waiting&&t-lastMove>45)break;
+  }
+  let last=0,sum=0;for(let a=0;a<nA;a++)if(done[a]>=0){last=Math.max(last,done[a]);sum+=done[a]}
+  let exposed=0;for(let a=0;a<nA;a++)if(expo[a]>0)exposed++;
+  return {frames,fireFrames,series,total:last,avg:evac?sum/evac:0,evac,trapped:nA-evac,exposed,exitCount:Array.from(exitCount),cong,flow,used,n:nA,ticks:t};
+}
+
+/* NAJAT optimiser: test what-if exit plans per classroom, keep the safest fastest one.
+   Plan value -1 = each student takes their own safest nearest exit. */
+const planScore=r=>r.total+0.25*r.avg+3*r.exposed+1000*r.trapped;
+function optimizePlan(model,S,P,drillRes){
+  const R=S.roomName.length,G=S.exitGroups.length,has=new Array(R).fill(false);
+  for(const p of S.start)if(S.roomOf[p]>=0)has[S.roomOf[p]]=true;
+  let plan=new Int16Array(R).fill(-1),best=simulate(model,S,"najat",P,plan,false),bs=planScore(best),tested=1;
+  const votes=[...Array(R)].map(()=>new Array(G).fill(0));
+  S.start.forEach((p,a)=>{const r=S.roomOf[p];if(r>=0&&drillRes.used[a]>=0)votes[r][drillRes.used[a]]++});
+  const drillPlan=new Int16Array(R).fill(-1);votes.forEach((v,r)=>{const m=Math.max(...v);if(m>0)drillPlan[r]=v.indexOf(m)});
+  {const res=simulate(model,S,"najat",P,drillPlan,false);tested++;const sc=planScore(res);if(sc<bs){bs=sc;plan=drillPlan.slice();best=res}}
+  for(let pass=0;pass<P.passes;pass++){
+    let improved=false;
+    for(let r=0;r<R;r++){if(!has[r])continue;
+      for(let g=-1;g<G;g++){if(g===plan[r])continue;
+        const cand=plan.slice();cand[r]=g;const res=simulate(model,S,"najat",P,cand,false);tested++;
+        const sc=planScore(res);if(sc<bs-0.01){bs=sc;plan=cand;best=res;improved=true}}}
+    if(!improved)break;
+  }
+  // The existing drill plan is a candidate too: if nothing beats it, NAJAT recommends keeping it.
+  if(planScore(drillRes)<=bs)return {plan:drillPlan,tested,result:drillRes,keep:true};
+  return {plan,tested,result:simulate(model,S,"najat",P,plan,true),keep:false};
+}
+
+/* ================= State ================= */
+const P={students:240,react:30,fire:"slow",seed:7,maxT:1500,sight:2,riskW:14,riskR:6,passes:2};
+let model=buildSchool();PRESETS[0].apply(model);
+let setup=null,res=null,opt=null,view="najat",tick=0,playing=false,stale=false;
+let tool="fire";
+
+try{const s=localStorage.getItem("najat-map-v1");if(s)loadJSON(JSON.parse(s),true)}catch(e){}
+
+/* ================= Tools ================= */
+const TOOLS=[
+  {id:"wall",name:"Wall",sw:"var(--m-wall)"},
+  {id:"floor",name:"Corridor",sw:"var(--m-floor)"},
+  {id:"room",name:"Classroom",sw:"var(--m-room)"},
+  {id:"stairs",name:"Stairs",sw:"var(--m-stairs)"},
+  {id:"exit",name:"Exit",sw:"var(--m-exit)"},
+  {id:"fire",name:"Fire",sw:"var(--m-fire)"},
+  {id:"block",name:"Blocked",sw:"repeating-linear-gradient(45deg,var(--m-block-a) 0 3px,var(--m-block-b) 3px 6px)"},
+  {id:"clear",name:"Clear hazard",sw:"transparent"},
+];
+const toolsEl=document.getElementById("tools");
+TOOLS.forEach((t,i)=>{const b=document.createElement("button");b.className="tool";b.type="button";b.dataset.tool=t.id;
+  b.innerHTML=`<span class="sw" style="background:${t.sw}"></span>${t.name} <kbd>${i+1}</kbd>`;
+  b.setAttribute("aria-pressed",String(t.id===tool));b.onclick=()=>setTool(t.id);toolsEl.appendChild(b)});
+function setTool(id){tool=id;toolsEl.querySelectorAll(".tool").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===id)))}
+
+const presetsEl=document.getElementById("presets");
+PRESETS.forEach(p=>{const b=document.createElement("button");b.className="preset";b.type="button";b.innerHTML=`<b>${p.name}</b><span>${p.desc}</span>`;
+  b.onclick=()=>{p.apply(model);markStale();runAll()};presetsEl.appendChild(b)});
+
+/* ================= Canvas ================= */
+const cv=document.getElementById("map"),ctx=cv.getContext("2d"),wrap=document.getElementById("cwrap");
+let cs=10,dpr=1,C={},staticLayer=document.createElement("canvas");
+function readColors(){const s=getComputedStyle(document.documentElement);const g=n=>s.getPropertyValue(n).trim();
+  C={wall:g("--m-wall"),floor:g("--m-floor"),room:g("--m-room"),stairs:g("--m-stairs"),grid:g("--m-grid"),exit:g("--m-exit"),fire:g("--m-fire"),smoke:g("--m-smoke"),ba:g("--m-block-a"),bb:g("--m-block-b"),std:g("--std"),naj:g("--naj"),ink:g("--ink")}}
+function resize(){const r=wrap.getBoundingClientRect();dpr=window.devicePixelRatio||1;cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);cs=cv.width/W;buildStatic();draw()}
+function buildStatic(){
+  staticLayer.width=cv.width;staticLayer.height=cv.height;const g=staticLayer.getContext("2d"),c=model.cells;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const t=c[idx(x,y)];const X=x*cs,Y=y*cs;
+    g.fillStyle=t===WALL?C.wall:t===ROOM?C.room:t===STAIRS?C.stairs:t===EXIT?C.exit:C.floor;
+    g.fillRect(X,Y,cs+.5,cs+.5);
+    if(t===STAIRS){g.strokeStyle=C.grid.replace(/[\d.]+\)$/,".35)");g.lineWidth=Math.max(1,cs*.08);for(let k=1;k<4;k++){g.beginPath();g.moveTo(X,Y+k*cs/4);g.lineTo(X+cs,Y+k*cs/4);g.stroke()}}
+    if(t!==WALL&&t!==EXIT){g.strokeStyle=C.grid;g.lineWidth=1;g.strokeRect(X+.5,Y+.5,cs-1,cs-1)}
+    if(t===EXIT){g.fillStyle="#fff";g.beginPath();const m=cs/2;g.moveTo(X+cs*.25,Y+m-cs*.08);g.lineTo(X+cs*.5,Y+m-cs*.08);g.lineTo(X+cs*.5,Y+m-cs*.22);g.lineTo(X+cs*.78,Y+m);g.lineTo(X+cs*.5,Y+m+cs*.22);g.lineTo(X+cs*.5,Y+m+cs*.08);g.lineTo(X+cs*.25,Y+m+cs*.08);g.closePath();g.fill()}
+  }
+  // room labels
+  if(setup){g.font=`600 ${Math.max(9,cs*.75)}px ${getComputedStyle(document.body).getPropertyValue("--f-display")||"sans-serif"}`;g.textAlign="center";g.textBaseline="middle";
+    const rm=components(c,t=>t===ROOM);rm.groups.forEach((gr,i)=>{let sx=0,sy=0;for(const k of gr){sx+=k%W;sy+=(k/W)|0}
+      g.fillStyle=C.ink;g.globalAlpha=.28;g.fillText((setup.roomName[i]||"").replace("Classroom","Class"),(sx/gr.length+.5)*cs,(sy/gr.length+.5)*cs);g.globalAlpha=1})}
+}
+let fdCache={ref:null,d:null};
+function draw(){
+  ctx.clearRect(0,0,cv.width,cv.height);ctx.drawImage(staticLayer,0,0);
+  const r=res&&!stale?res[view]:null;
+  const fireArr=r?r.fireFrames[Math.min(tick,r.fireFrames.length-1)]:null;
+  // hazards
+  const isFire=i=>fireArr?fireArr[i]:model.fire.has(i);
+  if(document.getElementById("optSmoke").checked){
+    let d;if(fireArr){if(fdCache.ref!==fireArr){fdCache={ref:fireArr,d:bfsFrom(model.cells,fireArr)}}d=fdCache.d}
+    else{const f=new Uint8Array(N);model.fire.forEach(i=>f[i]=1);d=bfsFrom(model.cells,f)}
+    ctx.fillStyle=C.smoke;for(let i=0;i<N;i++){if(d[i]>0&&d[i]<=P.riskR&&model.cells[i]!==WALL){ctx.globalAlpha=1-(d[i]-1)/P.riskR*.7;ctx.fillRect((i%W)*cs,((i/W)|0)*cs,cs,cs)}}ctx.globalAlpha=1}
+  if(r&&document.getElementById("optHeat").checked){let mx=0;for(let i=0;i<N;i++)mx=Math.max(mx,r.cong[i]);
+    if(mx>0)for(let i=0;i<N;i++){const v=r.cong[i]/mx;if(v<.04)continue;ctx.fillStyle=`rgba(230,40,60,${Math.min(.85,.15+v*.8)})`;ctx.fillRect((i%W)*cs,((i/W)|0)*cs,cs,cs)}}
+  const now=performance.now()/1000;
+  for(let i=0;i<N;i++){if(!isFire(i))continue;const x=(i%W)*cs,y=((i/W)|0)*cs;
+    ctx.fillStyle=C.fire;ctx.fillRect(x,y,cs,cs);
+    const fl=.5+.5*Math.sin(now*9+i*1.7);ctx.fillStyle=`rgba(255,214,90,${.35+.45*fl})`;
+    ctx.beginPath();ctx.ellipse(x+cs/2,y+cs*.62,cs*.26,cs*.34*(0.8+.3*fl),0,0,Math.PI*2);ctx.fill()}
+  for(const i of model.blocked){const x=(i%W)*cs,y=((i/W)|0)*cs;ctx.save();ctx.beginPath();ctx.rect(x,y,cs,cs);ctx.clip();ctx.fillStyle=C.bb;ctx.fillRect(x,y,cs,cs);
+    ctx.strokeStyle=C.ba;ctx.lineWidth=cs*.22;for(let k=-1;k<3;k++){ctx.beginPath();ctx.moveTo(x+k*cs*.5,y+cs);ctx.lineTo(x+k*cs*.5+cs,y);ctx.stroke()}ctx.restore()}
+  // agents
+  const col=view==="std"?C.std:C.naj,rad=cs*.34;
+  if(r){
+    const fr=r.frames[Math.min(tick,r.frames.length-1)];
+    if(document.getElementById("optTrail").checked){ctx.strokeStyle=col;ctx.lineWidth=Math.max(1,cs*.12);ctx.lineCap="round";
+      for(let back=1;back<=6;back++){const f0=r.frames[Math.max(0,tick-back)],f1=r.frames[Math.max(0,tick-back+1)];ctx.globalAlpha=.22*(1-back/7);ctx.beginPath();
+        for(let a=0;a<fr.length;a++){const p0=f0[a],p1=f1[a];if(p0<0||p1<0||p0===p1)continue;ctx.moveTo((p0%W+.5)*cs,(((p0/W)|0)+.5)*cs);ctx.lineTo((p1%W+.5)*cs,(((p1/W)|0)+.5)*cs)}ctx.stroke()}ctx.globalAlpha=1}
+    for(let a=0;a<fr.length;a++){const p=fr[a];if(p<0)continue;const waitingNow=setup.delay[a]>tick;
+      ctx.globalAlpha=waitingNow?.45:1;ctx.fillStyle=col;ctx.beginPath();ctx.arc((p%W+.5)*cs,(((p/W)|0)+.5)*cs,rad,0,Math.PI*2);ctx.fill()}
+    ctx.globalAlpha=1;
+  }else if(setup){ctx.fillStyle=C.ink;ctx.globalAlpha=.35;for(const p of setup.start){ctx.beginPath();ctx.arc((p%W+.5)*cs,(((p/W)|0)+.5)*cs,rad*.8,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1}
+}
+
+/* painting */
+let painting=false,lastCell=-1;
+function cellAt(e){const r=cv.getBoundingClientRect();const x=Math.floor((e.clientX-r.left)/r.width*W),y=Math.floor((e.clientY-r.top)/r.height*H);return(x<0||y<0||x>=W||y>=H)?-1:idx(x,y)}
+function paint(i){if(i<0||i===lastCell)return;lastCell=i;const c=model.cells;
+  switch(tool){
+    case"wall":c[i]=WALL;model.fire.delete(i);model.blocked.delete(i);break;
+    case"floor":c[i]=FLOOR;break;case"room":c[i]=ROOM;break;case"stairs":c[i]=STAIRS;break;
+    case"exit":c[i]=EXIT;model.fire.delete(i);model.blocked.delete(i);break;
+    case"fire":if(c[i]!==WALL&&c[i]!==EXIT){model.blocked.delete(i);model.fire.has(i)?model.fire.delete(i):model.fire.add(i)}break;
+    case"block":if(c[i]!==WALL){model.fire.delete(i);model.blocked.has(i)?model.blocked.delete(i):model.blocked.add(i)}break;
+    case"clear":model.fire.delete(i);model.blocked.delete(i);break;
+  }
+  markStale();setup=makeSetup(model,P);buildStatic();draw();
+}
+cv.addEventListener("pointerdown",e=>{painting=true;lastCell=-1;cv.setPointerCapture(e.pointerId);paint(cellAt(e))});
+cv.addEventListener("pointermove",e=>{const i=cellAt(e);if(painting&&(tool!=="fire"&&tool!=="block"))paint(i);describe(i)});
+cv.addEventListener("pointerup",()=>{painting=false;saveLocal()});
+cv.addEventListener("pointerleave",()=>{document.getElementById("hover").textContent="Hover the map to inspect a cell. Each cell is about 1 m × 1 m."});
+function describe(i){if(i<0)return;const t=model.cells[i];let s=`Col ${i%W+1}, Row ${((i/W)|0)+1} · `;
+  s+=t===WALL?"Wall":t===ROOM?(setup&&setup.roomOf[i]>=0?setup.roomName[setup.roomOf[i]]:"Classroom"):t===STAIRS?"Stairs":t===EXIT?(setup&&setup.exitOf[i]>=0?setup.exitNames[setup.exitOf[i]]:"Exit"):"Corridor";
+  if(model.fire.has(i))s+=" · fire origin";if(model.blocked.has(i))s+=" · blocked";
+  const r=res&&!stale?res[view]:null;if(r&&r.cong[i]>0)s+=` · ${Math.round(r.cong[i])} s of queuing here`;
+  document.getElementById("hover").textContent=s}
+
+/* ================= Run + playback ================= */
+function markStale(){stale=true;playing=false;updPlay();const c=document.getElementById("statusChip");c.classList.add("stale");document.getElementById("statusText").textContent="Map changed · run again"}
+let runTimer=0;
+function runAll(){
+  clearTimeout(runTimer);playing=false;updPlay();
+  document.getElementById("statusText").textContent="Testing what-if plans…";$("run").disabled=true;
+  runTimer=setTimeout(runNow,30);
+}
+function runNow(){
+  $("run").disabled=false;
+  setup=makeSetup(model,P);
+  if(!setup.start.length||!setup.exitGroups.length){res=null;stale=true;renderResults();buildStatic();draw();
+    document.getElementById("statusText").textContent=!setup.exitGroups.length?"Add at least one exit":"Add classroom cells";return}
+  const std=simulate(model,setup,"std",P);opt=optimizePlan(model,setup,P,std);
+  res={std,najat:opt.result};
+  stale=false;document.getElementById("statusChip").classList.remove("stale");document.getElementById("statusText").textContent="Results current";
+  tick=0;setScrub();buildStatic();renderResults();playing=true;updPlay();lastTs=0;
+}
+const scrub=document.getElementById("scrub"),clock=document.getElementById("clock"),playBtn=document.getElementById("play");
+function setScrub(){const r=res&&res[view];scrub.max=r?r.frames.length-1:0;scrub.value=tick;clock.textContent=fmt(tick)+(r?" / "+fmt(r.frames.length-1):"");moveCursor()}
+function updPlay(){playBtn.textContent=playing?"❚❚ Pause":"▶ Play";playBtn.setAttribute("aria-label",playing?"Pause":"Play")}
+playBtn.onclick=()=>{if(!res||stale){runAll();return}const r=res[view];if(tick>=r.frames.length-1)tick=0;playing=!playing;updPlay()};
+scrub.oninput=()=>{tick=+scrub.value;playing=false;updPlay();setScrub();draw()};
+function setView(v){view=v;document.getElementById("viewStd").setAttribute("aria-pressed",String(v==="std"));document.getElementById("viewNaj").setAttribute("aria-pressed",String(v==="najat"));
+  if(res){tick=Math.min(tick,res[v].frames.length-1)}setScrub();draw()}
+document.getElementById("viewStd").onclick=()=>setView("std");
+document.getElementById("viewNaj").onclick=()=>setView("najat");
+["optHeat","optSmoke","optTrail"].forEach(id=>document.getElementById(id).onchange=draw);
+let lastTs=0,acc=0;
+function loop(ts){
+  if(playing&&res&&!stale){const sp=+document.getElementById("speed").value;const dt=lastTs?(ts-lastTs)/1000:0;acc+=dt*sp;
+    if(acc>=1){const st=Math.floor(acc);acc-=st;tick=Math.min(tick+st,res[view].frames.length-1);setScrub();if(tick>=res[view].frames.length-1){playing=false;updPlay()}}}
+  lastTs=ts;draw();requestAnimationFrame(loop)}
+
+/* ================= Results rendering ================= */
+const $=id=>document.getElementById(id);
+function renderResults(){
+  if(!res||stale){["kStd","kNaj","kImp","kExp"].forEach(k=>$(k).textContent="–");$("curve").innerHTML="";$("bars").innerHTML="";$("recs").innerHTML="";$("routes").innerHTML="";return}
+  const s=res.std,n=res.najat;
+  $("kStd").textContent=fmt(s.total);$("kStdSub").textContent=`Average ${fmt(s.avg)} per student${s.trapped?` · ${s.trapped} trapped`:""}`;
+  $("kNaj").textContent=fmt(n.total);$("kNajSub").textContent=`Best of ${opt.tested} what-if plans · average ${fmt(n.avg)}${n.trapped?` · ${n.trapped} trapped`:""}`;
+  const imp=s.total?((s.total-n.total)/s.total*100):0,tot=setup.start.length;
+  const trapNote=r=>r.trapped?`<b style="color:var(--bad)">${r.trapped} trapped</b> · time covers escapees only`:"";
+  $("kStdSub").innerHTML=s.trapped?trapNote(s):`Average ${fmt(s.avg)} per student`;
+  if(n.trapped)$("kNajSub").innerHTML=trapNote(n);
+  if(s.trapped!==n.trapped){
+    $("kImpCard").querySelector(".lbl").textContent="Students reaching safety";
+    $("kImp").textContent=`${n.evac}/${tot}`;$("kImpCard").className="card kpi "+(n.evac>=s.evac?"good":"warn");
+    $("kImpSub").textContent=`Standard plan: ${s.evac}/${tot} · ${Math.abs(n.evac-s.evac)} ${n.evac>=s.evac?"more":"fewer"} students out`;
+  }else{
+    $("kImpCard").querySelector(".lbl").textContent="Time improvement";
+    $("kImp").textContent=(imp>=0?"↓ ":"↑ ")+Math.abs(imp).toFixed(1)+"%";
+    $("kImpCard").className="card kpi "+(imp>=0?"good":"warn");
+    $("kImpSub").textContent=`${fmt(Math.abs(s.total-n.total))} ${imp>=0?"faster":"slower"} · ${tot} students`;
+  }
+  $("kExp").textContent=`${s.exposed} → ${n.exposed}`;
+  $("kExpSub").textContent=s.exposed||n.exposed?"Spent time within 1 m of fire (standard → NAJAT)":"No student came within 1 m of fire";
+  drawCurve();drawBars();drawRecs(imp);drawRoutes();
+}
+function niceStep(max){for(const s of [10,15,20,30,60,90,120,180,300,600])if(max/s<=7)return s;return 900}
+let curveCursor=null;
+function drawCurve(){
+  const svg=$("curve"),s=res.std,n=res.najat,tot=setup.start.length;
+  const L=44,R=16,T=12,B=30,Wd=640-L-R,Hd=260-T-B;const tmax=Math.max(s.series.length,n.series.length)-1||1;
+  const X=t=>L+t/tmax*Wd,Y=v=>T+Hd-(v/tot)*Hd;
+  let h="";for(const p of [0,25,50,75,100]){const y=Y(p/100*tot);h+=`<line class="gridl" x1="${L}" x2="${L+Wd}" y1="${y}" y2="${y}"/><text x="${L-6}" y="${y+4}" text-anchor="end">${p}%</text>`}
+  const st=niceStep(tmax);for(let t=0;t<=tmax;t+=st){h+=`<text x="${X(t)}" y="${T+Hd+18}" text-anchor="middle">${fmt(t)}</text>`}
+  const path=(ser,col)=>{let d="";const step=Math.max(1,Math.floor(ser.length/400));for(let t=0;t<ser.length;t+=step)d+=(d?"L":"M")+X(t).toFixed(1)+","+Y(ser[t]).toFixed(1);d+="L"+X(ser.length-1).toFixed(1)+","+Y(ser[ser.length-1]).toFixed(1);
+    return `<path d="${d}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round"/>`};
+  const area=(ser,col)=>{let d=`M${X(0)},${Y(0)}`;const step=Math.max(1,Math.floor(ser.length/400));for(let t=0;t<ser.length;t+=step)d+="L"+X(t).toFixed(1)+","+Y(ser[t]).toFixed(1);d+=`L${X(ser.length-1)},${Y(ser[ser.length-1])}L${X(ser.length-1)},${Y(0)}Z`;return `<path d="${d}" fill="${col}" opacity=".08"/>`};
+  h+=area(s.series,"var(--std)")+area(n.series,"var(--naj)")+path(s.series,"var(--std)")+path(n.series,"var(--naj)");
+  const end=(r,col,dy)=>{const x=X(r.total),y=Y(r.evac);return `<circle cx="${x}" cy="${y}" r="4.5" fill="${col}"/><text x="${x-8}" y="${y+dy}" text-anchor="end" style="fill:${col};font-weight:600">${fmt(r.total)}</text>`};
+  h+=end(n,"var(--naj)",18)+end(s,"var(--std)",n.total===s.total?34:18);
+  h+=`<line id="cursor" x1="${L}" x2="${L}" y1="${T}" y2="${T+Hd}" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" opacity=".5"/>`;
+  svg.innerHTML=h;curveCursor={el:svg.querySelector("#cursor"),X};
+}
+function moveCursor(){if(curveCursor&&curveCursor.el){const x=curveCursor.X(tick);curveCursor.el.setAttribute("x1",x);curveCursor.el.setAttribute("x2",x)}}
+function drawBars(){
+  const s=res.std,n=res.najat,mx=Math.max(1,...s.exitCount,...n.exitCount);let h="";
+  setup.exitNames.forEach((nm,g)=>{h+=`<div class="bar-row"><div class="nm">${nm}</div>
+    <div class="bar-line"><div class="bar" style="width:${s.exitCount[g]/mx*85}%;background:var(--std)"></div><span class="mono">${s.exitCount[g]}</span></div>
+    <div class="bar-line"><div class="bar" style="width:${n.exitCount[g]/mx*85}%;background:var(--naj)"></div><span class="mono">${n.exitCount[g]}</span></div></div>`});
+  $("bars").innerHTML=h+`<div class="keys" style="margin-top:4px"><span><i style="background:var(--std)"></i>Standard</span><span><i style="background:var(--naj)"></i>NAJAT</span></div>`;
+}
+function where(i){const t=model.cells[i];const x=i%W,y=(i/W)|0;
+  if(t===ROOM&&setup.roomOf[i]>=0)return setup.roomName[setup.roomOf[i]]+" door area";
+  if(t===STAIRS)return (y<H/2?"North":"South")+" stairwell";
+  const ew=x<W/3?"west":x>2*W/3?"east":"central";return `${ew} corridor (col ${x+1}, row ${y+1})`}
+function hotspots(r,k){const c=Float32Array.from(r.cong),out=[];
+  for(let n=0;n<k;n++){let b=-1,bv=0;for(let i=0;i<N;i++)if(c[i]>bv){bv=c[i];b=i}if(b<0||bv<8)break;
+    let sum=0;const bx=b%W,by=(b/W)|0;for(let y=by-2;y<=by+2;y++)for(let x=bx-2;x<=bx+2;x++)if(x>=0&&y>=0&&x<W&&y<H){sum+=c[idx(x,y)];c[idx(x,y)]=0}out.push({i:b,sum})}
+  return out}
+function drawRecs(imp){
+  const s=res.std,n=res.najat,tot=setup.start.length,recs=[];
+  if(s.trapped>n.trapped)recs.push(["good","NAJAT routes get more students out",`${s.trapped-n.trapped} students who were trapped on the drill routes reach an exit with NAJAT routing${imp<0?`, at the cost of ${fmt(n.total-s.total)} longer total time`:""}. Safety comes before speed.`]);
+  else if(opt.keep)recs.push(["info","Keep the current drill routes",`NAJAT tested ${opt.tested} alternative route plans for this scenario and none was both safer and faster than the existing drill plan.`]);
+  else if(imp>0.5)recs.push(["good","Adopt the NAJAT routes for this scenario",`NAJAT tested ${opt.tested} route plans. The best one cuts total evacuation time from ${fmt(s.total)} to ${fmt(n.total)} (${imp.toFixed(1)}% faster) and average time per student from ${fmt(s.avg)} to ${fmt(n.avg)}. Use the classroom route table as the updated evacuation map.`]);
+  else recs.push(["info","The drill plan already performs well here",`Both plans finish within ${fmt(Math.abs(s.total-n.total))} of each other. Keep the current plan for this scenario and test harder ones.`]);
+  if(s.trapped||n.trapped)recs.push(["critical","Some students have no safe route",`${s.trapped} students (standard) and ${n.trapped} (NAJAT) could not reach an exit. Add an exit or a second door to the affected rooms.`]);
+  if(s.exposed>n.exposed)recs.push(["warning","Drill routes pass close to the fire",`${s.exposed} students came within 1 m of fire on the drill routes versus ${n.exposed} with risk-aware routing. Train students to follow an alternate route when the primary one is unsafe.`]);
+  const hs=hotspots(s,3);
+  if(hs.length)recs.push(["warning","Congestion hotspots",`Longest queues in the standard plan: ${hs.map(h=>where(h.i)).join("; ")}. Stagger class release or widen these points.`]);
+  const share=s.exitCount.map(c=>c/Math.max(1,s.evac));const mi=share.indexOf(Math.max(...share));
+  if(share[mi]>0.4&&setup.exitNames.length>1)recs.push(["warning",`${setup.exitNames[mi]} is overloaded`,`It carries ${(share[mi]*100).toFixed(0)}% of students in the standard plan. NAJAT spreads the load to ${(n.exitCount[mi]/Math.max(1,n.evac)*100).toFixed(0)}%.`]);
+  const unused=setup.exitNames.filter((_,g)=>s.exitCount[g]===0&&n.exitCount[g]===0);
+  if(unused.length)recs.push(["info","Unused exits",`${unused.join(", ")} carried no students. Check that the exit is reachable and signposted.`]);
+  if(model.cells.some(t=>t===STAIRS)){let sc=0;for(let i=0;i<N;i++)if(model.cells[i]===STAIRS)sc+=s.cong[i];if(sc>20)recs.push(["info","Stairs slow the flow",`Students spent about ${Math.round(sc)} person-seconds waiting on stairs. Assign upper-floor classes to separate stairwells.`])}
+  $("recs").innerHTML=recs.map(r=>`<li class="rec"><span class="sev ${r[0]}">${r[0]}</span><div><b>${r[1]}</b><p>${r[2]}</p></div></li>`).join("");
+}
+function drawRoutes(){
+  const s=res.std,n=res.najat,R=setup.roomName.length,rows=[];
+  for(let r=0;r<R;r++){const cs_=new Array(setup.exitNames.length).fill(0),cn=cs_.slice();let k=0;
+    setup.start.forEach((p,a)=>{if(setup.roomOf[p]!==r)return;k++;if(s.used[a]>=0)cs_[s.used[a]]++;if(n.used[a]>=0)cn[n.used[a]]++});
+    if(!k)continue;const ms=cs_.indexOf(Math.max(...cs_)),mn=cn.indexOf(Math.max(...cn));
+    const label=(arr,m)=>Math.max(...arr)?setup.exitNames[m]:"—";
+    const pl=opt.plan[r];rows.push({name:setup.roomName[r],k,a:label(cs_,ms),b:pl>=0?setup.exitNames[pl]:label(cn,mn),split:pl<0&&cn.filter(v=>v>0).length>1})}
+  rows.sort((x,y)=>x.name.localeCompare(y.name,undefined,{numeric:true}));
+  $("routes").innerHTML=`<thead><tr><th>Classroom</th><th style="text-align:right">Students</th><th>Drill exit</th><th>NAJAT exit</th></tr></thead><tbody>`+
+    rows.map(r=>`<tr><td>${r.name}</td><td class="num-c">${r.k}</td><td>${r.a}</td><td><span class="tag ${r.a!==r.b?"chg":""}">${r.b}</span>${r.split?' <span style="color:var(--muted);font-size:.75rem">nearest safe exit per student</span>':""}</td></tr>`).join("")+"</tbody>";
+}
+
+/* ================= Controls ================= */
+function bindRange(id,out,key,f){const el=$(id),o=$(out);const upd=()=>{P[key]=+el.value;o.textContent=f(+el.value)};el.oninput=()=>{upd();markStale();setup=makeSetup(model,P);buildStatic()};el.onchange=runAll;upd()}
+bindRange("pStudents","oStudents","students",v=>v+" students");
+bindRange("pReact","oReact","react",v=>v?"0–"+v+" s":"instant");
+$("pFire").onchange=e=>{P.fire=e.target.value;runAll()};
+$("pSeed").onchange=e=>{P.seed=Math.max(1,+e.target.value||1);runAll()};
+$("reseed").onclick=()=>{P.seed=1+Math.floor(Math.random()*99999);$("pSeed").value=P.seed;runAll()};
+$("run").onclick=runAll;
+$("loadSample").onclick=()=>{model=buildSchool();PRESETS[0].apply(model);saveLocal();runAll()};
+$("clearMap").onclick=()=>{const c=new Uint8Array(N);for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)c[idx(x,y)]=FLOOR;model={cells:c,fire:new Set(),blocked:new Set()};markStale();setup=makeSetup(model,P);buildStatic();renderResults();saveLocal()};
+function toJSON(){return {v:1,W,H,cells:Array.from(model.cells).join(""),fire:[...model.fire],blocked:[...model.blocked]}}
+function loadJSON(o,quiet){if(!o||o.W!==W||o.H!==H||typeof o.cells!=="string"||o.cells.length!==N)throw new Error("Map must be a 48 × 30 NAJAT map");
+  const c=new Uint8Array(N);for(let i=0;i<N;i++){const v=+o.cells[i];c[i]=v>=0&&v<=4?v:0}model={cells:c,fire:new Set(o.fire||[]),blocked:new Set(o.blocked||[])}}
+function saveLocal(){try{localStorage.setItem("najat-map-v1",JSON.stringify(toJSON()))}catch(e){}}
+$("mapJson").value="";document.querySelector("details").addEventListener("toggle",e=>{if(e.target.open)$("mapJson").value=JSON.stringify(toJSON())});
+$("copyJson").onclick=()=>{const t=JSON.stringify(toJSON());$("mapJson").value=t;navigator.clipboard.writeText(t).then(()=>$("jsonNote").textContent="Copied. Paste it anywhere to keep this map.",()=>{$("mapJson").select();$("jsonNote").textContent="Text selected. Press Ctrl+C (⌘C) to copy."})};
+$("loadJson").onclick=()=>{try{loadJSON(JSON.parse($("mapJson").value));saveLocal();$("jsonNote").textContent="Map loaded.";runAll()}catch(e){$("jsonNote").textContent="Could not load: "+e.message+". Paste the full text from Copy map."}};
+document.addEventListener("keydown",e=>{if(e.target.matches("input,textarea,select"))return;const k=+e.key;if(k>=1&&k<=TOOLS.length){setTool(TOOLS[k-1].id)}else if(e.code==="Space"&&e.target===document.body){e.preventDefault();playBtn.click()}});
+
+readColors();
+const mo=new MutationObserver(()=>{readColors();buildStatic()});mo.observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{readColors();buildStatic()});
+new ResizeObserver(resize).observe(wrap);
+runAll();resize();requestAnimationFrame(loop);
+</script>
+</body></html>

@@ -2,7 +2,7 @@
 (function () {
   var CFG = {
     email: "moh.dassen@gmail.com",
-    linkedin: "https://www.linkedin.com/in/mohammad-dassen", // TODO: confirm profile URL
+    linkedin: "https://www.linkedin.com/in/mohdassen/",
     calendly: "",                            // optional booking link
     goatcounter: "",                         // optional: your GoatCounter code, e.g. "mohdassen"
     site: "https://mohdassen.github.io/aws-consulting-roadmap/"

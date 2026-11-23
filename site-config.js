@@ -13,7 +13,7 @@ window.SITE_CONFIG = {
     title:    "AWS Cloud Architect & Strategic Consultant",
     role:     "Senior IT Infrastructure Specialist · Cloud Advisory · Riyadh, Saudi Arabia",
     location: "Riyadh, KSA",
-    linkedin: "https://linkedin.com",
+    linkedin: "https://www.linkedin.com/in/mohdassen/",
     email:    "moh.dassen@gmail.com",
     stats: [
       { num: "20+",  label: "Years Experience" },

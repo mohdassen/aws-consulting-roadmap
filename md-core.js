@@ -1,7 +1,7 @@
 /* MD Cloud — shared layer: profile, save/resume, export (MD/Word/PDF), CTA, analytics.  Client-side only. */
 (function () {
   var CFG = {
-    email: "your@email.com",                 // TODO: set real contact email
+    email: "moh.dassen@gmail.com",
     linkedin: "https://www.linkedin.com/in/mohammad-dassen", // TODO: confirm profile URL
     calendly: "",                            // optional booking link
     goatcounter: "",                         // optional: your GoatCounter code, e.g. "mohdassen"

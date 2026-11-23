@@ -14,7 +14,7 @@ window.SITE_CONFIG = {
     role:     "Senior IT Infrastructure Specialist · Cloud Advisory · Riyadh, Saudi Arabia",
     location: "Riyadh, KSA",
     linkedin: "https://linkedin.com",
-    email:    "your@email.com",
+    email:    "moh.dassen@gmail.com",
     stats: [
       { num: "20+",  label: "Years Experience" },
       { num: "11",   label: "Tools Published"  },

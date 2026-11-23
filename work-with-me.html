@@ -77,9 +77,9 @@
 <script>
 
 var OFFERS=[
- {k:"war",i:"🏗️",t:"5-Day Well-Architected Review",d:"Structured review across the six pillars for one critical workload.",b:["Pillar-scored findings (HRI/MRI)","Prioritised remediation backlog","Executive readout deck"],p:"From SAR 28,000"},
- {k:"nca",i:"🛡️",t:"NCA/PDPL Cloud Gap Assessment",d:"Control-by-control gap analysis against NCA ECC/CCC and PDPL for your AWS estate.",b:["Maturity score per control family","90-day remediation plan","Audit-ready evidence checklist"],p:"From SAR 35,000"},
- {k:"gov",i:"🌱",t:"Cloud Governance Workshop",d:"Two-day workshop to define landing zone, guardrails, FinOps and CCoE operating model.",b:["Governance framework document","SCP / guardrail starter pack","CCoE charter + RACI"],p:"From SAR 22,000"}];
+ {k:"war",i:"🏗️",t:"5-Day Well-Architected Review",d:"Structured review across the six pillars for one critical workload.",b:["Pillar-scored findings (HRI/MRI)","Prioritised remediation backlog","Executive readout deck"],p:"From SAR 24,000"},
+ {k:"nca",i:"🛡️",t:"NCA/PDPL Cloud Gap Assessment",d:"Control-by-control gap analysis against NCA ECC/CCC and PDPL for your AWS estate.",b:["Maturity score per control family","90-day remediation plan","Audit-ready evidence checklist"],p:"From SAR 33,000"},
+ {k:"gov",i:"🌱",t:"Cloud Governance Workshop",d:"Two-day workshop to define landing zone, guardrails, FinOps and CCoE operating model.",b:["Governance framework document","SCP / guardrail starter pack","CCoE charter + RACI"],p:"From SAR 21,000"}];
 document.getElementById("offers").innerHTML=OFFERS.map(function(o){return '<div class="card" style="margin:0"><div style="font-size:1.8rem">'+o.i+'</div><h2 style="margin-top:6px">'+o.t+'</h2><p class="sub">'+o.d+'</p><ul style="margin:0 0 12px 18px;font-size:.82rem;color:#c8d0e0">'+o.b.map(function(x){return "<li>"+x+"</li>"}).join("")+'</ul><span class="pill gold">'+o.p+'</span> <span class="pill">excl. 15% VAT · indicative</span><div class="bar"><button class="btn sm" data-offer="'+o.k+'">Request this →</button></div></div>'}).join("");
 var sel=document.getElementById("f-offer");sel.innerHTML=OFFERS.map(function(o){return '<option value="'+o.k+'">'+o.t+'</option>'}).join("")+'<option value="other">Something else</option>';
 document.getElementById("offers").addEventListener("click",function(e){var b=e.target.closest("[data-offer]");if(!b)return;sel.value=b.dataset.offer;MD.track("offer-"+b.dataset.offer);document.getElementById("lead").scrollIntoView({behavior:"smooth"})});

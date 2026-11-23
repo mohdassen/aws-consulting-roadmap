@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="theme-init.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landing Zone Designer — Mohammad Dassen</title>
+<meta name="description" content="Design your AWS Organizations structure — OUs and accounts — with a live diagram, then export Terraform and a design document.">
+<meta name="keywords" content="AWS landing zone design, AWS Organizations OU structure, Terraform aws_organizations_account, multi account strategy AWS">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/landing-zone-designer.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/landing-zone-designer.html">
+<meta property="og:title" content="Landing Zone Designer">
+<meta property="og:description" content="Design your AWS Organizations structure — OUs and accounts — with a live diagram, then export Terraform and a design document.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Landing Zone Designer">
+<meta name="twitter:description" content="Design your AWS Organizations structure — OUs and accounts — with a live diagram, then export Terraform and a design document.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "Landing Zone Designer",
+ "description": "Design your AWS Organizations structure \u2014 OUs and accounts \u2014 with a live diagram, then export Terraform and a design document.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/landing-zone-designer.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">Governance · Architecture</span><h1>Landing Zone Designer</h1><p>Build your OU and account structure, see the diagram update live, and export Terraform and a design document.</p></div>
+<div class="wrap">
+
+<div class="grid2"><div>
+<div class="card"><h2>1 · Organisation</h2><div class="grid2"><div><label for="org">Organisation</label><input id="org"></div><div><label for="mail">Account email pattern</label><input id="mail" value="aws+{name}@example.com"></div></div><p class="sub" style="margin-top:8px">Use <code>{name}</code> as the placeholder. Plus-addressing keeps one mailbox for many accounts.</p></div>
+<div class="card"><h2>2 · Structure</h2><div class="bar"><button class="btn gold" id="addou">＋ Add OU</button><button class="btn" id="preset">Reset to recommended</button></div><div id="tree"></div></div>
+</div><div>
+<div class="card"><h2>Diagram</h2><div class="chart-box" style="overflow:auto"><svg id="dg" width="100%"></svg></div><div class="kpis" id="kpis" style="margin-top:12px"></div></div>
+<div class="card no-print"><div class="tabs" id="tabs"><button data-o="tf" class="on">Terraform</button><button data-o="doc">Design document</button></div><div class="bar"><button class="btn" id="cp">📋 Copy</button><button class="btn" id="dl">⬇ Download</button></div><div class="preview" id="out" style="max-height:480px"></div><p class="sub" style="margin-top:10px">⚠ AWS accounts cannot be deleted instantly and often cannot be fully removed by Terraform — review before applying. Consider AWS Control Tower Account Factory for production.</p></div>
+</div></div>
+
+</div>
+<footer>🏗️ Landing Zone Designer · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script>
+
+var REC=[{n:"Security",a:["log-archive","security-audit"]},{n:"Infrastructure",a:["network-hub","shared-services"]},{n:"Workloads-Prod",a:["app-prod"]},{n:"Workloads-NonProd",a:["app-dev","app-test"]},{n:"Sandbox",a:["sandbox-1"]}];
+var T=JSON.parse(JSON.stringify(REC)),cur="tf";
+function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"")||"x"}
+function ui(){document.getElementById("tree").innerHTML=T.map(function(o,i){return '<div style="border:1px solid var(--border);border-radius:10px;padding:10px;margin:10px 0;background:var(--s2)"><div style="display:flex;gap:8px;align-items:center"><span>📁</span><input data-o="'+i+'" value="'+o.n+'"><button class="btn sm danger" data-delou="'+i+'">✕</button></div>'+o.a.map(function(a,j){return '<div style="display:flex;gap:8px;align-items:center;margin:6px 0 0 24px"><span>🧾</span><input data-o="'+i+'" data-a="'+j+'" value="'+a+'"><button class="btn sm" data-dela="'+i+'.'+j+'">✕</button></div>'}).join("")+'<div style="margin:8px 0 0 24px"><button class="btn sm" data-adda="'+i+'">＋ Account</button></div></div>'}).join("");out()}
+function out(){
+ var n=T.reduce(function(a,o){return a+o.a.length},0),W=Math.max(560,T.length*150),H=100+Math.max.apply(null,T.map(function(o){return o.a.length}).concat([1]))*46+30,s='<rect x="'+(W/2-90)+'" y="8" width="180" height="40" rx="9" fill="var(--s2)" stroke="var(--gold)"/><text x="'+W/2+'" y="33" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">Organization Root</text>';
+ T.forEach(function(o,i){var x=75+i*((W-150)/Math.max(T.length-1,1)||0);if(T.length===1)x=W/2;s+='<path d="M'+W/2+' 48 V68 H'+x+' V82" fill="none" stroke="var(--muted)"/><rect x="'+(x-68)+'" y="82" width="136" height="34" rx="8" fill="var(--s3)" stroke="var(--blue)"/><text x="'+x+'" y="103" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--text)">'+o.n+'</text>';
+  o.a.forEach(function(a,j){var y=130+j*46;s+='<line x1="'+x+'" y1="'+(j?y-12:116)+'" x2="'+x+'" y2="'+y+'" stroke="var(--muted)"/><rect x="'+(x-62)+'" y="'+y+'" width="124" height="32" rx="7" fill="var(--s2)" stroke="var(--border2)"/><text x="'+x+'" y="'+(y+20)+'" text-anchor="middle" font-size="10.5" fill="var(--muted2)">'+a+'</text>'})});
+ var svg=document.getElementById("dg");svg.setAttribute("viewBox","0 0 "+W+" "+H);svg.innerHTML=s;
+ document.getElementById("kpis").innerHTML='<div class="kpi"><b>'+T.length+'</b><span>OUs</span></div><div class="kpi"><b>'+n+'</b><span>Accounts</span></div>';
+ var mail=document.getElementById("mail").value||"aws+{name}@example.com",tf='# Generated by mohdassen.github.io — review before applying\ndata "aws_organizations_organization" "org" {}\n\n';
+ T.forEach(function(o){tf+='resource "aws_organizations_organizational_unit" "ou_'+slug(o.n)+'" {\n  name      = "'+o.n+'"\n  parent_id = data.aws_organizations_organization.org.roots[0].id\n}\n\n'});
+ T.forEach(function(o){o.a.forEach(function(a){tf+='resource "aws_organizations_account" "'+slug(a)+'" {\n  name      = "'+a+'"\n  email     = "'+mail.replace("{name}",a)+'"\n  parent_id = aws_organizations_organizational_unit.ou_'+slug(o.n)+'.id\n  role_name = "OrganizationAccountAccessRole"\n\n  lifecycle { ignore_changes = [role_name] }\n}\n\n'})});
+ var doc="# Landing Zone Design\n\n**Organisation:** "+(document.getElementById("org").value||"—")+"  \n**Date:** "+new Date().toISOString().slice(0,10)+"\n\n## Account structure\n\n"+T.map(function(o){return "### "+o.n+"\n\n"+(o.a.length?o.a.map(function(a){return "- `"+a+"` — "+mail.replace("{name}",a)}).join("\n"):"- (no accounts)")+"\n"}).join("\n")+"\n## Design principles\n\n- Separate security, logging and network accounts from workload accounts.\n- Separate production and non-production workloads into distinct OUs.\n- Attach guardrail SCPs at OU level (see SCP generator).\n- Centralise logs in the log-archive account with immutable storage.\n";
+ window.__o=cur==="tf"?tf:doc;document.getElementById("out").textContent=window.__o;MD.results.save("landing-zone",{ous:T.length,accounts:n});
+}
+document.getElementById("tree").addEventListener("input",function(e){var t=e.target,o=t.dataset.o,a=t.dataset.a;if(o==null)return;if(a!=null)T[o].a[a]=t.value;else T[o].n=t.value;out()});
+document.getElementById("tree").addEventListener("click",function(e){var b=e.target;if(b.dataset.delou!=null){T.splice(+b.dataset.delou,1);ui()}else if(b.dataset.dela!=null){var p=b.dataset.dela.split(".");T[p[0]].a.splice(+p[1],1);ui()}else if(b.dataset.adda!=null){T[b.dataset.adda].a.push("new-account");ui()}});
+document.getElementById("addou").onclick=function(){T.push({n:"New-OU",a:[]});ui()};
+document.getElementById("preset").onclick=function(){T=JSON.parse(JSON.stringify(REC));ui()};
+document.getElementById("mail").addEventListener("input",out);document.getElementById("org").addEventListener("input",out);
+document.getElementById("tabs").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;cur=b.dataset.o;[].forEach.call(document.querySelectorAll("#tabs button"),function(x){x.classList.toggle("on",x===b)});out()});
+document.getElementById("cp").onclick=function(){MD.copy(window.__o)};document.getElementById("dl").onclick=function(){MD.download(cur==="tf"?"landing-zone.tf":"landing-zone-design.md",window.__o);MD.track("lz-dl")};
+MD.profile.bind({org:"#org"});
+MD.state("landing-zone",function(){return {T:T,mail:mail.value,org:org.value}},function(d){T=d.T||T;if(d.mail)mail.value=d.mail;if(d.org)org.value=d.org});
+ui();
+
+</script>
+</body>
+</html>

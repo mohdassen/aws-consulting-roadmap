@@ -3,6 +3,7 @@
   var CFG = {
     email: "moh.dassen@gmail.com",
     linkedin: "https://www.linkedin.com/in/mohdassen/",
+    newsletter: "",                         // optional: email-service subscribe endpoint (e.g. Buttondown embed URL)
     calendly: "",                            // optional booking link
     goatcounter: "mohdassen",                       // optional: your GoatCounter code, e.g. "mohdassen"
     site: "https://mohdassen.github.io/aws-consulting-roadmap/"
@@ -111,6 +112,21 @@
     el.innerHTML = '<button class="btn" data-x="copy">📋 Copy Markdown</button><button class="btn" data-x="md">⬇ .md</button><button class="btn" data-x="word">⬇ Word</button><button class="btn" data-x="pdf">🖨 PDF / Print</button>';
     el.addEventListener("click", function (e) { var b = e.target.closest("[data-x]"); if (!b) return; var md = getMd(), d = getDir ? getDir() : ""; MD.track("export-" + b.dataset.x);
       ({ copy: function () { MD.copy(md); }, md: function () { MD.exportMD(getName(), md); }, word: function () { MD.exportWord(getName(), getTitle(), md, d); }, pdf: function () { MD.exportPDF(getTitle(), md, d); } })[b.dataset.x](); });
+  };
+
+  /* ---------- share card (PNG for LinkedIn) ---------- */
+  MD.shareCard = function (o) { // {title, big, sub, lines:[], file}
+    var c = document.createElement("canvas"); c.width = 1200; c.height = 630; var x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 1200, 630); g.addColorStop(0, "#0a1020"); g.addColorStop(1, "#162036"); x.fillStyle = g; x.fillRect(0, 0, 1200, 630);
+    x.fillStyle = "#e5b04a"; x.fillRect(70, 70, 70, 6);
+    x.fillStyle = "#aab5cd"; x.font = "600 26px Segoe UI, Arial"; x.fillText((o.eyebrow || "AWS CLOUD ADVISORY · RIYADH").toUpperCase(), 70, 120);
+    x.fillStyle = "#eaf0fb"; x.font = "700 54px Georgia, serif"; wrap(x, o.title, 70, 200, 1060, 64);
+    x.fillStyle = "#e5b04a"; x.font = "700 150px Georgia, serif"; x.fillText(o.big || "", 70, 430);
+    x.fillStyle = "#aab5cd"; x.font = "500 28px Segoe UI, Arial"; x.fillText(o.sub || "", 70, 480);
+    (o.lines || []).slice(0, 3).forEach(function (l, i) { x.fillStyle = "#eaf0fb"; x.font = "600 26px Segoe UI, Arial"; x.fillText("• " + l, 560, 340 + i * 44); });
+    x.fillStyle = "#8794b0"; x.font = "500 24px Segoe UI, Arial"; x.fillText("Mohammad Dassen · mohdassen.github.io/aws-consulting-roadmap", 70, 585);
+    c.toBlob(function (b) { var a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = (o.file || "result") + ".png"; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500); MD.track("share-card"); });
+    function wrap(ctx, t, px, py, mw, lh) { var w = (t || "").split(" "), l = ""; w.forEach(function (k) { var tt = l + k + " "; if (ctx.measureText(tt).width > mw && l) { ctx.fillText(l, px, py); l = k + " "; py += lh; } else l = tt; }); ctx.fillText(l, px, py); }
   };
 
   /* ---------- analytics (optional, cookie-less GoatCounter) ---------- */

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="theme-init.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCA → AWS Config Rule Mapper — Mohammad Dassen</title>
+<meta name="description" content="Map NCA ECC/CCC and PDPL control themes to AWS Config managed rules and export Terraform, CloudFormation and an evidence matrix.">
+<meta name="keywords" content="NCA AWS Config rules, NCA ECC AWS mapping, AWS Config conformance NCA, Terraform aws_config_config_rule, Security Hub NCA">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/nca-config-mapper.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/nca-config-mapper.html">
+<meta property="og:title" content="NCA → AWS Config Rule Mapper">
+<meta property="og:description" content="Map NCA ECC/CCC and PDPL control themes to AWS Config managed rules and export Terraform, CloudFormation and an evidence matrix.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NCA → AWS Config Rule Mapper">
+<meta name="twitter:description" content="Map NCA ECC/CCC and PDPL control themes to AWS Config managed rules and export Terraform, CloudFormation and an evidence matrix.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "NCA \u2192 AWS Config Rule Mapper",
+ "description": "Map NCA ECC/CCC and PDPL control themes to AWS Config managed rules and export Terraform, CloudFormation and an evidence matrix.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/nca-config-mapper.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">Compliance · Automation</span><h1>NCA → AWS Config Rule Mapper</h1><p>Pick control themes and get the AWS Config managed rules that evidence them — as Terraform, CloudFormation and an audit-ready matrix.</p></div>
+<div class="wrap">
+
+<div class="grid2"><div>
+<div class="card"><h2>1 · Select control themes</h2><p class="sub">Each theme maps to AWS Config managed rules that provide automated evidence. Themes with no rule are process controls that need manual evidence.</p><div id="fam"></div><div class="bar"><button class="btn sm" id="all">Select all</button><button class="btn sm danger" id="none">Clear</button></div></div>
+<div class="card"><h2>2 · Options</h2><label for="pfx">Resource name prefix</label><input id="pfx" value="nca"></div>
+</div><div>
+<div class="card"><h2>Summary</h2><div class="kpis" id="kpis"></div><div id="manual" style="font-size:.82rem;color:var(--muted2)"></div></div>
+<div class="card no-print"><div class="tabs" id="tabs"><button data-o="tf" class="on">Terraform</button><button data-o="cfn">CloudFormation</button><button data-o="doc">Evidence matrix</button></div><div class="bar"><button class="btn" id="cp">📋 Copy</button><button class="btn" id="dl">⬇ Download</button></div><div class="preview" id="out" style="max-height:560px"></div></div>
+</div></div>
+
+</div>
+<footer>🧩 NCA → AWS Config Rule Mapper · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script src="nca-data.js"></script>
+<script>
+
+var F=NCA.families,sel={},cur="tf";F.forEach(function(f){sel[f.id]=true});
+function famUI(){document.getElementById("fam").innerHTML=F.map(function(f){var n=f.q.reduce(function(a,q){return a+q.rules.length},0);return '<label style="display:flex;gap:10px;text-transform:none;font-weight:500;letter-spacing:0;margin:0;padding:8px 0;border-top:1px solid var(--border);cursor:pointer;font-size:.86rem"><input type="checkbox" style="width:auto;margin-top:4px" data-f="'+f.id+'"'+(sel[f.id]?" checked":"")+'><span>'+f.en+'<br><span class="pill '+(n?"green":"")+'">'+n+' Config rules</span></span></label>'}).join("")}
+function rules(){var seen={},out=[];F.forEach(function(f){if(!sel[f.id])return;f.q.forEach(function(q){q.rules.forEach(function(r){if(!seen[r]){seen[r]=1;out.push({r:r,f:f,q:q})}})})});return out}
+function nm(r){return r.toLowerCase().replace(/_/g,"-")}
+function out(){var R=rules(),p=document.getElementById("pfx").value||"nca",txt="";
+ var manual=[];F.forEach(function(f){if(sel[f.id])f.q.forEach(function(q){if(!q.rules.length)manual.push(q.en)})});
+ document.getElementById("kpis").innerHTML='<div class="kpi"><b>'+R.length+'</b><span>Config rules</span></div><div class="kpi"><b>'+F.filter(function(f){return sel[f.id]}).length+'</b><span>Themes</span></div><div class="kpi"><b>'+manual.length+'</b><span>Manual-evidence controls</span></div>';
+ document.getElementById("manual").innerHTML=manual.length?'<b>Manual evidence needed for:</b><ul style="margin:6px 0 0 18px">'+manual.map(function(m){return "<li>"+m+"</li>"}).join("")+'</ul>':"";
+ if(cur==="tf")txt='# AWS Config managed rules — generated by mohdassen.github.io\n# Requires an enabled AWS Config recorder in each account/region.\n\n'+(R.length?R.map(function(x){return 'resource "aws_config_config_rule" "'+p+'_'+x.r.toLowerCase()+'" {\n  name = "'+p+'-'+nm(x.r)+'"\n\n  source {\n    owner             = "AWS"\n    source_identifier = "'+x.r+'"\n  }\n}\n'}).join("\n"):"# Select at least one theme");
+ if(cur==="cfn")txt='AWSTemplateFormatVersion: "2010-09-09"\nDescription: NCA-aligned AWS Config managed rules (generated)\nResources:\n'+(R.length?R.map(function(x){return '  '+x.r.split("_").map(function(w){return w.charAt(0)+w.slice(1).toLowerCase()}).join("")+':\n    Type: AWS::Config::ConfigRule\n    Properties:\n      ConfigRuleName: '+p+'-'+nm(x.r)+'\n      Source:\n        Owner: AWS\n        SourceIdentifier: '+x.r+'\n'}).join(""):"  # select at least one theme\n");
+ var doc="# NCA Control → AWS Evidence Matrix\n\n**Date:** "+new Date().toISOString().slice(0,10)+"\n\n> Indicative mapping of common NCA ECC/CCC and PDPL control themes to AWS Config managed rules. Not an official NCA mapping — validate against current publications.\n\n| Control theme | Control | AWS Config rules | Evidence type |\n|---|---|---|---|\n"+F.filter(function(f){return sel[f.id]}).map(function(f){return f.q.map(function(q){return "| "+f.en+" | "+q.en+" | "+(q.rules.length?q.rules.map(function(r){return "`"+r+"`"}).join(", "):"—")+" | "+(q.rules.length?"Automated + review":"Manual (policy / process)")+" |"}).join("\n")}).join("\n")+"\n";
+ if(cur==="doc")txt=doc;window.__o=txt;document.getElementById("out").textContent=txt;MD.results.save("nca-mapper",{rules:R.length});
+}
+document.getElementById("fam").addEventListener("change",function(e){var f=e.target.dataset.f;if(f){sel[f]=e.target.checked;out()}});
+document.getElementById("pfx").addEventListener("input",out);
+document.getElementById("tabs").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;cur=b.dataset.o;[].forEach.call(document.querySelectorAll("#tabs button"),function(x){x.classList.toggle("on",x===b)});out()});
+document.getElementById("all").onclick=function(){F.forEach(function(f){sel[f.id]=true});famUI();out()};document.getElementById("none").onclick=function(){F.forEach(function(f){sel[f.id]=false});famUI();out()};
+document.getElementById("cp").onclick=function(){MD.copy(window.__o)};
+document.getElementById("dl").onclick=function(){MD.download("nca-config-"+cur+({tf:".tf",cfn:".yaml",doc:".md"}[cur]),window.__o);MD.track("mapper-dl-"+cur)};
+MD.state("nca-mapper",function(){return {sel:sel,pfx:pfx.value}},function(d){sel=d.sel||sel;if(d.pfx)pfx.value=d.pfx});
+famUI();out();
+
+</script>
+</body>
+</html>

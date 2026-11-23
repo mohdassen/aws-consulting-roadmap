@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="theme-init.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCA & PDPL Control Explorer (EN/AR) — Mohammad Dassen</title>
+<meta name="description" content="Search bilingual NCA ECC/CCC and PDPL control themes with suggested AWS actions and Config rule mappings. English and Arabic.">
+<meta name="keywords" content="NCA ECC controls explained, NCA CCC AWS, PDPL controls checklist, ضوابط الهيئة الوطنية للأمن السيبراني, ضوابط الأمن السيبراني السحابية">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/nca-control-explorer.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/nca-control-explorer.html">
+<meta property="og:title" content="NCA & PDPL Control Explorer (EN/AR)">
+<meta property="og:description" content="Search bilingual NCA ECC/CCC and PDPL control themes with suggested AWS actions and Config rule mappings. English and Arabic.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NCA & PDPL Control Explorer (EN/AR)">
+<meta name="twitter:description" content="Search bilingual NCA ECC/CCC and PDPL control themes with suggested AWS actions and Config rule mappings. English and Arabic.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "NCA & PDPL Control Explorer (EN/AR)",
+ "description": "Search bilingual NCA ECC/CCC and PDPL control themes with suggested AWS actions and Config rule mappings. English and Arabic.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/nca-control-explorer.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">Reference · English / العربية</span><h1>NCA &amp; PDPL Control Explorer</h1><p>Search control themes in English or Arabic, with suggested AWS actions and Config rule mappings.</p></div>
+<div class="wrap">
+
+<div class="card no-print"><div class="bar" style="margin:0;justify-content:space-between"><div class="tabs" style="margin:0"><button id="l-en" class="on">English</button><button id="l-ar">العربية</button></div><input id="q" placeholder="Search controls, services or rules…" style="max-width:380px"></div><div class="bar" id="chips" style="margin-bottom:0"></div></div>
+<div id="list"></div>
+
+</div>
+<footer>🔎 NCA & PDPL Control Explorer (EN/AR) · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script src="nca-data.js"></script>
+<script>
+
+var F=NCA.families,lang="en",fam="all",q="";
+function nm(o){return o[lang]}
+function draw(){
+ document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+ document.getElementById("chips").innerHTML='<button class="btn sm'+(fam==="all"?" gold":"")+'" data-f="all">'+(lang==="ar"?"الكل":"All")+'</button>'+F.map(function(f){return '<button class="btn sm'+(fam===f.id?" gold":"")+'" data-f="'+f.id+'" style="border-color:'+f.c+'">'+nm(f).replace(/\s*\(.*\)/,"")+'</button>'}).join("");
+ var out="",n=0;F.forEach(function(f){if(fam!=="all"&&fam!==f.id)return;var items=f.q.filter(function(c){var h=(c.en+" "+c.ar+" "+c.a.en+" "+c.a.ar+" "+c.rules.join(" ")).toLowerCase();return !q||h.indexOf(q.toLowerCase())>-1});if(!items.length)return;
+  out+='<div class="card" style="border-top:3px solid '+f.c+'"><h2>'+nm(f)+'</h2>'+items.map(function(c){n++;return '<div style="padding:12px 0;border-top:1px solid var(--border)"><div style="font-size:.92rem;font-weight:600">'+nm(c)+(c.w===3?' <span class="pill red">'+(lang==="ar"?"أولوية عالية":"High priority")+'</span>':'')+'</div><div style="font-size:.84rem;color:var(--muted2);margin-top:5px"><b>'+(lang==="ar"?"الإجراء المقترح: ":"Suggested action: ")+'</b>'+c.a[lang]+'</div>'+(c.rules.length?'<div style="margin-top:7px">'+c.rules.map(function(r){return '<span class="pill blue" style="margin:2px;font-family:Consolas,monospace">'+r+'</span>'}).join("")+'</div>':'<div style="margin-top:6px;font-size:.76rem;color:var(--muted)">'+(lang==="ar"?"ضابط إجرائي — يتطلب أدلة يدوية":"Process control — manual evidence")+'</div>')+'</div>'}).join("")+'</div>'});
+ document.getElementById("list").innerHTML=out||'<div class="card"><p class="sub">'+(lang==="ar"?"لا توجد نتائج.":"No matching controls.")+'</p></div>';
+ document.getElementById("q").placeholder=lang==="ar"?"ابحث في الضوابط والخدمات...":"Search controls, services or rules…";
+}
+document.getElementById("chips").addEventListener("click",function(e){var b=e.target.closest("[data-f]");if(!b)return;fam=b.dataset.f;draw()});
+document.getElementById("q").addEventListener("input",function(){q=this.value;draw()});
+document.getElementById("l-en").onclick=function(){lang="en";this.classList.add("on");l_ar.classList.remove("on");draw()};
+document.getElementById("l-ar").onclick=function(){lang="ar";this.classList.add("on");l_en.classList.remove("on");draw()};
+var l_en=document.getElementById("l-en"),l_ar=document.getElementById("l-ar");
+draw();
+
+</script>
+</body>
+</html>

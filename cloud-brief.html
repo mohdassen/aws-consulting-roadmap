@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="theme-init.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saudi Cloud Brief — Newsletter — Mohammad Dassen</title>
+<meta name="description" content="Subscribe to the Saudi Cloud Brief: NCA/PDPL updates, AWS announcements and practical guidance for Saudi cloud teams.">
+<meta name="keywords" content="Saudi cloud newsletter, NCA PDPL updates newsletter, AWS Saudi Arabia news">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/cloud-brief.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/cloud-brief.html">
+<meta property="og:title" content="Saudi Cloud Brief — Newsletter">
+<meta property="og:description" content="Subscribe to the Saudi Cloud Brief: NCA/PDPL updates, AWS announcements and practical guidance for Saudi cloud teams.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Saudi Cloud Brief — Newsletter">
+<meta name="twitter:description" content="Subscribe to the Saudi Cloud Brief: NCA/PDPL updates, AWS announcements and practical guidance for Saudi cloud teams.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "Saudi Cloud Brief \u2014 Newsletter",
+ "description": "Subscribe to the Saudi Cloud Brief: NCA/PDPL updates, AWS announcements and practical guidance for Saudi cloud teams.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/cloud-brief.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">Newsletter</span><h1>Saudi Cloud Brief</h1><p>NCA and PDPL updates, AWS announcements and practical tips for Saudi cloud teams.</p></div>
+<div class="wrap">
+
+<div class="grid2"><div>
+<div class="card"><h2>Saudi Cloud Brief — subscribe</h2><p class="sub">A short brief on NCA/PDPL updates, AWS announcements and practical guidance for Saudi cloud teams. No spam; unsubscribe anytime.</p>
+<form id="sub"><label for="em">Your email</label><input id="em" type="email" required placeholder="name@organisation.sa"><label for="nm">Name (optional)</label><input id="nm"><div class="bar"><button class="btn gold" type="submit">Subscribe →</button></div><p class="sub" id="subnote"></p></form></div>
+<div class="card"><h2>What you get</h2><ul style="margin:0 0 0 18px;color:var(--muted2);font-size:.9rem"><li>Regulatory changes explained in plain language</li><li>One practical AWS tip per issue</li><li>New free tools and templates</li></ul></div>
+</div><div>
+<div class="card no-print"><h2>Brief composer (for the author)</h2><p class="sub">Draft each issue: add up to four items; copy the result into your email service or LinkedIn newsletter.</p>
+<label for="ttl">Issue title</label><input id="ttl" value="Saudi Cloud Brief"><div id="items"></div><div class="bar"><button class="btn" id="addi">＋ Item</button></div>
+<div class="bar" id="exp"></div><div class="preview" id="prev"></div></div>
+</div></div>
+
+</div>
+<footer>✉️ Saudi Cloud Brief — Newsletter · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script>
+
+var I=[{h:"",s:"",u:"",w:""}];
+function ui(){document.getElementById("items").innerHTML=I.map(function(x,i){return '<div style="border:1px solid var(--border);border-radius:10px;padding:10px;margin:10px 0;background:var(--s2)"><label>Headline</label><input data-i="'+i+'" data-f="h" value="'+x.h.replace(/"/g,"&quot;")+'"><label>Summary</label><textarea data-i="'+i+'" data-f="s">'+x.s+'</textarea><label>Source link</label><input data-i="'+i+'" data-f="u" value="'+x.u+'"><label>So what for Saudi cloud teams?</label><textarea data-i="'+i+'" data-f="w">'+x.w+'</textarea><button class="btn sm danger" data-del="'+i+'" style="margin-top:8px">Remove</button></div>'}).join("");out()}
+function out(){var md="# "+document.getElementById("ttl").value+"\n\n*"+new Date().toISOString().slice(0,10)+" · by Mohammad Dassen*\n\n"+I.filter(function(x){return x.h}).map(function(x,i){return "## "+(i+1)+". "+x.h+"\n\n"+x.s+"\n\n"+(x.w?"**So what:** "+x.w+"\n\n":"")+(x.u?"[Source]("+x.u+")\n":"")}).join("\n")+"\n---\n\nFree tools: https://mohdassen.github.io/aws-consulting-roadmap/\n";window.__md=md;document.getElementById("prev").textContent=md}
+document.getElementById("items").addEventListener("input",function(e){var t=e.target,i=t.dataset.i;if(i==null)return;I[i][t.dataset.f]=t.value;out()});
+document.getElementById("items").addEventListener("click",function(e){var b=e.target.closest("[data-del]");if(b){I.splice(+b.dataset.del,1);ui()}});
+document.getElementById("addi").onclick=function(){if(I.length<4){I.push({h:"",s:"",u:"",w:""});ui()}};
+document.getElementById("ttl").addEventListener("input",out);
+document.getElementById("sub").addEventListener("submit",function(e){e.preventDefault();var em=document.getElementById("em").value,nm=document.getElementById("nm").value;MD.track("subscribe");
+ if(MD.cfg.newsletter){var f=document.createElement("form");f.method="post";f.action=MD.cfg.newsletter;f.target="_blank";var i=document.createElement("input");i.name="email";i.value=em;f.appendChild(i);document.body.appendChild(f);f.submit();document.getElementById("subnote").textContent="Thank you — please confirm in the email you receive.";}
+ else{location.href=MD.mailto("Subscribe: Saudi Cloud Brief","Please add me to the Saudi Cloud Brief.\n\nName: "+nm+"\nEmail: "+em)}});
+MD.exportBar("#exp",function(){return "cloud-brief"},function(){return document.getElementById("ttl").value},function(){return window.__md});
+ui();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="theme-init.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Well-Architected Quick Scan — Mohammad Dassen</title>
+<meta name="description" content="A 30-question scan across the six AWS Well-Architected pillars. Get a risk rating per pillar and a prioritised list of where to focus.">
+<meta name="keywords" content="AWS Well-Architected quick scan, well-architected pillars checklist, AWS WAR self assessment">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/war-quick-scan.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/war-quick-scan.html">
+<meta property="og:title" content="Well-Architected Quick Scan">
+<meta property="og:description" content="A 30-question scan across the six AWS Well-Architected pillars. Get a risk rating per pillar and a prioritised list of where to focus.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Well-Architected Quick Scan">
+<meta name="twitter:description" content="A 30-question scan across the six AWS Well-Architected pillars. Get a risk rating per pillar and a prioritised list of where to focus.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "Well-Architected Quick Scan",
+ "description": "A 30-question scan across the six AWS Well-Architected pillars. Get a risk rating per pillar and a prioritised list of where to focus.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/war-quick-scan.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">Well-Architected</span><h1>Well-Architected Quick Scan</h1><p>Thirty questions across six pillars — a fast view of risk before a full review.</p></div>
+<div class="wrap">
+
+<div class="card"><p class="sub" style="margin:0">This is a short self-scan inspired by the six Well-Architected pillars, not the official AWS Well-Architected Tool. Use it to prepare for a full review.</p></div>
+<div id="qs"></div>
+<div class="card" id="res"><h2>Your results</h2><div class="kpis" id="kpis"></div><div class="chart-box" id="bars"></div></div>
+<div class="card"><h2>Where to focus first</h2><div id="recs"></div></div>
+<div class="card no-print"><h2>Share, export &amp; next step</h2><div class="bar" id="exp"></div><div class="bar"><button class="btn" id="b-share">🖼 Download share card (PNG)</button><button class="btn danger" id="b-reset">Reset</button><a class="btn gold" href="work-with-me.html" data-track="quiz-cta">Book a review →</a></div></div>
+
+</div>
+<footer>🏗️ Well-Architected Quick Scan · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script>
+
+var D={"key": "war-scan", "title": "Well-Architected Quick Scan", "tierLabel": "Overall posture", "max": 2, "scale": [{"l": "No", "v": 0}, {"l": "Partly", "v": 1}, {"l": "Yes", "v": 2}], "risk": true, "disc": "Indicative self-scan inspired by the AWS Well-Architected Framework pillars; not an official AWS assessment.", "next": "Book a 5-day Well-Architected Review for one critical workload: work-with-me.html", "tiers": [{"min": 0, "name": "High risk", "color": "#f27d7d"}, {"min": 40, "name": "Medium risk", "color": "#f0985a"}, {"min": 70, "name": "Low risk", "color": "#3ecf9a"}], "cats": [{"id": "ops", "name": "Operational Excellence", "color": "#e5b04a", "q": ["Infrastructure is defined as code and changes go through a pipeline", "Runbooks and playbooks exist for common operational events", "Workload health is monitored with meaningful metrics and alarms", "Post-incident reviews feed back into improvements", "Deployments are small, frequent and reversible"], "rec": "Automate deployments with IaC/CI-CD and document runbooks.", "link": ["war-template.html", "Open WAR Template"]}, {"id": "sec", "name": "Security", "color": "#f27d7d", "q": ["Identities use least privilege with MFA and federation", "Data is encrypted at rest and in transit with managed keys", "Logs are centralised, immutable and monitored", "Network boundaries and public exposure are controlled", "Security events have a defined response process"], "rec": "Enforce guardrails with SCPs, central logging and automated detection.", "link": ["scp-generator.html", "Open SCP Generator"]}, {"id": "rel", "name": "Reliability", "color": "#38cfc0", "q": ["Workloads span multiple Availability Zones", "Backups are automated and restores are tested", "Service quotas and limits are monitored", "Failures are tested (game days / fault injection)", "RTO and RPO are defined and met"], "rec": "Design for multi-AZ, test restores and define RTO/RPO.", "link": ["dr-planner.html", "Open DR Planner"]}, {"id": "perf", "name": "Performance Efficiency", "color": "#6ea8fe", "q": ["Instance and storage types are selected from measured needs", "Caching and CDN are used where appropriate", "Performance is load-tested before launch", "Managed or serverless services are preferred where suitable", "Performance metrics are reviewed regularly"], "rec": "Benchmark before choosing resource types and add caching where it pays off.", "link": null}, {"id": "cost", "name": "Cost Optimization", "color": "#3ecf9a", "q": ["All resources are tagged for cost allocation", "Budgets and anomaly alerts are configured", "Idle and oversized resources are reviewed monthly", "Savings Plans or Reserved capacity cover steady-state usage", "Non-production environments are scheduled off outside hours"], "rec": "Introduce tagging, budgets and scheduled shutdowns.", "link": ["tco-calculator.html", "Open TCO Calculator"]}, {"id": "sus", "name": "Sustainability", "color": "#b79cf5", "q": ["Region choice considers carbon impact where data rules allow", "Resources are right-sized to reduce idle capacity", "Data lifecycle policies archive or delete unneeded data", "Managed services and efficient instance families are preferred", "Utilisation targets are tracked"], "rec": "Right-size and apply lifecycle policies to reduce waste.", "link": null}]};
+var A={};
+function pct(c){var s=0,m=0;c.q.forEach(function(q,i){var v=A[c.id+"-"+i];if(v!=null){s+=v}m+=D.max});return m?s/m*100:0}
+function answered(c){return c.q.filter(function(q,i){return A[c.id+"-"+i]!=null}).length}
+function render(){
+ document.getElementById("qs").innerHTML=D.cats.map(function(c){return '<div class="card" style="border-top:3px solid '+c.color+'"><h2>'+c.name+'</h2>'+(c.sub?'<p class="sub">'+c.sub+'</p>':'')+c.q.map(function(q,i){var k=c.id+"-"+i,v=A[k];return '<div style="padding:10px 0;border-top:1px solid var(--border)"><div style="font-size:.9rem;margin-bottom:7px">'+q+'</div><div class="bar" style="margin:0">'+D.scale.map(function(o){return '<button class="btn sm'+(v===o.v?' gold':'')+'" data-k="'+k+'" data-v="'+o.v+'" data-autosave>'+o.l+'</button>'}).join("")+'</div></div>'}).join("")+'</div>'}).join("");
+ calc()}
+function tier(p){var t=D.tiers[0];D.tiers.forEach(function(x){if(p>=x.min)t=x});return t}
+function calc(){
+ var tot=0,max=0,ans=0,n=0;D.cats.forEach(function(c){c.q.forEach(function(q,i){n++;max+=D.max;var v=A[c.id+"-"+i];if(v!=null){tot+=v;ans++}})});
+ var overall=max?tot/max*100:0,t=tier(overall),done=ans===n;
+ var rows=D.cats.map(function(c){return {c:c,p:pct(c)}}).sort(function(a,b){return a.p-b.p});
+ document.getElementById("kpis").innerHTML='<div class="kpi"><b>'+Math.round(overall)+'%</b><span>Overall score</span></div><div class="kpi"><b style="font-size:1.25rem;color:'+t.color+'">'+t.name+'</b><span>'+D.tierLabel+'</span></div><div class="kpi"><b>'+ans+'/'+n+'</b><span>Answered</span></div>';
+ document.getElementById("bars").innerHTML=D.cats.map(function(c){var p=pct(c);var r=D.risk?(p<40?"High risk":p<70?"Medium":"Low"):"";return '<div class="hbar"><span class="n">'+c.name+'</span><span class="tr"><span class="fl" style="display:block;width:'+p+'%;background:'+c.color+'"></span></span><span class="v" style="width:'+(D.risk?78:42)+'px">'+Math.round(p)+'%'+(D.risk&&answered(c)?'<br><small style="font-weight:400;color:var(--muted)">'+r+'</small>':'')+'</span></div>'}).join("");
+ var low=rows.slice(0,3).filter(function(r){return answered(r.c)});
+ document.getElementById("recs").innerHTML=low.length?low.map(function(r){return '<div style="padding:10px 0;border-top:1px solid var(--border)"><b style="color:'+r.c.color+'">'+r.c.name+' — '+Math.round(r.p)+'%</b><div style="font-size:.86rem;color:var(--muted2);margin-top:3px">'+r.c.rec+'</div>'+(r.c.link?'<a class="btn sm" style="margin-top:8px" href="'+r.c.link[0]+'">'+r.c.link[1]+'</a>':'')+'</div>'}).join(""):'<p class="sub">Answer the questions above to see your priorities.</p>';
+ var md="# "+D.title+"\n\n**Date:** "+new Date().toISOString().slice(0,10)+"  \n**Overall:** "+Math.round(overall)+"% — "+t.name+"\n\n> "+D.disc+"\n\n## Scores\n\n| Area | Score |"+(D.risk?" Risk |":"")+"\n|---|---|"+(D.risk?"---|":"")+"\n"+D.cats.map(function(c){var p=pct(c);return "| "+c.name+" | "+Math.round(p)+"% |"+(D.risk?" "+(p<40?"High":p<70?"Medium":"Low")+" |":"")}).join("\n")+"\n\n## Priorities\n\n"+rows.slice(0,3).map(function(r,i){return (i+1)+". **"+r.c.name+"** ("+Math.round(r.p)+"%) — "+r.c.rec}).join("\n")+"\n\n"+"## Next step\n\n"+D.next+"\n";
+ window.__md=md;window.__t=t;window.__p=Math.round(overall);window.__low=low;
+ MD.results.save(D.key,{overall:Math.round(overall),tier:t.name,areas:D.cats.map(function(c){return {id:c.id,score:Math.round(pct(c))}})});
+}
+document.addEventListener("click",function(e){var b=e.target.closest("[data-k]");if(!b)return;var v=+b.dataset.v;A[b.dataset.k]=A[b.dataset.k]===v?undefined:v;render()});
+var SS=MD.state(D.key,function(){return {A:A}},function(d){A=d.A||{}});
+document.getElementById("b-reset").onclick=function(){if(confirm("Clear answers?"))SS.clear()};
+document.getElementById("b-share").onclick=function(){MD.shareCard({title:D.title,big:window.__p+"%",sub:window.__t.name+" · "+D.tierLabel,lines:(window.__low||[]).map(function(r){return "Focus: "+r.c.name}),file:D.key})};
+MD.exportBar("#exp",function(){return D.key},function(){return D.title},function(){return window.__md});
+render();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="theme-init.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS Regional Cost Comparison — Mohammad Dassen</title>
+<meta name="description" content="Compare the same workload across AWS regions and an on-premises baseline over your contract horizon, with editable price-uplift assumptions and a chart.">
+<meta name="keywords" content="AWS region cost comparison, me-south-1 pricing, Bahrain vs UAE AWS region, cloud vs on-premises cost Saudi">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/cost-compare.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/cost-compare.html">
+<meta property="og:title" content="AWS Regional Cost Comparison">
+<meta property="og:description" content="Compare the same workload across AWS regions and an on-premises baseline over your contract horizon, with editable price-uplift assumptions and a chart.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AWS Regional Cost Comparison">
+<meta name="twitter:description" content="Compare the same workload across AWS regions and an on-premises baseline over your contract horizon, with editable price-uplift assumptions and a chart.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "AWS Regional Cost Comparison",
+ "description": "Compare the same workload across AWS regions and an on-premises baseline over your contract horizon, with editable price-uplift assumptions and a chart.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/cost-compare.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">FinOps · Region Strategy</span><h1>Regional Cost Comparison</h1><p>Model one workload across regions and against on-premises — with assumptions you control.</p></div>
+<div class="wrap">
+
+<div class="grid2"><div>
+<div class="card"><h2>1 · Baseline monthly cost (SAR)</h2><p class="sub">Enter your workload cost in a reference region (for example from the AWS Pricing Calculator for us-east-1).</p>
+<div class="grid2"><div><label for="c1">Compute</label><input id="c1" type="number" value="40000"></div><div><label for="c2">Storage</label><input id="c2" type="number" value="12000"></div><div><label for="c3">Database</label><input id="c3" type="number" value="18000"></div><div><label for="c4">Network &amp; data transfer</label><input id="c4" type="number" value="8000"></div><div><label for="c5">Other / support</label><input id="c5" type="number" value="7000"></div><div><label for="mon">Contract horizon (months)</label><input id="mon" type="number" value="36"></div></div></div>
+<div class="card"><h2>2 · Regional price uplift vs reference (%)</h2><p class="sub"><b>Assumptions — placeholders.</b> Replace with figures from the AWS Pricing Calculator for your services; regional price differences vary by service.</p>
+<div class="grid2" id="reg"></div></div>
+<div class="card"><h2>3 · On-premises baseline</h2><div class="grid2"><div><label for="op">On-prem monthly run cost (SAR)</label><input id="op" type="number" value="115000"></div><div><label for="opx">Hardware refresh within horizon (SAR)</label><input id="opx" type="number" value="1500000"></div></div></div>
+</div><div>
+<div class="card" id="res"><h2>Comparison</h2><div class="kpis" id="kpis"></div><div class="chart-box" id="bars"></div><p class="sub" style="margin-top:10px" id="note"></p></div>
+<div class="card no-print"><h2>Export</h2><div class="bar" id="exp"></div></div>
+</div></div>
+
+</div>
+<footer>🌍 AWS Regional Cost Comparison · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script>
+
+var R=[["me-south-1 (Bahrain)",15],["me-central-1 (UAE)",12],["eu-central-1 (Frankfurt)",6],["us-east-1 (reference)",0]];
+document.getElementById("reg").innerHTML=R.map(function(r,i){return '<div><label for="u'+i+'">'+r[0]+'</label><input id="u'+i+'" type="number" value="'+r[1]+'"'+(i===3?' disabled':'')+'></div>'}).join("");
+function n(i){return +document.getElementById(i).value||0}function f(x){return Math.round(x).toLocaleString("en-US")}
+var COL=["var(--gold)","var(--blue)","var(--teal)","var(--green)","var(--red)"];
+function calc(){
+ var base=n("c1")+n("c2")+n("c3")+n("c4")+n("c5"),m=n("mon")||36,opt=[];
+ R.forEach(function(r,i){var u=i===3?0:n("u"+i);opt.push({name:r[0],tot:base*(1+u/100)*m,mon:base*(1+u/100)})});
+ var op={name:"On-premises",tot:n("op")*m+n("opx"),mon:n("op")+n("opx")/m};
+ var all=opt.concat([op]),mx=Math.max.apply(null,all.map(function(x){return x.tot}));
+ var best=opt.slice().sort(function(a,b){return a.tot-b.tot})[0];
+ document.getElementById("kpis").innerHTML='<div class="kpi"><b>'+f(base)+'</b><span>Baseline / month</span></div><div class="kpi"><b>'+f(op.tot-opt[0].tot)+'</b><span>'+m+'-mo saving vs on-prem (me-south-1)</span></div>';
+ document.getElementById("bars").innerHTML=all.map(function(x,i){return '<div class="hbar"><span class="n" style="width:170px">'+x.name+'</span><span class="tr"><span class="fl" style="display:block;width:'+x.tot/mx*100+'%;background:'+COL[i]+'"></span></span><span class="v" style="width:90px">'+(x.tot/1e6).toFixed(2)+'M</span></div>'}).join("");
+ document.getElementById("note").textContent="Totals over "+m+" months in SAR. Check data-residency rules (NCA / PDPL / sector regulators) before choosing a region — the cheapest region is not always permitted.";
+ window.__md="# Regional Cost Comparison\n\n**Date:** "+new Date().toISOString().slice(0,10)+"\n\n> Based on user-supplied baseline and price-uplift assumptions; validate with the AWS Pricing Calculator. Check data-residency requirements before region selection.\n\n| Option | Monthly (SAR) | "+m+"-month total (SAR) |\n|---|---|---|\n"+all.map(function(x){return "| "+x.name+" | "+f(x.mon)+" | "+f(x.tot)+" |"}).join("\n")+"\n";
+ MD.results.save("cost-compare",{baseMonthly:base});
+}
+document.addEventListener("input",calc);
+MD.state("cost-compare",function(){var o={};[].forEach.call(document.querySelectorAll("input"),function(e){o[e.id]=e.value});return o},function(d){Object.keys(d).forEach(function(k){var e=document.getElementById(k);if(e&&!e.disabled)e.value=d[k]})});
+MD.exportBar("#exp",function(){return "regional-cost-comparison"},function(){return "Regional Cost Comparison"},function(){return window.__md});
+calc();
+
+</script>
+</body>
+</html>

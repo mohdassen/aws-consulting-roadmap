@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="theme-init.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Disaster Recovery Planner (RTO/RPO) — Mohammad Dassen</title>
+<meta name="description" content="Choose the right AWS disaster-recovery pattern per system from RTO and RPO targets: backup and restore, pilot light, warm standby or multi-site active/active.">
+<meta name="keywords" content="AWS disaster recovery planner, RTO RPO calculator, pilot light warm standby, DR strategy AWS Saudi">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/dr-planner.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/dr-planner.html">
+<meta property="og:title" content="Disaster Recovery Planner (RTO/RPO)">
+<meta property="og:description" content="Choose the right AWS disaster-recovery pattern per system from RTO and RPO targets: backup and restore, pilot light, warm standby or multi-site active/active.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Disaster Recovery Planner (RTO/RPO)">
+<meta name="twitter:description" content="Choose the right AWS disaster-recovery pattern per system from RTO and RPO targets: backup and restore, pilot light, warm standby or multi-site active/active.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "Disaster Recovery Planner (RTO/RPO)",
+ "description": "Choose the right AWS disaster-recovery pattern per system from RTO and RPO targets: backup and restore, pilot light, warm standby or multi-site active/active.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/dr-planner.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">Resilience</span><h1>Disaster Recovery Planner</h1><p>Set RTO and RPO per system and get the recommended AWS DR pattern, indicative cost band and a test plan.</p></div>
+<div class="wrap">
+
+<div class="card"><h2>Systems &amp; recovery objectives</h2><p class="sub">Add each system with its target recovery time (RTO) and data-loss tolerance (RPO). The planner recommends one of the four AWS disaster-recovery patterns.</p>
+<div class="grid3"><div><label for="org">Organisation</label><input id="org"></div><div><label for="prim">Primary region</label><input id="prim" value="me-south-1"></div><div><label for="sec">DR region</label><input id="sec" value="me-central-1"></div></div>
+<div class="bar"><button class="btn gold" id="add">＋ Add system</button><button class="btn" id="demo">Load sample</button><button class="btn sm danger" id="reset">Reset</button></div>
+<div style="overflow:auto"><table class="t" id="tbl"><thead><tr><th>System</th><th>RTO (recovery time)</th><th>RPO (data loss)</th><th>Pattern</th><th></th></tr></thead><tbody></tbody></table></div></div>
+<div class="card" id="res"><h2>Recommended patterns</h2><div class="kpis" id="kpis"></div><div class="grid2"><div class="chart-box" id="bars"></div><div class="chart-box" id="legend"></div></div></div>
+<div class="card no-print"><h2>Export</h2><div class="bar" id="exp"></div><div class="preview" id="prev"></div></div>
+
+</div>
+<footer>🛟 Disaster Recovery Planner (RTO/RPO) · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script>
+
+var P={bk:{n:"Backup & Restore",c:"var(--blue)",cost:"≈1.05–1.15×",svc:"AWS Backup, cross-Region copy, IaC to rebuild"},pl:{n:"Pilot Light",c:"var(--teal)",cost:"≈1.15–1.30×",svc:"AWS Elastic Disaster Recovery, replicated data stores, minimal core running"},ws:{n:"Warm Standby",c:"var(--gold)",cost:"≈1.40–1.70×",svc:"Scaled-down full stack in DR Region, Aurora Global Database, Route 53 health checks"},mx:{n:"Multi-site Active/Active",c:"var(--red)",cost:"≈1.8–2.2×",svc:"Active stacks in both Regions, global data replication, Route 53 ARC / Global Accelerator"}};
+var RT=[["0.25","≤ 15 minutes"],["1","≤ 1 hour"],["4","≤ 4 hours"],["12","≤ 12 hours"],["24","≤ 24 hours"],["72","≤ 72 hours"]],RP=[["0","Near-zero"],["0.25","≤ 15 minutes"],["1","≤ 1 hour"],["4","≤ 4 hours"],["24","≤ 24 hours"]];
+var S=[];
+function pat2(s){var rto=+s.rto,rpo=+s.rpo;if(rpo<=0.25&&rto<=0.25)return"mx";if(rto<=1)return"ws";if(rto<=12)return"pl";return"bk"}
+function sel(opts,v,i,f){return '<select data-i="'+i+'" data-f="'+f+'">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(String(v)===o[0]?" selected":"")+'>'+o[1]+'</option>'}).join("")+'</select>'}
+function draw(){document.querySelector("#tbl tbody").innerHTML=S.map(function(s,i){return '<tr><td><input data-i="'+i+'" data-f="name" value="'+(s.name||"").replace(/"/g,"&quot;")+'" placeholder="System name" style="min-width:160px"></td><td>'+sel(RT,s.rto,i,"rto")+'</td><td>'+sel(RP,s.rpo,i,"rpo")+'</td><td id="p'+i+'"></td><td><button class="btn sm danger" data-del="'+i+'">✕</button></td></tr>'}).join("")||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:22px">No systems yet — add one or load the sample.</td></tr>';calc()}
+function calc(){var cnt={bk:0,pl:0,ws:0,mx:0};S.forEach(function(s,i){var p=pat2(s);cnt[p]++;var e=document.getElementById("p"+i);if(e)e.innerHTML='<span class="pill" style="color:'+P[p].c+';border-color:'+P[p].c+'">'+P[p].n+'</span>'});
+ var tot=S.length;document.getElementById("kpis").innerHTML='<div class="kpi"><b>'+tot+'</b><span>Systems</span></div><div class="kpi"><b>'+(cnt.ws+cnt.mx)+'</b><span>Warm standby or higher</span></div><div class="kpi"><b>'+cnt.bk+'</b><span>Backup &amp; restore</span></div>';
+ document.getElementById("bars").innerHTML=Object.keys(P).map(function(k){return '<div class="hbar"><span class="n" style="width:150px">'+P[k].n+'</span><span class="tr"><span class="fl" style="display:block;width:'+(tot?cnt[k]/tot*100:0)+'%;background:'+P[k].c+'"></span></span><span class="v">'+cnt[k]+'</span></div>'}).join("");
+ document.getElementById("legend").innerHTML='<table class="t"><thead><tr><th>Pattern</th><th>Indicative cost vs prod</th></tr></thead><tbody>'+Object.keys(P).map(function(k){return '<tr><td><b style="color:'+P[k].c+'">'+P[k].n+'</b><br><span style="font-size:.72rem;color:var(--muted)">'+P[k].svc+'</span></td><td>'+P[k].cost+'</td></tr>'}).join("")+'</tbody></table>';
+ var md="# Disaster Recovery Plan Summary\n\n**Organisation:** "+(org.value||"—")+"  \n**Primary region:** "+prim.value+" · **DR region:** "+sec.value+"  \n**Date:** "+new Date().toISOString().slice(0,10)+"\n\n> Pattern selection follows the four AWS DR strategies. Cost multipliers are indicative ranges for the DR environment relative to production; validate with a detailed estimate. Confirm data-residency rules before choosing the DR region.\n\n| System | RTO | RPO | Pattern | Key AWS services |\n|---|---|---|---|---|\n"+S.map(function(s){var p=pat2(s);return "| "+(s.name||"Unnamed")+" | "+(RT.filter(function(r){return r[0]===String(s.rto)})[0]||["",""])[1]+" | "+(RP.filter(function(r){return r[0]===String(s.rpo)})[0]||["",""])[1]+" | "+P[p].n+" | "+P[p].svc+" |"}).join("\n")+"\n\n## Test plan\n\n- Run a recovery test for every system at least annually; Tier-1 systems semi-annually.\n- Record achieved RTO/RPO and compare with targets.\n- Review patterns when business criticality changes.\n";
+ window.__md=md;document.getElementById("prev").textContent=md;MD.results.save("dr",{systems:tot,counts:cnt})}
+document.getElementById("add").onclick=function(){S.push({name:"",rto:"4",rpo:"1"});draw()};
+document.getElementById("demo").onclick=function(){S=[{name:"Student Information System",rto:"1",rpo:"0.25"},{name:"Learning Management System",rto:"4",rpo:"1"},{name:"HR & Payroll",rto:"12",rpo:"4"},{name:"Internal File Share",rto:"72",rpo:"24"},{name:"Public Website",rto:"0.25",rpo:"0"}];draw()};
+document.querySelector("#tbl").addEventListener("input",function(e){var t=e.target,i=t.dataset.i;if(i==null)return;S[i][t.dataset.f]=t.value;calc()});
+document.querySelector("#tbl").addEventListener("click",function(e){var b=e.target.closest("[data-del]");if(b){S.splice(+b.dataset.del,1);draw()}});
+document.addEventListener("input",function(e){if(e.target.id==="org"||e.target.id==="prim"||e.target.id==="sec")calc()});
+MD.profile.bind({org:"#org"});
+var SS=MD.state("dr",function(){return {S:S,org:org.value,prim:prim.value,sec:sec.value}},function(d){S=d.S||[];if(d.org)org.value=d.org;if(d.prim)prim.value=d.prim;if(d.sec)sec.value=d.sec});
+document.getElementById("reset").onclick=function(){if(confirm("Clear systems?"))SS.clear()};
+MD.exportBar("#exp",function(){return "dr-plan"},function(){return "Disaster Recovery Plan Summary"},function(){return window.__md});
+draw();
+
+</script>
+</body>
+</html>

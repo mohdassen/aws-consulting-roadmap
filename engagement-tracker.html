@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="theme-init.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engagement Status Tracker — Mohammad Dassen</title>
+<meta name="description" content="Track consulting engagement milestones with a timeline and RAG status, and export a client-ready status report to Word or PDF.">
+<meta name="keywords" content="consulting status report template, project status RAG, engagement milestone tracker">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/engagement-tracker.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/engagement-tracker.html">
+<meta property="og:title" content="Engagement Status Tracker">
+<meta property="og:description" content="Track consulting engagement milestones with a timeline and RAG status, and export a client-ready status report to Word or PDF.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Engagement Status Tracker">
+<meta name="twitter:description" content="Track consulting engagement milestones with a timeline and RAG status, and export a client-ready status report to Word or PDF.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "Engagement Status Tracker",
+ "description": "Track consulting engagement milestones with a timeline and RAG status, and export a client-ready status report to Word or PDF.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/engagement-tracker.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">Consulting Toolkit</span><h1>Engagement Status Tracker</h1><p>Track milestones, see overall status at a glance and export a professional client status report.</p></div>
+<div class="wrap">
+
+<div class="grid2"><div>
+<div class="card"><h2>1 · Engagement</h2><div class="grid2"><div><label for="client">Client</label><input id="client"></div><div><label for="eng">Engagement</label><input id="eng" placeholder="e.g. NCA/PDPL Gap Assessment"></div><div><label for="start">Start date</label><input id="start" type="date"></div><div><label for="rep">Report date</label><input id="rep" type="date"></div></div></div>
+<div class="card"><h2>2 · Milestones</h2><div class="bar"><button class="btn gold" id="add">＋ Milestone</button><button class="btn" id="demo">Load sample</button></div><div style="overflow:auto"><table class="t" id="tbl"><thead><tr><th>Milestone</th><th>Due</th><th>Status</th><th>Owner</th><th></th></tr></thead><tbody></tbody></table></div></div>
+<div class="card"><h2>3 · Notes</h2><label for="risk">Risks &amp; issues</label><textarea id="risk"></textarea><label for="dec">Decisions needed from client</label><textarea id="dec"></textarea></div>
+</div><div>
+<div class="card"><h2>Status</h2><div class="kpis" id="kpis"></div><div class="chart-box"><svg id="tl" width="100%" viewBox="0 0 520 220"></svg></div></div>
+<div class="card no-print"><h2>Export status report</h2><div class="bar" id="exp"></div><div class="bar"><button class="btn sm" id="b-json">⬇ Save session</button><label class="btn sm" style="margin:0;text-transform:none">⬆ Load<input type="file" id="b-load" accept=".json" hidden></label><button class="btn sm danger" id="b-reset">Reset</button></div><div class="preview" id="prev"></div><p class="sub" style="margin-top:10px">This generates a shareable status report. It is not a secure client portal — data stays in your browser.</p></div>
+</div></div>
+
+</div>
+<footer>🗓️ Engagement Status Tracker · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script>
+
+var ST=["Not started","In progress","Done","Blocked"],M=[];
+function today(){return new Date().toISOString().slice(0,10)}
+function row(m,i){return '<tr><td><input data-i="'+i+'" data-f="n" value="'+(m.n||"").replace(/"/g,"&quot;")+'" style="min-width:150px"></td><td><input type="date" data-i="'+i+'" data-f="d" value="'+(m.d||"")+'"></td><td><select data-i="'+i+'" data-f="s">'+ST.map(function(s){return '<option'+(m.s===s?" selected":"")+'>'+s+'</option>'}).join("")+'</select></td><td><input data-i="'+i+'" data-f="o" value="'+(m.o||"")+'" style="min-width:90px"></td><td><button class="btn sm danger" data-del="'+i+'">✕</button></td></tr>'}
+function draw(){document.querySelector("#tbl tbody").innerHTML=M.map(row).join("")||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">No milestones yet.</td></tr>';calc()}
+function rag(){var rep=document.getElementById("rep").value||today(),late=M.filter(function(m){return m.s!=="Done"&&m.d&&m.d<rep}).length,blk=M.filter(function(m){return m.s==="Blocked"}).length;return blk||late>1?{t:"Red",c:"var(--red)"}:late?{t:"Amber",c:"var(--gold)"}:{t:"Green",c:"var(--green)"}}
+function calc(){var done=M.filter(function(m){return m.s==="Done"}).length,pc=M.length?Math.round(done/M.length*100):0,r=rag(),rep=document.getElementById("rep").value||today(),late=M.filter(function(m){return m.s!=="Done"&&m.d&&m.d<rep}).length;
+ document.getElementById("kpis").innerHTML='<div class="kpi"><b>'+pc+'%</b><span>Complete</span></div><div class="kpi"><b style="color:'+r.c+'">'+r.t+'</b><span>Overall status</span></div><div class="kpi"><b>'+late+'</b><span>Overdue</span></div>';
+ var ds=M.filter(function(m){return m.d}).map(function(m){return +new Date(m.d)}),st=document.getElementById("start").value?+new Date(document.getElementById("start").value):(ds.length?Math.min.apply(null,ds)-7*864e5:Date.now()),en=ds.length?Math.max.apply(null,ds)+7*864e5:st+30*864e5,W=520,L=140,s='';
+ var X=function(t){return L+(W-L-14)*(t-st)/Math.max(en-st,1)},cm={"Done":"var(--green)","In progress":"var(--blue)","Blocked":"var(--red)","Not started":"var(--muted)"};
+ M.forEach(function(m,i){var y=22+i*26;s+='<text x="'+(L-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="10.5" fill="var(--muted2)">'+(m.n||"—").slice(0,24)+'</text><line x1="'+L+'" x2="'+(W-14)+'" y1="'+y+'" y2="'+y+'" stroke="var(--border)"/>';if(m.d)s+='<circle cx="'+X(+new Date(m.d))+'" cy="'+y+'" r="7" fill="'+cm[m.s]+'"/>'});
+ var nowx=X(+new Date(rep));s+='<line x1="'+nowx+'" x2="'+nowx+'" y1="6" y2="'+(22+M.length*26)+'" stroke="var(--gold)" stroke-dasharray="4 3"/><text x="'+nowx+'" y="12" text-anchor="middle" font-size="9" fill="var(--gold)">report date</text>';
+ var svg=document.getElementById("tl");svg.setAttribute("viewBox","0 0 520 "+Math.max(80,40+M.length*26));svg.innerHTML=s;
+ var md="# Engagement Status Report\n\n**Client:** "+(client.value||"—")+"  \n**Engagement:** "+(eng.value||"—")+"  \n**Report date:** "+(document.getElementById("rep").value||today())+"  \n**Overall status:** "+r.t+" · **Progress:** "+pc+"%\n\n## Milestones\n\n| Milestone | Due | Status | Owner |\n|---|---|---|---|\n"+M.map(function(m){return "| "+(m.n||"—")+" | "+(m.d||"—")+" | "+m.s+" | "+(m.o||"—")+" |"}).join("\n")+"\n\n## Risks & issues\n\n"+(risk.value||"None reported.")+"\n\n## Decisions needed\n\n"+(dec.value||"None.")+"\n";
+ window.__md=md;document.getElementById("prev").textContent=md}
+document.getElementById("add").onclick=function(){M.push({n:"",d:"",s:"Not started",o:""});draw()};
+document.getElementById("demo").onclick=function(){var b=new Date(),f=function(d){var x=new Date(b);x.setDate(x.getDate()+d);return x.toISOString().slice(0,10)};M=[{n:"Kick-off & scoping",d:f(-14),s:"Done",o:"Consultant"},{n:"Evidence collection",d:f(-3),s:"In progress",o:"Client"},{n:"Findings workshop",d:f(7),s:"Not started",o:"Consultant"},{n:"Final report & readout",d:f(21),s:"Not started",o:"Consultant"}];draw()};
+document.querySelector("#tbl").addEventListener("input",function(e){var t=e.target,i=t.dataset.i;if(i==null)return;M[i][t.dataset.f]=t.value;calc()});
+document.querySelector("#tbl").addEventListener("click",function(e){var b=e.target.closest("[data-del]");if(b){M.splice(+b.dataset.del,1);draw()}});
+document.addEventListener("input",function(e){if(!e.target.dataset.i)calc()});
+MD.profile.bind({org:"#client"});
+var SS=MD.state("tracker",function(){return {M:M,client:client.value,eng:eng.value,start:start.value,rep:rep.value,risk:risk.value,dec:dec.value}},function(d){M=d.M||[];["client","eng","start","rep","risk","dec"].forEach(function(k){if(d[k])document.getElementById(k).value=d[k]})});
+document.getElementById("b-json").onclick=SS.exportJSON;document.getElementById("b-reset").onclick=function(){if(confirm("Clear tracker?"))SS.clear()};document.getElementById("b-load").onchange=function(){if(this.files[0])SS.importJSON(this.files[0])};
+MD.exportBar("#exp",function(){return "status-report"},function(){return "Engagement Status Report"},function(){return window.__md});
+draw();
+
+</script>
+</body>
+</html>

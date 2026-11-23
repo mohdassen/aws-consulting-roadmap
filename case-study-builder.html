@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="theme-init.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study Builder — Mohammad Dassen</title>
+<meta name="description" content="Turn a client engagement into a clean, shareable case study with metrics, approach and AWS services — with optional client anonymisation. Export to Word or PDF.">
+<meta name="keywords" content="cloud consulting case study template, AWS migration case study, consulting portfolio case study">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/case-study-builder.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/case-study-builder.html">
+<meta property="og:title" content="Case Study Builder">
+<meta property="og:description" content="Turn a client engagement into a clean, shareable case study with metrics, approach and AWS services — with optional client anonymisation. Export to Word or PDF.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Case Study Builder">
+<meta name="twitter:description" content="Turn a client engagement into a clean, shareable case study with metrics, approach and AWS services — with optional client anonymisation. Export to Word or PDF.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "Case Study Builder",
+ "description": "Turn a client engagement into a clean, shareable case study with metrics, approach and AWS services \u2014 with optional client anonymisation. Export to Word or PDF.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/case-study-builder.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">Consulting Toolkit</span><h1>Case Study Builder</h1><p>Turn a completed engagement into a credible, client-safe case study in minutes.</p></div>
+<div class="wrap">
+
+<div class="grid2"><div>
+<div class="card"><h2>1 · Engagement</h2>
+<div class="grid2"><div><label for="client">Client name</label><input id="client" placeholder="e.g. Princess Nourah bint Abdulrahman University"></div><div><label for="sector">Sector</label><select id="sector"><option>university</option><option>government entity</option><option>financial institution</option><option>healthcare organisation</option><option>enterprise</option></select></div></div>
+<label style="display:flex;gap:8px;align-items:center;text-transform:none;font-weight:600"><input type="checkbox" id="anon" style="width:auto"> Anonymise client (“A Saudi &lt;sector&gt;”)</label>
+<div class="grid2"><div><label for="svc">Engagement type</label><input id="svc" placeholder="e.g. Data center migration advisory"></div><div><label for="dur">Duration</label><input id="dur" placeholder="e.g. 4 months"></div></div></div>
+<div class="card"><h2>2 · Story</h2><label for="chal">Challenge</label><textarea id="chal" placeholder="What problem did the client face?"></textarea><label for="appr">Approach (one step per line)</label><textarea id="appr" placeholder="Assessed current estate&#10;Designed landing zone&#10;Planned migration waves"></textarea><label for="aws">AWS services &amp; frameworks (comma separated)</label><input id="aws" placeholder="Control Tower, Well-Architected, AWS MGN"></div>
+<div class="card"><h2>3 · Results</h2><p class="sub">Only enter results you can verify and are cleared to publish.</p><div class="grid2"><div><label for="m1l">Metric 1</label><input id="m1l" placeholder="e.g. Workloads migrated"></div><div><label for="m1v">Value</label><input id="m1v" placeholder="e.g. 42"></div><div><label for="m2l">Metric 2</label><input id="m2l"></div><div><label for="m2v">Value</label><input id="m2v"></div><div><label for="m3l">Metric 3</label><input id="m3l"></div><div><label for="m3v">Value</label><input id="m3v"></div></div><label for="quote">Client quote (optional, with permission)</label><textarea id="quote"></textarea></div>
+</div><div>
+<div class="card"><h2>Preview</h2><div id="pv" style="border:1px solid var(--border2);border-radius:14px;padding:22px;background:var(--s2)"></div><div class="alert" style="margin-top:12px;font-size:.78rem;color:var(--muted)">Confirm client permission and confidentiality obligations before publishing any case study.</div></div>
+<div class="card no-print"><h2>Export</h2><div class="bar" id="exp"></div><div class="bar"><button class="btn sm" id="b-json">⬇ Save session</button><label class="btn sm" style="margin:0;text-transform:none">⬆ Load<input type="file" id="b-load" accept=".json" hidden></label><button class="btn sm danger" id="b-reset">Reset</button></div></div>
+</div></div>
+
+</div>
+<footer>📚 Case Study Builder · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script>
+
+function v(i){return document.getElementById(i).value.trim()}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function calc(){
+ var name=document.getElementById("anon").checked?"A Saudi "+v("sector"):(v("client")||"[Client]");
+ var steps=v("appr").split("\n").map(function(x){return x.trim()}).filter(Boolean),aws=v("aws").split(",").map(function(x){return x.trim()}).filter(Boolean);
+ var M=[1,2,3].map(function(i){return {l:v("m"+i+"l"),v:v("m"+i+"v")}}).filter(function(m){return m.l&&m.v});
+ document.getElementById("pv").innerHTML='<div style="font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:700">Case study'+(v("svc")?" · "+esc(v("svc")):"")+'</div><h2 style="font-family:Georgia,serif;margin:6px 0 4px">'+esc(name)+'</h2><div style="font-size:.78rem;color:var(--muted);margin-bottom:12px">'+(v("dur")?"Duration: "+esc(v("dur")):"")+'</div>'+
+  (M.length?'<div class="kpis">'+M.map(function(m){return '<div class="kpi"><b>'+esc(m.v)+'</b><span>'+esc(m.l)+'</span></div>'}).join("")+'</div>':'')+
+  (v("chal")?'<h4 style="margin:10px 0 4px">Challenge</h4><p style="font-size:.88rem;color:var(--muted2)">'+esc(v("chal"))+'</p>':'')+
+  (steps.length?'<h4 style="margin:10px 0 4px">Approach</h4><ol style="margin-left:18px;font-size:.88rem;color:var(--muted2)">'+steps.map(function(s){return '<li>'+esc(s)+'</li>'}).join("")+'</ol>':'')+
+  (aws.length?'<div style="margin-top:10px">'+aws.map(function(a){return '<span class="pill blue" style="margin:2px">'+esc(a)+'</span>'}).join("")+'</div>':'')+
+  (v("quote")?'<blockquote style="border-left:3px solid var(--gold);padding:4px 12px;margin-top:12px;font-style:italic;color:var(--muted2)">“'+esc(v("quote"))+'”</blockquote>':'');
+ window.__md="# Case Study: "+name+"\n\n"+(v("svc")?"**Engagement:** "+v("svc")+"  \n":"")+(v("dur")?"**Duration:** "+v("dur")+"  \n":"")+"**Prepared by:** Mohammad Dassen — AWS Cloud Architect, Riyadh\n\n"+(M.length?"## Results\n\n| Metric | Value |\n|---|---|\n"+M.map(function(m){return "| "+m.l+" | "+m.v+" |"}).join("\n")+"\n\n":"")+(v("chal")?"## Challenge\n\n"+v("chal")+"\n\n":"")+(steps.length?"## Approach\n\n"+steps.map(function(s,i){return (i+1)+". "+s}).join("\n")+"\n\n":"")+(aws.length?"## AWS services & frameworks\n\n"+aws.map(function(a){return "- "+a}).join("\n")+"\n\n":"")+(v("quote")?"> “"+v("quote")+"”\n":"");
+}
+document.addEventListener("input",calc);document.addEventListener("change",calc);
+var ids=["client","sector","anon","svc","dur","chal","appr","aws","m1l","m1v","m2l","m2v","m3l","m3v","quote"];
+var SS=MD.state("case-study",function(){var o={};ids.forEach(function(i){var e=document.getElementById(i);o[i]=e.type==="checkbox"?e.checked:e.value});return o},function(d){ids.forEach(function(i){var e=document.getElementById(i);if(d[i]!=null){if(e.type==="checkbox")e.checked=d[i];else e.value=d[i]}})});
+document.getElementById("b-json").onclick=SS.exportJSON;document.getElementById("b-reset").onclick=function(){if(confirm("Clear case study?"))SS.clear()};document.getElementById("b-load").onchange=function(){if(this.files[0])SS.importJSON(this.files[0])};
+MD.exportBar("#exp",function(){return "case-study"},function(){return "Case Study"},function(){return window.__md});
+calc();
+
+</script>
+</body>
+</html>

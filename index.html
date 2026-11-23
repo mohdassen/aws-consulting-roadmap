@@ -62,7 +62,7 @@
   .cards-count  { font-size: 0.62rem; color: var(--muted); margin-left: auto; }
 </style>
 </head>
-<body>
+<body data-no-cta>
 
 <!-- TOPBAR (rendered by JS) -->
 <div id="topbar-mount"></div>
@@ -157,6 +157,7 @@
     { href:'cloud-best-practices.html',label:'Best Practices',active:false},
     { href:'nca-pdpl-compliance.html',label:'NCA & PDPL',    active:false },
     { href:'tco-calculator.html',     label:'TCO Calculator',active:false },
+    { href:'work-with-me.html',       label:'Work With Me',  active:false },
     { href:'#about',                  label:'About',         active:false },
     { href:'#contact',                label:'Contact',       active:false },
   ];
@@ -250,5 +251,6 @@
   document.getElementById('footer-mount').innerHTML = `
     <p>Built with purpose · <span>${C.owner.name}</span> · ${C.owner.title} · Riyadh, Saudi Arabia · Vision 2030 Aligned</p>`;
 </script>
+<script src="md-core.js" defer></script>
 </body>
 </html>

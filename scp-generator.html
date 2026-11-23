@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCP & Terraform Guardrail Generator — Mohammad Dassen</title>
+<meta name="description" content="Generate valid AWS Organizations Service Control Policies and Terraform from NCA-aligned guardrails: region restriction, root deny, log protection, encryption enforcement and more.">
+<meta name="keywords" content="AWS SCP generator, service control policy examples, Terraform aws_organizations_policy, AWS guardrails NCA, region restriction SCP, Control Tower guardrails">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/scp-generator.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/scp-generator.html">
+<meta property="og:title" content="SCP & Terraform Guardrail Generator">
+<meta property="og:description" content="Generate valid AWS Organizations Service Control Policies and Terraform from NCA-aligned guardrails: region restriction, root deny, log protection, encryption enforcement and more.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SCP & Terraform Guardrail Generator">
+<meta name="twitter:description" content="Generate valid AWS Organizations Service Control Policies and Terraform from NCA-aligned guardrails: region restriction, root deny, log protection, encryption enforcement and more.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "SCP & Terraform Guardrail Generator",
+ "description": "Generate valid AWS Organizations Service Control Policies and Terraform from NCA-aligned guardrails: region restriction, root deny, log protection, encryption enforcement and more.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/scp-generator.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">Governance · Infrastructure as Code</span><h1>SCP &amp; Terraform Guardrail Generator</h1><p>Pick guardrails, set parameters, and get production-style SCP JSON, Terraform and AWS CLI — auto-split to respect the 5,120-byte policy limit.</p></div>
+<div class="wrap">
+
+<div class="grid2"><div>
+<div class="card"><h2>1 · Choose guardrails</h2><p class="sub">Each guardrail maps to common NCA ECC / CCC expectations. Deny-list SCPs never grant permissions — attach alongside the default FullAWSAccess policy.</p><div id="gl"></div></div>
+</div><div>
+<div class="card"><h2>2 · Parameters</h2>
+<label for="regions-h">Allowed regions</label><div id="regions" class="bar" style="margin-top:4px"></div>
+<label for="admin">Break-glass / admin role ARN pattern (exempted)</label><input id="admin" value="arn:aws:iam::*:role/OrgAdmin*">
+<label for="tagkey">Mandatory tag key (cost allocation)</label><input id="tagkey" value="CostCenter">
+<label for="target">Target OU ID (Terraform)</label><input id="target" value="ou-xxxx-xxxxxxxx">
+<label for="pfx">Policy name prefix</label><input id="pfx" value="scp-guardrail">
+<div class="bar"><button class="btn sm" id="all">Select all</button><button class="btn sm" id="rec">Recommended baseline</button><button class="btn sm danger" id="none">Clear</button></div></div>
+<div class="card"><h2>Summary</h2><div class="kpis" id="kpis"></div><div id="warn" style="font-size:.8rem;color:var(--gold)"></div></div>
+</div></div>
+<div class="card no-print"><div class="tabs" id="tabs"><button data-o="json" class="on">SCP JSON</button><button data-o="tf">Terraform</button><button data-o="cli">AWS CLI</button><button data-o="doc">Guardrail document</button></div>
+<div class="bar"><button class="btn" id="cp">📋 Copy</button><button class="btn" id="dl">⬇ Download</button><span id="dlx"></span></div><div class="preview" id="out" style="max-height:600px"></div></div>
+
+</div>
+<footer>🔒 SCP & Terraform Guardrail Generator · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script>
+
+var REG=["me-south-1","me-central-1","eu-central-1","eu-west-1","us-east-1","us-east-2"];
+var G=[
+{id:"leave",rec:1,t:"Prevent leaving the organisation",nca:"ECC 1 · Governance",s:{Effect:"Deny",Action:["organizations:LeaveOrganization"],Resource:"*"}},
+{id:"root",rec:1,t:"Deny root user actions in member accounts",nca:"ECC 2-2 · IAM",s:{Effect:"Deny",Action:"*",Resource:"*",Condition:{StringLike:{"aws:PrincipalArn":["arn:aws:iam::*:root"]}}}},
+{id:"region",rec:1,t:"Restrict to approved regions (data residency)",nca:"CCC · Hosting location",region:1},
+{id:"trail",rec:1,t:"Protect CloudTrail & AWS Config from tampering",nca:"ECC 2-11 · Logging",s:{Effect:"Deny",Action:["cloudtrail:StopLogging","cloudtrail:DeleteTrail","cloudtrail:UpdateTrail","cloudtrail:PutEventSelectors","config:DeleteConfigurationRecorder","config:StopConfigurationRecorder","config:DeleteDeliveryChannel"],Resource:"*",Condition:{ArnNotLike:{"aws:PrincipalArn":["{ADMIN}"]}}}},
+{id:"detect",rec:1,t:"Protect GuardDuty & Security Hub",nca:"ECC 2-11 · Monitoring",s:{Effect:"Deny",Action:["guardduty:DeleteDetector","guardduty:DisassociateFromMasterAccount","guardduty:StopMonitoringMembers","securityhub:DisableSecurityHub","securityhub:DisassociateFromAdministratorAccount","securityhub:DeleteMembers"],Resource:"*",Condition:{ArnNotLike:{"aws:PrincipalArn":["{ADMIN}"]}}}},
+{id:"s3pub",rec:1,t:"Prevent disabling S3 Block Public Access",nca:"ECC 2-6 · Data protection",s:{Effect:"Deny",Action:["s3:PutAccountPublicAccessBlock","s3:PutBucketPublicAccessBlock"],Resource:"*",Condition:{ArnNotLike:{"aws:PrincipalArn":["{ADMIN}"]}}}},
+{id:"iamusers",rec:0,t:"Block long-lived IAM users and access keys",nca:"ECC 2-2 · IAM",s:{Effect:"Deny",Action:["iam:CreateUser","iam:CreateLoginProfile","iam:CreateAccessKey"],Resource:"*",Condition:{ArnNotLike:{"aws:PrincipalArn":["{ADMIN}"]}}}},
+{id:"ebs",rec:1,t:"Require encrypted EBS volumes",nca:"ECC 2-7 · Cryptography",s:{Effect:"Deny",Action:["ec2:CreateVolume"],Resource:"*",Condition:{Bool:{"ec2:Encrypted":"false"}}}},
+{id:"rds",rec:1,t:"Require encrypted RDS instances",nca:"ECC 2-7 · Cryptography",s:{Effect:"Deny",Action:["rds:CreateDBInstance","rds:CreateDBCluster"],Resource:"*",Condition:{Bool:{"rds:StorageEncrypted":"false"}}}},
+{id:"imds",rec:0,t:"Require IMDSv2 on new EC2 instances",nca:"ECC 2-3 · Systems protection",s:{Effect:"Deny",Action:["ec2:RunInstances"],Resource:"arn:aws:ec2:*:*:instance/*",Condition:{StringNotEquals:{"ec2:MetadataHttpTokens":"required"}}}},
+{id:"itype",rec:0,t:"Block very large / bare-metal instance types (cost guardrail)",nca:"FinOps",s:{Effect:"Deny",Action:["ec2:RunInstances"],Resource:"arn:aws:ec2:*:*:instance/*",Condition:{StringLike:{"ec2:InstanceType":["*.metal","p4*","p5*","x2*","u-*"]}}}},
+{id:"tag",rec:0,t:"Require cost-allocation tag on EC2 creation",nca:"FinOps · Tagging",s:{Effect:"Deny",Action:["ec2:RunInstances"],Resource:"arn:aws:ec2:*:*:instance/*",Condition:{Null:{"aws:RequestTag/{TAG}":"true"}}}}];
+var sel={},cur="json";
+G.forEach(function(g){sel[g.id]=!!g.rec});
+var GLOBAL=["a4b:*","account:*","acm:*","aws-marketplace:*","budgets:*","ce:*","cloudfront:*","cur:*","globalaccelerator:*","health:*","iam:*","organizations:*","route53:*","route53domains:*","shield:*","sts:*","support:*","trustedadvisor:*","waf:*","wafv2:*","sso:*","sso-directory:*"];
+var regSel={"me-south-1":1,"me-central-1":1,"us-east-1":1};
+document.getElementById("regions").innerHTML=REG.map(function(r){return '<label style="display:inline-flex;gap:5px;align-items:center;margin:0;text-transform:none;font-weight:500"><input type="checkbox" style="width:auto" data-r="'+r+'"'+(regSel[r]?" checked":"")+'>'+r+'</label>'}).join("");
+function gl(){document.getElementById("gl").innerHTML=G.map(function(g){return '<label style="display:flex;gap:10px;align-items:flex-start;text-transform:none;font-weight:500;letter-spacing:0;font-size:.85rem;padding:8px 0;border-top:1px solid var(--border);margin:0;cursor:pointer"><input type="checkbox" style="width:auto;margin-top:4px" data-g="'+g.id+'" data-autosave'+(sel[g.id]?" checked":"")+'><span>'+g.t+'<br><span class="pill blue" style="margin-top:3px">'+g.nca+'</span></span></label>'}).join("")}
+function v(i){return document.getElementById(i).value}
+function stmts(){var A=v("admin")||"arn:aws:iam::*:role/OrgAdmin*",T=v("tagkey")||"CostCenter",out=[];
+ G.forEach(function(g){if(!sel[g.id])return;var s;
+  if(g.region){var rs=REG.filter(function(r){return regSel[r]});if(!rs.length)return;s={Effect:"Deny",NotAction:GLOBAL,Resource:"*",Condition:{StringNotEquals:{"aws:RequestedRegion":rs}}}}
+  else s=JSON.parse(JSON.stringify(g.s).replace(/\{ADMIN\}/g,A.replace(/\\/g,"\\\\")).replace(/\{TAG\}/g,T));
+  var o={Sid:"Guard"+g.id.replace(/[^a-z0-9]/gi,"").replace(/^./,function(c){return c.toUpperCase()})};for(var k in s)o[k]=s[k];out.push({g:g,s:o})});return out}
+function policies(){var st=stmts(),pols=[],cur=[],size=0;
+ function wrap(a){return {Version:"2012-10-17",Statement:a.map(function(x){return x.s})}}
+ st.forEach(function(x){var l=JSON.stringify(x.s).length+1;if(size+l>4700&&cur.length){pols.push(cur);cur=[];size=0}cur.push(x);size+=l});if(cur.length)pols.push(cur);
+ return pols.map(function(p,i){var n=v("pfx")+"-"+(i+1);return {name:n,items:p,json:wrap(p),size:JSON.stringify(wrap(p)).length}})}
+function out(){var P=policies(),txt="",warn="";
+ document.getElementById("kpis").innerHTML='<div class="kpi"><b>'+P.reduce(function(a,p){return a+p.items.length},0)+'</b><span>Guardrails</span></div><div class="kpi"><b>'+P.length+'</b><span>SCP policies</span></div><div class="kpi"><b>'+(P.length?Math.max.apply(null,P.map(function(p){return p.size})):0)+'</b><span>Max bytes / 5,120</span></div>';
+ if(P.length>1)warn+="Selection exceeds the 5,120-byte SCP limit, so it was split into "+P.length+" policies. ";
+ if(P.length>5)warn+="⚠ AWS allows max 5 SCPs directly attached per OU/account — attach some at parent OUs.";
+ document.getElementById("warn").textContent=warn;
+ if(cur==="json")txt=P.length?P.map(function(p){return "// "+p.name+" ("+p.size+" bytes)\n"+JSON.stringify(p.json,null,2)}).join("\n\n"):"// Select at least one guardrail";
+ if(cur==="tf"){txt='# Generated by mohdassen.github.io — review before applying\nvariable "target_ou_id" {\n  type    = string\n  default = "'+v("target")+'"\n}\n\n'+P.map(function(p,i){var id=p.name.replace(/[^a-zA-Z0-9]/g,"_");return 'resource "aws_organizations_policy" "'+id+'" {\n  name        = "'+p.name+'"\n  description = "'+p.items.map(function(x){return x.g.t}).join("; ").replace(/"/g,"'").slice(0,500)+'"\n  type        = "SERVICE_CONTROL_POLICY"\n  content     = <<-POLICY\n'+JSON.stringify(p.json,null,2).replace(/^/gm,"  ")+'\n  POLICY\n}\n\nresource "aws_organizations_policy_attachment" "'+id+'" {\n  policy_id = aws_organizations_policy.'+id+'.id\n  target_id = var.target_ou_id\n}\n'}).join("\n")}
+ if(cur==="cli"){txt="# Requires Organizations management account credentials\n"+P.map(function(p,i){return "cat > "+p.name+".json <<'EOF'\n"+JSON.stringify(p.json,null,2)+"\nEOF\naws organizations create-policy --name "+p.name+" --type SERVICE_CONTROL_POLICY --description \"Guardrail pack "+(i+1)+"\" --content file://"+p.name+".json\n# aws organizations attach-policy --policy-id <policy-id> --target-id "+v("target")+"\n"}).join("\n")}
+ var md="# Cloud Guardrail Specification (SCP)\n\n**Date:** "+new Date().toISOString().slice(0,10)+"  \n**Target OU:** "+v("target")+"\n\n> Service Control Policies set permission ceilings; they never grant access. Test in a sandbox OU before wide rollout.\n\n## Guardrail register\n\n| # | Guardrail | Control reference | Policy |\n|---|---|---|---|\n"+P.map(function(p){return p.items.map(function(x){return "| "+x.s.Sid+" | "+x.g.t+" | "+x.g.nca+" | "+p.name+" |"}).join("\n")}).join("\n")+"\n\n## Allowed regions\n\n"+(REG.filter(function(r){return regSel[r]}).join(", ")||"n/a")+"\n\n## Rollout approach\n\n1. Attach to a sandbox OU and run pilot workloads for 2 weeks.\n2. Review CloudTrail for AccessDenied events attributable to SCPs.\n3. Roll out to non-production OUs, then production.\n4. Document exceptions via the break-glass role pattern: `"+v("admin")+"`.\n";
+ if(cur==="doc")txt=md;
+ window.__o=txt;window.__md=md;document.getElementById("out").textContent=txt;
+ MD.results.save("scp",{guardrails:P.reduce(function(a,p){return a+p.items.length},0),ids:Object.keys(sel).filter(function(k){return sel[k]})});
+}
+document.getElementById("gl").addEventListener("change",function(e){var g=e.target.dataset.g;if(g){sel[g]=e.target.checked;out()}});
+document.getElementById("regions").addEventListener("change",function(e){var r=e.target.dataset.r;if(r){regSel[r]=e.target.checked?1:0;out()}});
+["admin","tagkey","target","pfx"].forEach(function(i){document.getElementById(i).addEventListener("input",out)});
+document.getElementById("tabs").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;cur=b.dataset.o;[].forEach.call(document.querySelectorAll("#tabs button"),function(x){x.classList.toggle("on",x===b)});out()});
+document.getElementById("all").onclick=function(){G.forEach(function(g){sel[g.id]=true});gl();out()};
+document.getElementById("none").onclick=function(){G.forEach(function(g){sel[g.id]=false});gl();out()};
+document.getElementById("rec").onclick=function(){G.forEach(function(g){sel[g.id]=!!g.rec});gl();out()};
+document.getElementById("cp").onclick=function(){MD.copy(window.__o)};
+document.getElementById("dl").onclick=function(){var ext={json:".json",tf:".tf",cli:".sh",doc:".md"}[cur];MD.download("scp-guardrails"+ext,window.__o,"text/plain");MD.track("scp-download-"+cur)};
+var SS=MD.state("scp",function(){return {sel:sel,regSel:regSel,admin:v("admin"),tagkey:v("tagkey"),target:v("target"),pfx:v("pfx")}},function(d){sel=d.sel||sel;regSel=d.regSel||regSel;["admin","tagkey","target","pfx"].forEach(function(k){if(d[k])document.getElementById(k).value=d[k]});[].forEach.call(document.querySelectorAll("[data-r]"),function(c){c.checked=!!regSel[c.dataset.r]})});
+gl();out();
+
+</script>
+</body>
+</html>

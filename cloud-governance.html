@@ -794,6 +794,10 @@ footer span{color:var(--gold);}
           <button class="btn-primary" onclick="generateDocument();copyDoc()">📋 Copy Document</button>
           <button class="btn-ghost" onclick="generateDocument()">🔄 Regenerate</button>
           <button class="btn-ghost" onclick="downloadDoc()">⬇️ Download .md</button>
+          <button class="btn-ghost" onclick="generateDocument();MD.exportWord('cloud-governance-framework','Cloud Governance Framework',window._docText)">⬇️ Word</button>
+          <button class="btn-ghost" onclick="generateDocument();MD.exportPDF('Cloud Governance Framework',window._docText)">🖨 PDF / Print</button>
+          <button class="btn-ghost" onclick="GOVS.exportJSON()">💾 Save session</button>
+          <button class="btn-ghost" onclick="if(confirm('Clear saved framework?'))GOVS.clear()">Reset</button>
         </div>
       </div>
     </div>
@@ -803,6 +807,7 @@ footer span{color:var(--gold);}
 
 <footer>🌱 Cloud Governance Framework Builder · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
 
+<script src="md-core.js"></script>
 <script>
 // ─── NAVIGATION ───
 function showSection(id, sbEl) {
@@ -948,7 +953,6 @@ function generateDocument() {
   const objs = getSelectedOpts('objectives');
   const cadence = getSelectedOpts('review-cadence')[0] || 'Quarterly';
   const accts = getEnabledAccts();
-  const scps = getSelectedOpts('');
   const iamGuards = getActiveGuardrails('gr-iam');
   const detectGuards = getActiveGuardrails('gr-detective');
   const dataGuards = getActiveGuardrails('gr-data');
@@ -976,7 +980,7 @@ function generateDocument() {
   document.getElementById('out-guardrails').textContent = totalGuardrails;
   document.getElementById('out-accounts').textContent = accts.length;
 
-  const doc = `# Cloud Governance Framework
+  let doc = `# Cloud Governance Framework
 ## ${org}${short ? ' ('+short+')' : ''}
 
 **Document Classification:** Internal — Confidential
@@ -1162,6 +1166,13 @@ This framework is reviewed ${cadence.toLowerCase()} by the Cloud Governance Boar
 
 *This framework was built using the Cloud Governance Framework Builder — a free tool for Saudi enterprise cloud teams.*
 `;
+  // Import results from the NCA/PDPL Gap Assessment (same browser)
+  try {
+    const gap = window.MD && MD.results.get('nca-gap');
+    if (gap && gap.data) {
+      doc += `\n---\n\n## Appendix A — Compliance Posture (NCA/PDPL Gap Assessment)\n\n**Overall maturity:** ${gap.data.overall} / 4 · **Open gaps:** ${gap.data.gaps} · **Critical gaps:** ${gap.data.critical}  \n*Assessed ${gap.at.slice(0,10)} using the NCA/PDPL Gap Assessment tool.*\n\n| Control family | Score (0–4) |\n|---|---|\n` + gap.data.families.map(f => `| ${f.id} | ${f.score==null?'–':f.score.toFixed(1)} |`).join('\n') + '\n';
+    }
+  } catch(e) {}
 
   document.getElementById('doc-output').innerHTML = escapeHtml(doc)
     .replace(/^(# .+)$/m, '<span class="output-section-head">$1</span>')
@@ -1196,6 +1207,22 @@ function downloadDoc() {
   a.download = filename;
   a.click();
 }
+
+// ─── SAVE / RESUME (generic DOM snapshot) ───
+function govCollect(){
+  const f=[...document.querySelectorAll('input,select,textarea')].map(e=>e.type==='checkbox'?e.checked:e.value);
+  const c=[...document.querySelectorAll('.opt,.guardrail,.acct-card')].map(e=>e.className);
+  return {f,c};
+}
+function govApply(d){
+  const els=[...document.querySelectorAll('input,select,textarea')];
+  if(d.f&&d.f.length===els.length) els.forEach((e,i)=>{ if(e.type==='checkbox') e.checked=!!d.f[i]; else e.value=d.f[i]; });
+  const cs=[...document.querySelectorAll('.opt,.guardrail,.acct-card')];
+  if(d.c&&d.c.length===cs.length) cs.forEach((e,i)=>{ e.className=d.c[i]; });
+  updateAllScores();
+}
+const GOVS = MD.state('governance', govCollect, govApply);
+MD.profile.bind({org:'#org-name'});
 
 // Init score update
 updateAllScores();

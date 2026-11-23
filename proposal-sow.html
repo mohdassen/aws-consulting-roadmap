@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposal & SOW Generator (SAR) — Mohammad Dassen</title>
+<meta name="description" content="Generate a client-ready AWS advisory proposal and statement of work with SAR pricing, 15% VAT, milestones and deliverables. Export to Word or PDF.">
+<meta name="keywords" content="AWS consulting proposal template, statement of work generator, SOW SAR VAT, cloud consulting pricing Saudi Arabia">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/proposal-sow.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/proposal-sow.html">
+<meta property="og:title" content="Proposal & SOW Generator (SAR)">
+<meta property="og:description" content="Generate a client-ready AWS advisory proposal and statement of work with SAR pricing, 15% VAT, milestones and deliverables. Export to Word or PDF.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Proposal & SOW Generator (SAR)">
+<meta name="twitter:description" content="Generate a client-ready AWS advisory proposal and statement of work with SAR pricing, 15% VAT, milestones and deliverables. Export to Word or PDF.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "Proposal & SOW Generator (SAR)",
+ "description": "Generate a client-ready AWS advisory proposal and statement of work with SAR pricing, 15% VAT, milestones and deliverables. Export to Word or PDF.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/proposal-sow.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">Consulting Toolkit</span><h1>Proposal &amp; SOW Generator</h1><p>Scope, price (SAR + 15% VAT) and export a professional proposal in minutes.</p></div>
+<div class="wrap">
+
+<div class="grid2"><div>
+<div class="card"><h2>1 · Client &amp; engagement</h2>
+<div class="grid2"><div><label for="org">Client organisation</label><input id="org"></div><div><label for="contact">Client contact</label><input id="contact"></div></div>
+<label for="type">Engagement type</label><select id="type"></select>
+<label for="obj">Objective / background</label><textarea id="obj"></textarea>
+<div class="grid2"><div><label for="weeks">Duration (weeks)</label><input id="weeks" type="number" min="1" value="2"></div><div><label for="valid">Proposal valid (days)</label><input id="valid" type="number" value="30"></div></div></div>
+<div class="card"><h2>2 · Deliverables</h2><div id="dels"></div></div>
+<div class="card"><h2>3 · Assumptions</h2><textarea id="assume">- Client provides access to stakeholders and read-only AWS console/Security Hub access within 5 working days of kickoff.
+- Work is performed remotely with up to 2 on-site days in Riyadh if requested.
+- Scope changes are handled through written change requests.
+- Client reviews deliverables within 5 working days.</textarea></div>
+</div><div>
+<div class="card"><h2>4 · Effort &amp; fees (SAR)</h2><p class="sub">Rates are editable; VAT is applied at 15%.</p><table class="t" id="rt"><thead><tr><th>Role</th><th>Days</th><th>Rate / day</th><th style="text-align:right">Fee</th></tr></thead><tbody></tbody></table>
+<div class="grid2"><div><label for="exp">Expenses (% of fees)</label><input id="exp" type="number" value="0" min="0"></div><div><label for="disc">Discount (%)</label><input id="disc" type="number" value="0" min="0"></div></div></div>
+<div class="card"><h2>Commercial summary</h2><div class="kpis" id="kp"></div><div class="chart-box" id="ch"></div></div>
+<div class="card"><h2>5 · Payment terms</h2><select id="pay"><option value="50/50">50% on signature · 50% on final deliverable</option><option value="30/40/30">30% on signature · 40% mid-point · 30% on final deliverable</option><option value="100">100% on final deliverable (net 30)</option></select></div>
+</div></div>
+<div class="card no-print"><h2>Export proposal</h2><div class="bar" id="exp-bar"></div><div class="bar"><button class="btn sm" id="b-json">⬇ Save session</button><label class="btn sm" style="margin:0;text-transform:none">⬆ Load<input type="file" id="b-load" accept=".json" hidden></label><button class="btn sm danger" id="b-reset">Reset</button></div><div class="preview" id="prev"></div></div>
+
+</div>
+<footer>📄 Proposal & SOW Generator (SAR) · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script>
+
+var TY={war:{t:"5-Day Well-Architected Review",wk:2,obj:"Review a business-critical AWS workload against the six Well-Architected pillars, identify risks and deliver a prioritised remediation roadmap.",roles:[["Lead Cloud Architect",5,4500],["Solutions Architect",3,3200]],d:["Workload discovery & scoping session","Well-Architected review workshops (6 pillars)","Findings report with High/Medium risk scoring","Prioritised remediation backlog","Executive readout presentation"]},
+ nca:{t:"NCA/PDPL Cloud Gap Assessment",wk:3,obj:"Assess the AWS environment against NCA ECC/CCC and PDPL control themes and provide a prioritised 90-day remediation plan.",roles:[["Lead Cloud Architect",6,4500],["Security / Compliance Consultant",5,3800]],d:["Control-by-control gap assessment","Maturity scorecard by control family","Audit-ready evidence checklist","90-day prioritised remediation plan","Executive readout presentation"]},
+ gov:{t:"Cloud Governance Workshop",wk:2,obj:"Define the target cloud governance framework: landing zone, guardrails, FinOps and CCoE operating model.",roles:[["Lead Cloud Architect",4,4500],["FinOps / Governance Consultant",3,3500]],d:["Two-day governance workshop","Cloud governance framework document","SCP / guardrail starter pack","CCoE charter and RACI","Implementation roadmap"]},
+ custom:{t:"Custom advisory engagement",wk:4,obj:"",roles:[["Lead Cloud Architect",8,4500],["Solutions Architect",4,3200]],d:["Discovery and requirements","Assessment report","Recommendations and roadmap"]}};
+var st={dels:{},roles:[]};
+var typ=document.getElementById("type");typ.innerHTML=Object.keys(TY).map(function(k){return '<option value="'+k+'">'+TY[k].t+'</option>'}).join("");
+function load(k){var T=TY[k];st.roles=T.roles.map(function(r){return r.slice()});st.dels={};T.d.forEach(function(d,i){st.dels[i]=1});st.dlist=T.d.slice();obj.value=T.obj;weeks.value=T.wk;ui()}
+function ui(){document.getElementById("dels").innerHTML=st.dlist.map(function(d,i){return '<label style="display:flex;gap:10px;text-transform:none;font-weight:500;letter-spacing:0;margin:0;padding:5px 0;font-size:.85rem;cursor:pointer"><input type="checkbox" style="width:auto;margin-top:4px" data-d="'+i+'"'+(st.dels[i]?" checked":"")+'>'+d+'</label>'}).join("");
+ document.querySelector("#rt tbody").innerHTML=st.roles.map(function(r,i){return '<tr><td>'+r[0]+'</td><td><input type="number" min="0" style="width:70px" data-ri="'+i+'" data-rf="1" value="'+r[1]+'"></td><td><input type="number" min="0" style="width:95px" data-ri="'+i+'" data-rf="2" value="'+r[2]+'"></td><td style="text-align:right;white-space:nowrap" id="fee'+i+'"></td></tr>'}).join("");calc()}
+function f(n){return Math.round(n).toLocaleString("en-US")}
+function calc(){
+ var fees=0;st.roles.forEach(function(r,i){var x=(+r[1]||0)*(+r[2]||0);fees+=x;var e=document.getElementById("fee"+i);if(e)e.textContent=f(x)});
+ var ex=fees*(+exp.value||0)/100,dc=(fees+ex)*(+disc.value||0)/100,net=fees+ex-dc,vat=net*.15,tot=net+vat,days=st.roles.reduce(function(a,r){return a+(+r[1]||0)},0);
+ document.getElementById("kp").innerHTML='<div class="kpi"><b>'+days+'</b><span>Consulting days</span></div><div class="kpi"><b>'+f(net)+'</b><span>Net (SAR)</span></div><div class="kpi"><b>'+f(tot)+'</b><span>Total incl. VAT</span></div>';
+ var mx=Math.max.apply(null,st.roles.map(function(r){return (+r[1]||0)*(+r[2]||0)}).concat([1])),cols=["#f59e0b","#60a5fa","#34d399","#c084fc"];
+ document.getElementById("ch").innerHTML=st.roles.map(function(r,i){var x=(+r[1]||0)*(+r[2]||0);return '<div class="hbar"><span class="n">'+r[0]+'</span><span class="tr"><span class="fl" style="display:block;width:'+x/mx*100+'%;background:'+cols[i%4]+'"></span></span><span class="v" style="width:70px">'+f(x)+'</span></div>'}).join("");
+ var pay=document.getElementById("pay").value,ms={"50/50":[["On signature",.5],["On final deliverable",.5]],"30/40/30":[["On signature",.3],["Mid-point review",.4],["On final deliverable",.3]],"100":[["On final deliverable (net 30)",1]]}[pay];
+ var D=st.dlist.filter(function(d,i){return st.dels[i]});
+ var md="# Proposal & Statement of Work\n\n**Prepared for:** "+(org.value||"—")+(contact.value?" (Attn: "+contact.value+")":"")+"  \n**Prepared by:** Mohammad Dassen — AWS Cloud Architect & Strategic Consultant, Riyadh  \n**Date:** "+new Date().toISOString().slice(0,10)+"  \n**Valid for:** "+valid.value+" days\n\n## 1. Engagement\n\n**"+TY[typ.value].t+"** · "+weeks.value+" week(s)\n\n"+obj.value+"\n\n## 2. Deliverables\n\n"+D.map(function(d,i){return (i+1)+". "+d}).join("\n")+"\n\n## 3. Effort & fees\n\n| Role | Days | Rate (SAR) | Fee (SAR) |\n|---|---|---|---|\n"+st.roles.map(function(r){return "| "+r[0]+" | "+r[1]+" | "+f(r[2])+" | "+f((+r[1]||0)*(+r[2]||0))+" |"}).join("\n")+"\n| **Professional fees** | **"+days+"** | | **"+f(fees)+"** |\n"+(ex?"| Expenses ("+exp.value+"%) | | | "+f(ex)+" |\n":"")+(dc?"| Discount ("+disc.value+"%) | | | -"+f(dc)+" |\n":"")+"| **Net amount** | | | **"+f(net)+"** |\n| VAT 15% | | | "+f(vat)+" |\n| **Total (SAR)** | | | **"+f(tot)+"** |\n\n## 4. Payment schedule\n\n| Milestone | Share | Amount incl. VAT (SAR) |\n|---|---|---|\n"+ms.map(function(m){return "| "+m[0]+" | "+Math.round(m[1]*100)+"% | "+f(tot*m[1])+" |"}).join("\n")+"\n\n## 5. Assumptions\n\n"+assume.value+"\n\n## 6. Terms\n\n- Fees are in Saudi Riyals; VAT at the prevailing rate (15%).\n- Deliverables remain confidential; client data is handled under an agreed NDA.\n- Either party may terminate with 14 days' written notice; work completed is billable.\n\n## 7. Acceptance\n\n| | Client | Consultant |\n|---|---|---|\n| Name | | Mohammad Dassen |\n| Signature | | |\n| Date | | |\n";
+ window.__md=md;document.getElementById("prev").textContent=md;MD.results.save("proposal",{net:Math.round(net),total:Math.round(tot)});
+}
+typ.onchange=function(){load(typ.value)};
+document.addEventListener("change",function(e){var t=e.target;if(t.dataset.d!=null)st.dels[t.dataset.d]=t.checked?1:0;calc()});
+document.addEventListener("input",function(e){var t=e.target;if(t.dataset.ri!=null)st.roles[t.dataset.ri][t.dataset.rf]=+t.value;calc()});
+MD.profile.bind({org:"#org",contact:"#contact"});
+var SS=MD.state("sow",function(){return {st:st,type:typ.value,org:org.value,contact:contact.value,obj:obj.value,weeks:weeks.value,valid:valid.value,assume:assume.value,exp:exp.value,disc:disc.value,pay:pay.value}},function(d){st=d.st||st;typ.value=d.type||"war";["org","contact","obj","weeks","valid","assume","exp","disc","pay"].forEach(function(k){if(d[k]!=null)document.getElementById(k).value=d[k]});ui()});
+document.getElementById("b-json").onclick=SS.exportJSON;document.getElementById("b-reset").onclick=function(){if(confirm("Clear saved proposal?"))SS.clear()};document.getElementById("b-load").onchange=function(){if(this.files[0])SS.importJSON(this.files[0])};
+MD.exportBar("#exp-bar",function(){return "proposal-sow"},function(){return "Proposal & Statement of Work"},function(){return window.__md});
+if(!st.dlist)load("war");
+
+</script>
+</body>
+</html>

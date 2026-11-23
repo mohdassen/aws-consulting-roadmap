@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCA & PDPL Cloud Gap Assessment (EN/AR) — Mohammad Dassen</title>
+<meta name="description" content="Bilingual English/Arabic self-assessment against NCA ECC/CCC and PDPL control themes for AWS environments, with maturity scoring, radar chart and a 90-day remediation plan.">
+<meta name="keywords" content="NCA ECC gap assessment, PDPL compliance AWS, NCA CCC cloud controls, Saudi cloud compliance, تقييم الامتثال السحابي, الهيئة الوطنية للأمن السيبراني">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/nca-gap-assessment.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/nca-gap-assessment.html">
+<meta property="og:title" content="NCA & PDPL Cloud Gap Assessment (EN/AR)">
+<meta property="og:description" content="Bilingual English/Arabic self-assessment against NCA ECC/CCC and PDPL control themes for AWS environments, with maturity scoring, radar chart and a 90-day remediation plan.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NCA & PDPL Cloud Gap Assessment (EN/AR)">
+<meta name="twitter:description" content="Bilingual English/Arabic self-assessment against NCA ECC/CCC and PDPL control themes for AWS environments, with maturity scoring, radar chart and a 90-day remediation plan.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "NCA & PDPL Cloud Gap Assessment (EN/AR)",
+ "description": "Bilingual English/Arabic self-assessment against NCA ECC/CCC and PDPL control themes for AWS environments, with maturity scoring, radar chart and a 90-day remediation plan.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/nca-gap-assessment.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">Compliance · English / العربية</span><h1>NCA &amp; PDPL Cloud Gap Assessment</h1><p>Score your AWS environment across 8 control families, see your maturity radar, and export a prioritised 90-day remediation plan in English or Arabic.</p></div>
+<div class="wrap">
+
+<div class="card no-print"><div class="bar" style="margin:0;justify-content:space-between"><div class="tabs" style="margin:0"><button id="lang-en" class="on">English</button><button id="lang-ar">العربية</button></div><div class="bar" style="margin:0"><button class="btn sm" id="b-json">⬇ Save session</button><label class="btn sm" style="margin:0;text-transform:none">⬆ Load<input type="file" id="b-load" accept=".json" hidden></label><button class="btn sm danger" id="b-reset">Reset</button></div></div></div>
+<div class="card"><h2 data-t="orgH">Organisation</h2><div class="grid3"><div><label data-t="org">Organisation</label><input id="org"></div><div><label data-t="sector">Sector</label><select id="sector"><option value="gov">Government</option><option value="edu">Education</option><option value="fin">Financial</option><option value="health">Healthcare</option><option value="other">Other</option></select></div><div><label data-t="assessor">Assessor</label><input id="contact"></div></div></div>
+<div class="card"><h2 data-t="scaleH">Maturity scale</h2><p class="sub" id="scale"></p></div>
+<div id="qs"></div>
+<div class="card" id="res"><h2 data-t="resH">Results</h2><div class="kpis" id="kpis"></div><div class="grid2"><div class="chart-box"><svg id="radar" viewBox="0 0 420 380" width="100%"></svg></div><div class="chart-box" id="bars"></div></div></div>
+<div class="card"><h2 data-t="planH">Prioritised remediation plan</h2><p class="sub" data-t="planS"></p><div id="plan"></div></div>
+<div class="card no-print"><h2 data-t="expH">Export report</h2><div class="bar" id="exp"></div><div class="preview" id="prev"></div></div>
+
+</div>
+<footer>🛡️ NCA & PDPL Cloud Gap Assessment (EN/AR) · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script>
+
+var LV={en:["Not implemented","Ad hoc / partial","Defined, not consistent","Implemented & evidenced","Measured & optimised"],
+ar:["غير منفّذ","جزئي / عشوائي","موثّق وغير متسق","منفّذ وموثّق بالأدلة","مُقاس ومُحسَّن باستمرار"]};
+var T={en:{orgH:"Organisation",org:"Organisation",sector:"Sector",assessor:"Assessor",scaleH:"Maturity scale",resH:"Results",planH:"Prioritised remediation plan",planS:"Controls scoring below level 3, ordered by impact. Phase 1 = 0–30 days, Phase 2 = 31–60, Phase 3 = 61–90.",expH:"Export report",overall:"Overall maturity",gaps:"Open gaps",crit:"Critical gaps",answered:"Answered",na:"N/A",ph:["Phase 1 · 0–30 days","Phase 2 · 31–60 days","Phase 3 · 61–90 days"],none:"No gaps below level 3 — maintain evidence and run periodic reviews.",disc:"Indicative self-assessment based on common NCA ECC/CCC and PDPL control themes. It is not an official audit or certification; validate against the current NCA and SDAIA publications.",title:"NCA / PDPL Cloud Gap Assessment",fam:"Control family",ctl:"Control",score:"Score",action:"Remediation action",pri:"Priority"},
+ar:{orgH:"المنشأة",org:"اسم المنشأة",sector:"القطاع",assessor:"المقيِّم",scaleH:"مقياس النضج",resH:"النتائج",planH:"خطة المعالجة حسب الأولوية",planS:"الضوابط الأقل من المستوى 3 مرتبة حسب الأثر. المرحلة 1 = 0–30 يومًا، المرحلة 2 = 31–60، المرحلة 3 = 61–90.",expH:"تصدير التقرير",overall:"النضج العام",gaps:"الفجوات المفتوحة",crit:"فجوات حرجة",answered:"تمت الإجابة",na:"لا ينطبق",ph:["المرحلة 1 · 0–30 يومًا","المرحلة 2 · 31–60 يومًا","المرحلة 3 · 61–90 يومًا"],none:"لا توجد فجوات دون المستوى 3 — حافظ على الأدلة وأجرِ مراجعات دورية.",disc:"تقييم ذاتي استرشادي مبني على محاور ضوابط الهيئة الوطنية للأمن السيبراني (ECC/CCC) ونظام حماية البيانات الشخصية. ليس تدقيقًا رسميًا أو شهادة؛ يُرجى التحقق من الإصدارات الحالية للهيئة وسدايا.",title:"تقييم فجوات الامتثال السحابي (NCA / PDPL)",fam:"المحور",ctl:"الضابط",score:"الدرجة",action:"إجراء المعالجة",pri:"الأولوية"}};
+var F=[
+{id:"gov",c:"#f59e0b",en:"Cybersecurity Governance (ECC-1)",ar:"حوكمة الأمن السيبراني (ECC-1)",q:[
+ {w:3,en:"Approved cybersecurity strategy, policies and roles cover cloud workloads",ar:"استراتيجية وسياسات وأدوار معتمدة للأمن السيبراني تشمل الأحمال السحابية",a:{en:"Approve a cloud security policy and RACI; map to ECC domains",ar:"اعتماد سياسة أمن سحابي ومصفوفة مسؤوليات وربطها بمحاور ECC"}},
+ {w:2,en:"Cyber risk register includes cloud risks with owners and treatment plans",ar:"سجل مخاطر الأمن السيبراني يشمل مخاطر السحابة مع مالكين وخطط معالجة",a:{en:"Add cloud risks to the enterprise register; assign owners and review quarterly",ar:"إضافة مخاطر السحابة لسجل المخاطر وتعيين المالكين ومراجعتها ربع سنويًا"}},
+ {w:2,en:"Periodic compliance review against ECC/CCC with tracked findings",ar:"مراجعة دورية للامتثال لضوابط ECC/CCC مع تتبّع الملاحظات",a:{en:"Schedule semi-annual control reviews using AWS Audit Manager / Security Hub standards",ar:"جدولة مراجعات نصف سنوية للضوابط باستخدام AWS Audit Manager وSecurity Hub"}}]},
+{id:"iam",c:"#60a5fa",en:"Identity & Access Management (ECC 2-2)",ar:"إدارة الهوية والصلاحيات (ECC 2-2)",q:[
+ {w:3,en:"MFA enforced for all privileged and remote access, including AWS root and console users",ar:"المصادقة متعددة العوامل مفروضة لجميع الصلاحيات المميزة والوصول عن بُعد بما في ذلك حساب root",a:{en:"Enforce MFA via IAM Identity Center + SCP denying actions without MFA; lock root credentials",ar:"فرض MFA عبر IAM Identity Center وسياسة SCP تمنع الإجراءات بدون MFA وتأمين حساب root"}},
+ {w:3,en:"Least-privilege access with periodic access reviews and joiner/mover/leaver process",ar:"أقل الصلاحيات مع مراجعات دورية للصلاحيات وإجراءات الانضمام والنقل والمغادرة",a:{en:"Adopt permission sets per role; run quarterly access reviews with IAM Access Analyzer",ar:"اعتماد مجموعات صلاحيات حسب الدور ومراجعات ربع سنوية باستخدام IAM Access Analyzer"}},
+ {w:2,en:"Privileged access is just-in-time, logged and reviewed",ar:"الصلاحيات المميزة مؤقتة ومسجَّلة ومراجَعة",a:{en:"Introduce break-glass roles with approval workflow and CloudTrail alerting",ar:"استحداث أدوار طوارئ بسير موافقات وتنبيهات عبر CloudTrail"}}]},
+{id:"net",c:"#2dd4bf",en:"Network & Systems Protection (ECC 2-3 / 2-4)",ar:"حماية الشبكات والأنظمة (ECC 2-3 / 2-4)",q:[
+ {w:3,en:"Network segmentation: separate VPCs/subnets per environment and data classification",ar:"تقسيم الشبكة: فصل VPC والشبكات الفرعية حسب البيئة وتصنيف البيانات",a:{en:"Redesign into hub-and-spoke with Transit Gateway; isolate prod from non-prod",ar:"إعادة التصميم بنموذج hub-and-spoke عبر Transit Gateway وعزل الإنتاج عن غيره"}},
+ {w:2,en:"Hardened baselines (AMIs/images), patching SLA and endpoint protection",ar:"صور أساسية مُحصَّنة وجدول زمني للتحديثات وحماية للأجهزة الطرفية",a:{en:"Create golden AMIs; enforce patching via Systems Manager Patch Manager",ar:"إنشاء صور AMI معتمدة وفرض التحديثات عبر Systems Manager Patch Manager"}},
+ {w:2,en:"Perimeter protection: WAF, DDoS protection and restricted public exposure",ar:"حماية المحيط: WAF وحماية DDoS وتقييد التعرّض العام",a:{en:"Deploy AWS WAF + Shield; block public S3/security-group exposure with SCP/Config rules",ar:"نشر AWS WAF وShield ومنع التعرّض العام عبر SCP وقواعد Config"}}]},
+{id:"data",c:"#c084fc",en:"Data Protection & Cryptography (ECC 2-6 / 2-7)",ar:"حماية البيانات والتشفير (ECC 2-6 / 2-7)",q:[
+ {w:3,en:"Data classified per NDMO/NCA scheme with handling rules in cloud",ar:"تصنيف البيانات وفق نموذج الهيئة الوطنية لإدارة البيانات/NCA مع قواعد التعامل في السحابة",a:{en:"Apply classification tags; use Amazon Macie to discover sensitive data",ar:"تطبيق وسوم التصنيف واستخدام Amazon Macie لاكتشاف البيانات الحساسة"}},
+ {w:3,en:"Encryption at rest and in transit with managed keys (KMS) and key rotation",ar:"تشفير البيانات أثناء التخزين والنقل بمفاتيح مُدارة (KMS) مع تدوير المفاتيح",a:{en:"Enforce KMS CMKs and TLS 1.2+; enable automatic key rotation; deny unencrypted storage",ar:"فرض مفاتيح KMS وبروتوكول TLS 1.2+ وتفعيل التدوير التلقائي ومنع التخزين غير المشفّر"}},
+ {w:2,en:"Backups are automated, encrypted, immutable and restore-tested",ar:"نسخ احتياطي آلي ومشفّر وغير قابل للتعديل مع اختبار الاستعادة",a:{en:"Adopt AWS Backup with Vault Lock; test restores each quarter",ar:"اعتماد AWS Backup مع Vault Lock واختبار الاستعادة كل ربع سنة"}}]},
+{id:"ops",c:"#34d399",en:"Logging, Monitoring & Vulnerability Mgmt (ECC 2-9 / 2-11)",ar:"السجلات والمراقبة وإدارة الثغرات (ECC 2-9 / 2-11)",q:[
+ {w:3,en:"Centralised, immutable logging (CloudTrail, VPC Flow Logs) retained per policy",ar:"سجلات مركزية غير قابلة للتعديل (CloudTrail وVPC Flow Logs) محفوظة حسب السياسة",a:{en:"Create organisation trail to a log-archive account with object lock",ar:"إنشاء مسار على مستوى المنظمة إلى حساب أرشفة مع قفل الكائنات"}},
+ {w:3,en:"24/7 security monitoring with alerting (GuardDuty, Security Hub, SIEM/SOC integration)",ar:"مراقبة أمنية على مدار الساعة مع تنبيهات (GuardDuty وSecurity Hub وربط مع SOC)",a:{en:"Enable GuardDuty + Security Hub org-wide; integrate findings with SOC/SIEM",ar:"تفعيل GuardDuty وSecurity Hub على مستوى المنظمة وربط النتائج مع SOC/SIEM"}},
+ {w:2,en:"Vulnerability scanning and periodic penetration testing with remediation SLAs",ar:"فحص الثغرات واختبارات اختراق دورية مع مهل زمنية للمعالجة",a:{en:"Enable Amazon Inspector; schedule annual third-party penetration tests",ar:"تفعيل Amazon Inspector وجدولة اختبارات اختراق سنوية من طرف ثالث"}}]},
+{id:"ir",c:"#f87171",en:"Incident Response & Resilience (ECC 2-12 / 3-1)",ar:"الاستجابة للحوادث والاستمرارية (ECC 2-12 / 3-1)",q:[
+ {w:3,en:"Documented, tested incident response plan covering cloud scenarios and NCA reporting",ar:"خطة استجابة للحوادث موثّقة ومختبرة تغطي سيناريوهات السحابة والإبلاغ للهيئة",a:{en:"Write cloud IR playbooks; run a tabletop exercise; define NCA notification path",ar:"إعداد أدلة استجابة للسحابة وتنفيذ تمرين طاولة وتحديد مسار الإبلاغ للهيئة"}},
+ {w:3,en:"Business continuity / DR with defined RTO and RPO tested at least annually",ar:"استمرارية الأعمال والتعافي من الكوارث مع RTO وRPO محددة ومختبرة سنويًا",a:{en:"Define RTO/RPO per tier; implement multi-AZ and cross-region DR; run annual DR test",ar:"تحديد RTO/RPO لكل فئة وتنفيذ تعدد AZ وتعافٍ عبر المناطق واختبار سنوي"}},
+ {w:1,en:"Forensic readiness: evidence preservation and isolated forensics account",ar:"الجاهزية للتحقيق الرقمي: حفظ الأدلة وحساب معزول للتحقيق",a:{en:"Create forensics account and snapshot automation",ar:"إنشاء حساب للتحقيق وأتمتة اللقطات"}}]},
+{id:"cloud",c:"#fb923c",en:"Cloud & Third-Party Security (ECC 4-1 / 4-2, CCC)",ar:"أمن السحابة والأطراف الثالثة (ECC 4-1 / 4-2 وCCC)",q:[
+ {w:3,en:"Data and workloads hosted in approved Saudi regions / compliant with data-residency rules",ar:"استضافة البيانات والأحمال في مناطق سعودية معتمدة أو بما يتوافق مع متطلبات الإقامة",a:{en:"Document hosting decisions; restrict regions via SCP; assess KSA region availability",ar:"توثيق قرارات الاستضافة وتقييد المناطق عبر SCP وتقييم توفّر المنطقة السعودية"}},
+ {w:2,en:"Cloud provider and MSP due diligence, contracts and shared-responsibility matrix",ar:"العناية الواجبة لمزود السحابة ومزودي الخدمات والعقود ومصفوفة المسؤولية المشتركة",a:{en:"Build a shared-responsibility matrix; add security clauses and audit rights to contracts",ar:"إعداد مصفوفة المسؤولية المشتركة وإضافة بنود الأمن وحق التدقيق للعقود"}},
+ {w:2,en:"Multi-account structure with guardrails and continuous compliance checks",ar:"هيكل متعدد الحسابات مع ضوابط وقائية وفحوصات امتثال مستمرة",a:{en:"Adopt Control Tower/Organizations with SCP guardrails and AWS Config conformance packs",ar:"اعتماد Control Tower/Organizations مع ضوابط SCP وحزم الامتثال في AWS Config"}}]},
+{id:"pdpl",c:"#a78bfa",en:"Personal Data Protection (PDPL)",ar:"حماية البيانات الشخصية (PDPL)",q:[
+ {w:3,en:"Records of processing, lawful basis and privacy notices for personal data",ar:"سجل أنشطة المعالجة والأساس النظامي وإشعارات الخصوصية للبيانات الشخصية",a:{en:"Create a processing register and update privacy notices",ar:"إنشاء سجل المعالجة وتحديث إشعارات الخصوصية"}},
+ {w:3,en:"Data-subject rights handled (access, correction, deletion) within required timelines",ar:"معالجة حقوق أصحاب البيانات (الاطلاع والتصحيح والإتلاف) ضمن المهل المطلوبة",a:{en:"Define a DSR workflow with owners and SLAs",ar:"تحديد مسار لطلبات أصحاب البيانات مع المسؤولين والمهل"}},
+ {w:2,en:"Breach notification process, DPO/privacy lead and cross-border transfer assessment",ar:"إجراء الإبلاغ عن التسرب وتعيين مسؤول حماية البيانات وتقييم النقل خارج المملكة",a:{en:"Appoint privacy lead; define breach notification runbook; assess cross-border transfers",ar:"تعيين مسؤول خصوصية وإعداد دليل الإبلاغ وتقييم النقل عبر الحدود"}}]}];
+var lang="en",A={}; // A["famIdx-qIdx"] = 0..4 or "na"
+function t(k){return T[lang][k]}
+function nm(o){return o[lang]}
+function render(){
+ document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+ document.querySelectorAll("[data-t]").forEach(function(e){e.textContent=t(e.dataset.t)});
+ document.getElementById("scale").innerHTML=LV[lang].map(function(l,i){return "<b>"+i+"</b> = "+l}).join(" &nbsp;·&nbsp; ");
+ document.getElementById("qs").innerHTML=F.map(function(f,fi){return '<div class="card" style="border-top:3px solid '+f.c+'"><h2>'+nm(f)+'</h2>'+f.q.map(function(q,qi){var k=fi+"-"+qi,v=A[k];
+  return '<div style="padding:10px 0;border-top:1px solid var(--border)"><div style="font-size:.88rem;margin-bottom:6px">'+nm(q)+(q.w===3?' <span class="pill red">●</span>':'')+'</div><div class="bar" style="margin:0">'+[0,1,2,3,4].map(function(n){return '<button class="btn sm'+(v===n?' gold':'')+'" data-k="'+k+'" data-v="'+n+'" data-autosave title="'+LV[lang][n]+'">'+n+'</button>'}).join("")+'<button class="btn sm'+(v==="na"?' gold':'')+'" data-k="'+k+'" data-v="na" data-autosave>'+t("na")+'</button></div></div>'}).join("")+'</div>'}).join("");
+ calc();
+}
+function calc(){
+ var fams=[],tot=0,wt=0,ans=0,n=0,gaps=[];
+ F.forEach(function(f,fi){var s=0,w=0;f.q.forEach(function(q,qi){n++;var v=A[fi+"-"+qi];if(v==="na"){ans++;return}if(v==null)return;ans++;s+=v*q.w;w+=q.w;tot+=v*q.w;wt+=q.w;if(v<3)gaps.push({f:f,q:q,v:v,imp:(3-v)*q.w})});
+  fams.push({f:f,score:w?s/w:null})});
+ var overall=wt?tot/wt:0;gaps.sort(function(a,b){return b.imp-a.imp});
+ var crit=gaps.filter(function(g){return g.q.w===3&&g.v<=1}).length;
+ document.getElementById("kpis").innerHTML='<div class="kpi"><b>'+overall.toFixed(1)+' / 4</b><span>'+t("overall")+'</span></div><div class="kpi"><b>'+gaps.length+'</b><span>'+t("gaps")+'</span></div><div class="kpi"><b style="color:var(--red)">'+crit+'</b><span>'+t("crit")+'</span></div><div class="kpi"><b>'+ans+'/'+n+'</b><span>'+t("answered")+'</span></div>';
+ // radar
+ var cx=210,cy=190,R=130,N=fams.length,svg="";
+ for(var r=1;r<=4;r++){svg+='<polygon fill="none" stroke="rgba(255,255,255,.09)" points="'+fams.map(function(_,i){var a=-Math.PI/2+2*Math.PI*i/N;return (cx+R*r/4*Math.cos(a)).toFixed(1)+","+(cy+R*r/4*Math.sin(a)).toFixed(1)}).join(" ")+'"/>'}
+ fams.forEach(function(_,i){var a=-Math.PI/2+2*Math.PI*i/N;svg+='<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+R*Math.cos(a)).toFixed(1)+'" y2="'+(cy+R*Math.sin(a)).toFixed(1)+'" stroke="rgba(255,255,255,.09)"/><text x="'+(cx+(R+22)*Math.cos(a)).toFixed(1)+'" y="'+(cy+(R+22)*Math.sin(a)+4).toFixed(1)+'" text-anchor="middle" font-size="11" fill="#9aa3bd">'+nm(F[i]).replace(/\s*\(.*\)/,"").split(/ [&,] /)[0].slice(0,16)+'</text>'});
+ svg+='<polygon fill="rgba(245,158,11,.25)" stroke="#f59e0b" stroke-width="2" points="'+fams.map(function(x,i){var a=-Math.PI/2+2*Math.PI*i/N,r=(x.score||0)/4*R;return (cx+r*Math.cos(a)).toFixed(1)+","+(cy+r*Math.sin(a)).toFixed(1)}).join(" ")+'"/>';
+ document.getElementById("radar").innerHTML=svg;
+ document.getElementById("bars").innerHTML=fams.map(function(x){var p=(x.score||0)/4*100;return '<div class="hbar"><span class="n">'+nm(x.f).replace(/\s*\(.*\)/,"")+'</span><span class="tr"><span class="fl" style="display:block;width:'+p+'%;background:'+x.f.c+'"></span></span><span class="v">'+(x.score==null?"–":x.score.toFixed(1))+'</span></div>'}).join("");
+ // plan
+ var third=Math.ceil(gaps.length/3)||1;
+ var planMd="",html="";
+ if(!gaps.length){html='<p class="sub">'+t("none")+'</p>'}else{
+  html='<table class="t"><thead><tr><th>'+t("pri")+'</th><th>'+t("fam")+'</th><th>'+t("ctl")+'</th><th>'+t("score")+'</th><th>'+t("action")+'</th></tr></thead><tbody>'+gaps.map(function(g,i){var ph=Math.min(2,Math.floor(i/third));return '<tr><td><span class="pill '+(ph===0?'red':ph===1?'gold':'blue')+'">P'+(ph+1)+'</span></td><td>'+nm(g.f).replace(/\s*\(.*\)/,"")+'</td><td>'+nm(g.q)+'</td><td>'+g.v+'</td><td>'+g.q.a[lang]+'</td></tr>'}).join("")+'</tbody></table>'}
+ document.getElementById("plan").innerHTML=html;
+ // markdown
+ var org=document.getElementById("org").value||"—",md="# "+t("title")+"\n\n**"+t("org")+":** "+org+"  \n**"+t("assessor")+":** "+(document.getElementById("contact").value||"—")+"  \n**Date:** "+new Date().toISOString().slice(0,10)+"\n\n> "+t("disc")+"\n\n## "+t("resH")+"\n\n**"+t("overall")+":** "+overall.toFixed(1)+" / 4 · **"+t("gaps")+":** "+gaps.length+" · **"+t("crit")+":** "+crit+"\n\n| "+t("fam")+" | "+t("score")+" |\n|---|---|\n"+fams.map(function(x){return "| "+nm(x.f)+" | "+(x.score==null?"–":x.score.toFixed(1))+" / 4 |"}).join("\n")+"\n\n## "+t("planH")+"\n\n";
+ if(!gaps.length)md+=t("none")+"\n";else{[0,1,2].forEach(function(p){var g=gaps.filter(function(_,i){return Math.min(2,Math.floor(i/third))===p});if(!g.length)return;md+="### "+t("ph")[p]+"\n\n| "+t("fam")+" | "+t("ctl")+" | "+t("score")+" | "+t("action")+" |\n|---|---|---|---|\n"+g.map(function(x){return "| "+nm(x.f).replace(/\s*\(.*\)/,"")+" | "+nm(x.q)+" | "+x.v+" | "+x.q.a[lang]+" |"}).join("\n")+"\n\n"})}
+ window.__md=md;document.getElementById("prev").textContent=md;
+ MD.results.save("nca-gap",{overall:+overall.toFixed(2),gaps:gaps.length,critical:crit,families:fams.map(function(x){return {id:x.f.id,score:x.score}})});
+}
+document.addEventListener("click",function(e){var b=e.target.closest("[data-k]");if(!b)return;var v=b.dataset.v==="na"?"na":+b.dataset.v;A[b.dataset.k]=A[b.dataset.k]===v?undefined:v;render()});
+["org","contact","sector"].forEach(function(i){document.getElementById(i).addEventListener("input",calc)});
+document.getElementById("lang-en").onclick=function(){lang="en";this.classList.add("on");document.getElementById("lang-ar").classList.remove("on");render()};
+document.getElementById("lang-ar").onclick=function(){lang="ar";this.classList.add("on");document.getElementById("lang-en").classList.remove("on");render()};
+MD.profile.bind({org:"#org",contact:"#contact",sector:"#sector"});
+var S=MD.state("nca-gap",function(){return {A:A,lang:lang,org:org.value,contact:contact.value,sector:sector.value}},function(d){A=d.A||{};lang=d.lang||"en";if(d.org)org.value=d.org;if(d.contact)contact.value=d.contact;if(d.sector)sector.value=d.sector;document.getElementById("lang-"+lang).click()});
+document.getElementById("b-json").onclick=S.exportJSON;document.getElementById("b-reset").onclick=function(){if(confirm("Clear saved assessment?"))S.clear()};
+document.getElementById("b-load").onchange=function(){if(this.files[0])S.importJSON(this.files[0])};
+MD.exportBar("#exp",function(){return "nca-pdpl-gap-assessment-"+lang},function(){return t("title")},function(){return window.__md},function(){return lang==="ar"?"rtl":""});
+render();
+
+</script>
+</body>
+</html>

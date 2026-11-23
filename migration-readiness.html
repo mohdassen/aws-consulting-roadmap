@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Migration Readiness (6R) Assessment — Mohammad Dassen</title>
+<meta name="description" content="Classify your application portfolio into the 6Rs (Retire, Retain, Repurchase, Rehost, Replatform, Refactor), get a wave plan, and export a client-ready migration readiness report.">
+<meta name="keywords" content="AWS migration 6R, migration readiness assessment, rehost replatform refactor, AWS MGN, data center migration Saudi, migration wave plan">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/migration-readiness.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/migration-readiness.html">
+<meta property="og:title" content="Migration Readiness (6R) Assessment">
+<meta property="og:description" content="Classify your application portfolio into the 6Rs (Retire, Retain, Repurchase, Rehost, Replatform, Refactor), get a wave plan, and export a client-ready migration readiness report.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Migration Readiness (6R) Assessment">
+<meta name="twitter:description" content="Classify your application portfolio into the 6Rs (Retire, Retain, Repurchase, Rehost, Replatform, Refactor), get a wave plan, and export a client-ready migration readiness report.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "Migration Readiness (6R) Assessment",
+ "description": "Classify your application portfolio into the 6Rs (Retire, Retain, Repurchase, Rehost, Replatform, Refactor), get a wave plan, and export a client-ready migration readiness report.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/migration-readiness.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">Migration Planning</span><h1>Migration Readiness (6R) Assessment</h1><p>Turn an application inventory into 6R recommendations, a portfolio chart and a three-wave migration plan.</p></div>
+<div class="wrap">
+
+<div class="card"><h2>Workload inventory</h2><p class="sub">Add each application/workload. The engine applies transparent rules to suggest a 6R strategy and migration wave. Treat the output as a starting hypothesis to validate in discovery.</p>
+<div class="grid3"><div><label for="org">Organisation</label><input id="org"></div><div><label for="contact">Prepared by</label><input id="contact"></div><div><label for="tz">Target region</label><select id="tz"><option>me-south-1 (Bahrain)</option><option>me-central-1 (UAE)</option><option>eu-central-1 (Frankfurt)</option></select></div></div>
+<div class="bar"><button class="btn gold" id="add">＋ Add workload</button><button class="btn" id="demo">Load sample data</button><button class="btn sm" id="b-json">⬇ Save session</button><label class="btn sm" style="margin:0;text-transform:none">⬆ Load<input type="file" id="b-load" accept=".json" hidden></label><button class="btn sm danger" id="b-reset">Reset</button></div>
+<div style="overflow:auto"><table class="t" id="tbl"><thead><tr><th>Name</th><th>Business criticality</th><th>Technical complexity</th><th>Flags</th><th>Strategy</th><th></th></tr></thead><tbody></tbody></table></div></div>
+<div class="card" id="res"><h2>Portfolio analysis</h2><div class="kpis" id="kpis"></div><div class="grid2"><div class="chart-box"><svg id="donut" viewBox="0 0 380 240" width="100%"></svg></div><div class="chart-box" id="legend"></div></div></div>
+<div class="card"><h2>Wave plan</h2><p class="sub">Wave 1 builds confidence (low risk), later waves take on critical and complex systems after the landing zone and runbooks mature.</p><div id="waves"></div></div>
+<div class="card no-print"><h2>Export report</h2><div class="bar" id="exp"></div><div class="preview" id="prev"></div></div>
+
+</div>
+<footer>🚚 Migration Readiness (6R) Assessment · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script>
+
+var S6={retire:{n:"Retire",c:"#94a3b8",d:"Decommission — no business value or duplicate."},retain:{n:"Retain",c:"#f87171",d:"Keep on-premises for now (residency, latency or regulatory constraint)."},repurchase:{n:"Repurchase",c:"#fb923c",d:"Move to SaaS / commercial alternative."},rehost:{n:"Rehost",c:"#60a5fa",d:"Lift-and-shift to EC2 (e.g. AWS MGN)."},replatform:{n:"Replatform",c:"#34d399",d:"Lift-and-optimise: managed DB/containers with minimal code change."},refactor:{n:"Refactor",c:"#c084fc",d:"Re-architect to cloud-native for agility and scale."}};
+var FL=[["unused","Unused / duplicate"],["saas","SaaS equivalent available"],["resid","Residency / latency / regulatory block"],["eos","End-of-support OS/app"],["db","Database can be managed (RDS/Aurora)"],["scale","Needs elasticity / modernisation"],["lic","Licence constraint (Oracle/SQL)"]];
+var W=[];
+function rec(w){var f=w.flags||{};
+ if(f.unused)return "retire";if(f.resid)return "retain";if(f.saas)return "repurchase";
+ if(f.scale&&w.crit>=3&&w.cx<=3)return "refactor";
+ if(f.db||f.eos&&w.cx<=3)return "replatform";
+ if(f.lic&&w.cx>=4)return "rehost";return "rehost"}
+function wave(w,s){if(s==="retire")return 0;if(s==="retain")return 0;var sc=w.cx*1.2+w.crit; if(s==="repurchase")sc-=2; if(s==="refactor")sc+=3;
+ return sc<=4?1:sc<=7?2:3}
+function row(w,i){return '<tr><td><input data-i="'+i+'" data-f="name" value="'+(w.name||"").replace(/"/g,"&quot;")+'" placeholder="App name" style="min-width:140px"></td>'+
+ '<td><select style="min-width:150px" data-i="'+i+'" data-f="crit">'+[1,2,3,4,5].map(function(n){return '<option value="'+n+'"'+(w.crit===n?" selected":"")+'>'+n+(n===1?" · Low":n===5?" · Mission-critical":"")+'</option>'}).join("")+'</select></td>'+
+ '<td><select style="min-width:150px" data-i="'+i+'" data-f="cx">'+[1,2,3,4,5].map(function(n){return '<option value="'+n+'"'+(w.cx===n?" selected":"")+'>'+n+(n===1?" · Simple":n===5?" · Highly complex":"")+'</option>'}).join("")+'</select></td>'+
+ '<td style="min-width:250px">'+FL.map(function(f){return '<label style="display:inline-block;margin:2px 8px 2px 0;text-transform:none;font-weight:400;letter-spacing:0"><input type="checkbox" style="width:auto" data-i="'+i+'" data-fl="'+f[0]+'"'+((w.flags||{})[f[0]]?" checked":"")+'> '+f[1]+'</label>'}).join("")+'</td>'+
+ '<td id="st'+i+'"></td><td><button class="btn sm danger" data-del="'+i+'">✕</button></td></tr>'}
+function draw(){document.querySelector("#tbl tbody").innerHTML=W.map(row).join("")||'<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:24px">No workloads yet — add one or load the sample data.</td></tr>';calc()}
+function calc(){
+ var cnt={retire:0,retain:0,repurchase:0,rehost:0,replatform:0,refactor:0},waves={0:[],1:[],2:[],3:[]};
+ W.forEach(function(w,i){var s=rec(w);cnt[s]++;var wv=wave(w,s);waves[wv].push({w:w,s:s});var el=document.getElementById("st"+i);if(el)el.innerHTML='<span class="pill" style="color:'+S6[s].c+';border-color:'+S6[s].c+'">'+S6[s].n+'</span> <span class="pill">'+(wv?"Wave "+wv:"No wave")+'</span>'});
+ var tot=W.length,mig=tot-cnt.retire-cnt.retain;
+ document.getElementById("kpis").innerHTML='<div class="kpi"><b>'+tot+'</b><span>Workloads</span></div><div class="kpi"><b>'+mig+'</b><span>To migrate</span></div><div class="kpi"><b>'+(cnt.rehost+cnt.replatform)+'</b><span>Rehost / Replatform</span></div><div class="kpi"><b>'+(cnt.refactor+cnt.repurchase)+'</b><span>Refactor / Repurchase</span></div>';
+ // donut
+ var cx=110,cy=120,r=80,sw=34,a0=-Math.PI/2,svg="",C=2*Math.PI*r,off=0;
+ if(!tot)svg='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#1a1f2e" stroke-width="'+sw+'"/>';
+ Object.keys(S6).forEach(function(k){if(!cnt[k])return;var len=cnt[k]/tot*C;svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+S6[k].c+'" stroke-width="'+sw+'" stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';off+=len});
+ svg+='<text x="'+cx+'" y="'+(cy+6)+'" text-anchor="middle" font-size="24" font-weight="700" fill="#e8edf5">'+tot+'</text>';
+ var y=40;Object.keys(S6).forEach(function(k){svg+='<rect x="225" y="'+(y-10)+'" width="12" height="12" rx="3" fill="'+S6[k].c+'"/><text x="243" y="'+y+'" font-size="12" fill="#c8d0e0">'+S6[k].n+' · '+cnt[k]+'</text>';y+=24});
+ document.getElementById("donut").innerHTML=svg;
+ document.getElementById("legend").innerHTML=Object.keys(S6).map(function(k){return '<div class="hbar"><span class="n" style="color:'+S6[k].c+';font-weight:700">'+S6[k].n+'</span><span class="tr"><span class="fl" style="display:block;width:'+(tot?cnt[k]/tot*100:0)+'%;background:'+S6[k].c+'"></span></span><span class="v">'+cnt[k]+'</span></div><div style="font-size:.7rem;color:var(--muted);margin:-3px 0 4px 200px">'+S6[k].d+'</div>'}).join("");
+ var titles=["Not migrating (retire / retain)","Wave 1 · Foundation & quick wins","Wave 2 · Core business systems","Wave 3 · Critical & complex"];
+ document.getElementById("waves").innerHTML=[1,2,3,0].map(function(n){return '<div style="margin-bottom:14px"><b style="font-size:.85rem">'+titles[n]+' <span class="pill">'+waves[n].length+'</span></b>'+(waves[n].length?'<div style="margin-top:6px">'+waves[n].map(function(x){return '<span class="pill" style="margin:2px;color:'+S6[x.s].c+';border-color:'+S6[x.s].c+'">'+(x.w.name||"Unnamed")+' · '+S6[x.s].n+'</span>'}).join("")+'</div>':'<div style="font-size:.78rem;color:var(--muted)">—</div>')+'</div>'}).join("");
+ var md="# Migration Readiness Assessment (6R)\n\n**Organisation:** "+(org.value||"—")+"  \n**Prepared by:** "+(contact.value||"—")+"  \n**Target region:** "+tz.value+"  \n**Date:** "+new Date().toISOString().slice(0,10)+"\n\n> Rule-based starting hypothesis; validate each strategy during discovery (dependency mapping, performance baselines, licensing).\n\n## Portfolio summary\n\n| Strategy | Count | Meaning |\n|---|---|---|\n"+Object.keys(S6).map(function(k){return "| "+S6[k].n+" | "+cnt[k]+" | "+S6[k].d+" |"}).join("\n")+"\n\n## Workload decisions\n\n| Workload | Criticality | Complexity | Strategy | Wave |\n|---|---|---|---|---|\n"+W.map(function(w){var s=rec(w);return "| "+(w.name||"Unnamed")+" | "+w.crit+" | "+w.cx+" | "+S6[s].n+" | "+(wave(w,s)||"—")+" |"}).join("\n")+"\n\n## Wave plan\n\n"+[1,2,3,0].map(function(n){return "### "+titles[n]+"\n\n"+(waves[n].length?waves[n].map(function(x){return "- "+(x.w.name||"Unnamed")+" — "+S6[x.s].n}).join("\n"):"- None")+"\n"}).join("\n")+"\n## Recommended next steps\n\n1. Run discovery (AWS Application Discovery Service / MGN agentless) to confirm dependencies.\n2. Complete landing zone and security guardrails before Wave 1.\n3. Build a TCO baseline for Wave 1–2 and agree success criteria.\n4. Establish cutover and rollback runbooks per wave.\n";
+ window.__md=md;document.getElementById("prev").textContent=md;
+ MD.results.save("migration",{total:tot,counts:cnt});
+}
+document.getElementById("add").onclick=function(){W.push({name:"",crit:3,cx:3,flags:{}});draw()};
+document.getElementById("demo").onclick=function(){W=[{name:"HR Portal",crit:2,cx:2,flags:{eos:1}},{name:"Student Information System",crit:5,cx:4,flags:{db:1,lic:1}},{name:"Email Gateway",crit:3,cx:1,flags:{saas:1}},{name:"Legacy Reporting",crit:1,cx:2,flags:{unused:1}},{name:"E-Learning Platform",crit:4,cx:3,flags:{scale:1}},{name:"Government Integration Hub",crit:5,cx:5,flags:{resid:1}},{name:"File Servers",crit:2,cx:2,flags:{}}];draw()};
+document.querySelector("#tbl").addEventListener("input",function(e){var t=e.target,i=t.dataset.i;if(i==null)return;if(t.dataset.f){W[i][t.dataset.f]=t.dataset.f==="name"?t.value:+t.value}else if(t.dataset.fl){W[i].flags=W[i].flags||{};W[i].flags[t.dataset.fl]=t.checked}calc()});
+document.querySelector("#tbl").addEventListener("click",function(e){var b=e.target.closest("[data-del]");if(b){W.splice(+b.dataset.del,1);draw()}});
+["org","contact","tz"].forEach(function(i){document.getElementById(i).addEventListener("input",calc)});
+MD.profile.bind({org:"#org",contact:"#contact"});
+var SS=MD.state("migration",function(){return {W:W,org:org.value,contact:contact.value,tz:tz.value}},function(d){W=d.W||[];if(d.org)org.value=d.org;if(d.contact)contact.value=d.contact;if(d.tz)tz.value=d.tz});
+document.getElementById("b-json").onclick=SS.exportJSON;document.getElementById("b-reset").onclick=function(){if(confirm("Clear saved workloads?"))SS.clear()};document.getElementById("b-load").onchange=function(){if(this.files[0])SS.importJSON(this.files[0])};
+MD.exportBar("#exp",function(){return "migration-readiness-6r"},function(){return "Migration Readiness Assessment (6R)"},function(){return window.__md});
+draw();
+
+</script>
+</body>
+</html>

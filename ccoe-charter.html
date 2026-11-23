@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud Center of Excellence (CCoE) Charter Builder — Mohammad Dassen</title>
+<meta name="description" content="Build a Cloud Center of Excellence charter: mission, pillars, team, RACI, governance cadence, funding model and KPIs. Export to Word or PDF.">
+<meta name="keywords" content="CCoE charter, cloud center of excellence template, cloud operating model, RACI cloud governance, AWS CCoE Saudi Arabia">
+<meta name="author" content="Mohammad Dassen">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mohdassen.github.io/aws-consulting-roadmap/ccoe-charter.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mohdassen.github.io/aws-consulting-roadmap/ccoe-charter.html">
+<meta property="og:title" content="Cloud Center of Excellence (CCoE) Charter Builder">
+<meta property="og:description" content="Build a Cloud Center of Excellence charter: mission, pillars, team, RACI, governance cadence, funding model and KPIs. Export to Word or PDF.">
+<meta property="og:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<meta property="og:site_name" content="Mohammad Dassen — AWS Cloud Architect">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cloud Center of Excellence (CCoE) Charter Builder">
+<meta name="twitter:description" content="Build a Cloud Center of Excellence charter: mission, pillars, team, RACI, governance cadence, funding model and KPIs. Export to Word or PDF.">
+<meta name="twitter:image" content="https://mohdassen.github.io/aws-consulting-roadmap/og-preview.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "Cloud Center of Excellence (CCoE) Charter Builder",
+ "description": "Build a Cloud Center of Excellence charter: mission, pillars, team, RACI, governance cadence, funding model and KPIs. Export to Word or PDF.",
+ "url": "https://mohdassen.github.io/aws-consulting-roadmap/ccoe-charter.html",
+ "author": {
+  "@type": "Person",
+  "name": "Mohammad Dassen",
+  "jobTitle": "AWS Cloud Architect & Strategic Consultant",
+  "address": {
+   "@type": "PostalAddress",
+   "addressLocality": "Riyadh",
+   "addressCountry": "SA"
+  },
+  "url": "https://mohdassen.github.io/aws-consulting-roadmap/"
+ }
+}
+</script>
+<link rel="stylesheet" href="tools.css">
+</head>
+<body>
+<div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
+<div class="hero"><span class="tag">Operating Model</span><h1>CCoE Charter Builder</h1><p>Define mandate, pillars, team, RACI, cadence and KPIs — and export a board-ready Cloud Center of Excellence charter.</p></div>
+<div class="wrap">
+
+<div class="grid2"><div>
+<div class="card"><h2>1 · Mandate</h2>
+<div class="grid2"><div><label for="org">Organisation</label><input id="org"></div><div><label for="sponsor">Executive sponsor</label><input id="sponsor" placeholder="e.g. Vice President, IT"></div></div>
+<label for="mission">Mission statement</label><textarea id="mission">Enable the organisation to adopt AWS securely, compliantly and cost-effectively by providing guardrails, reusable patterns, skills and governance — so delivery teams move faster with lower risk.</textarea>
+<label for="model">Operating model</label><select id="model"><option value="central">Centralised CCoE (team owns platform)</option><option value="hybrid" selected>Hybrid / federated (CCoE sets standards, teams build)</option><option value="advisory">Advisory CCoE (guidance only)</option></select></div>
+<div class="card"><h2>2 · Pillars in scope</h2><div id="pillars"></div></div>
+<div class="card"><h2>3 · KPIs</h2><div id="kpisel"></div></div>
+</div><div>
+<div class="card"><h2>4 · Team &amp; cadence</h2><div id="roles"></div>
+<div class="grid2"><div><label for="cad">Governance forum cadence</label><select id="cad"><option>Weekly</option><option selected>Bi-weekly</option><option>Monthly</option></select></div><div><label for="fund">Funding model</label><select id="fund"><option>Central IT budget</option><option selected>Hybrid: core funded + chargeback for platform usage</option><option>Full chargeback</option></select></div></div></div>
+<div class="card"><h2>Charter summary</h2><div class="kpis" id="sum"></div><div class="chart-box"><svg id="org-svg" viewBox="0 0 520 210" width="100%"></svg></div></div>
+</div></div>
+<div class="card no-print"><h2>Export charter</h2><div class="bar" id="exp"></div><div class="bar"><button class="btn sm" id="b-json">⬇ Save session</button><label class="btn sm" style="margin:0;text-transform:none">⬆ Load<input type="file" id="b-load" accept=".json" hidden></label><button class="btn sm danger" id="b-reset">Reset</button></div><div class="preview" id="prev"></div></div>
+
+</div>
+<footer>🏛️ Cloud Center of Excellence (CCoE) Charter Builder · <span>Mohammad Dassen</span> · AWS Cloud Advisory · Riyadh, Saudi Arabia</footer>
+<script src="md-core.js"></script>
+<script>
+
+var PIL=[["gov","Cloud governance & policy","Landing zone, SCP guardrails, standards, architecture review board"],["sec","Security & compliance","NCA ECC/CCC, PDPL, security baselines, continuous compliance"],["fin","FinOps","Budgets, tagging, showback/chargeback, rightsizing, commitments"],["plat","Platform engineering","Reusable IaC modules, golden AMIs, CI/CD pipelines, service catalogue"],["ops","Cloud operations","Monitoring, incident management, backup/DR, SLAs"],["skills","Skills & enablement","Training paths, certifications, communities of practice"],["mig","Migration factory","Wave planning, runbooks, cutover support"]];
+var KP=[["Percentage of workloads in compliance with baseline (Security Hub score)"],["Cloud spend variance to budget"],["Tagging coverage of resources"],["Time to provision a compliant environment (days)"],["Number of AWS-certified staff"],["Mean time to detect / respond to security findings"],["Reserved/Savings Plans coverage"],["Workloads migrated per quarter"]];
+var RL=[["Cloud Lead / CCoE Head",1],["Cloud Architect",2],["Security Architect",1],["FinOps Analyst",1],["Platform / DevOps Engineer",2],["Cloud Operations Lead",1],["Training & Change Lead",1]];
+var st={pil:{gov:1,sec:1,fin:1,plat:1},kpi:{0:1,1:1,2:1,3:1},roles:{}};
+RL.forEach(function(r,i){st.roles[i]=r[1]});
+document.getElementById("pillars").innerHTML=PIL.map(function(p){return '<label style="display:flex;gap:10px;text-transform:none;font-weight:500;letter-spacing:0;margin:0;padding:7px 0;border-top:1px solid var(--border);cursor:pointer;font-size:.85rem"><input type="checkbox" style="width:auto;margin-top:4px" data-p="'+p[0]+'"'+(st.pil[p[0]]?" checked":"")+'><span>'+p[1]+'<br><span style="color:var(--muted);font-size:.74rem">'+p[2]+'</span></span></label>'}).join("");
+document.getElementById("kpisel").innerHTML=KP.map(function(k,i){return '<label style="display:flex;gap:10px;text-transform:none;font-weight:500;letter-spacing:0;margin:0;padding:6px 0;cursor:pointer;font-size:.84rem"><input type="checkbox" style="width:auto;margin-top:4px" data-k="'+i+'"'+(st.kpi[i]?" checked":"")+'>'+k[0]+'</label>'}).join("");
+function rolesUI(){document.getElementById("roles").innerHTML=RL.map(function(r,i){return '<div style="display:flex;align-items:center;gap:10px;margin:6px 0"><span style="flex:1;font-size:.85rem">'+r[0]+'</span><input type="number" min="0" max="20" style="width:70px" data-r="'+i+'" value="'+st.roles[i]+'"><span style="font-size:.7rem;color:var(--muted)">FTE</span></div>'}).join("")}
+function v(i){return document.getElementById(i).value}
+var RACI=[["Approve cloud policies & standards","A","R","C","C","I"],["Landing zone & guardrails","A","R","C","I","R"],["Security baseline & compliance","C","C","A/R","I","C"],["FinOps budgets & reporting","A","C","I","R","I"],["Platform modules & pipelines","I","C","C","I","A/R"],["Architecture review of new workloads","A","R","C","C","C"],["Cloud skills & certification plan","A","C","I","I","I"]];
+var COL=["Executive Sponsor","Cloud Lead","Security","FinOps","Platform Team"];
+function calc(){
+ var P=PIL.filter(function(p){return st.pil[p[0]]}),K=KP.filter(function(k,i){return st.kpi[i]}),fte=0;RL.forEach(function(r,i){fte+=+st.roles[i]||0});
+ document.getElementById("sum").innerHTML='<div class="kpi"><b>'+P.length+'</b><span>Pillars</span></div><div class="kpi"><b>'+fte+'</b><span>Core FTE</span></div><div class="kpi"><b>'+K.length+'</b><span>KPIs</span></div>';
+ var svg='<g font-family="Segoe UI" font-size="12" text-anchor="middle"><rect x="190" y="8" width="140" height="40" rx="9" fill="#141820" stroke="#f59e0b"/><text x="260" y="33" fill="#e8edf5" font-weight="700">Executive Sponsor</text><line x1="260" y1="48" x2="260" y2="70" stroke="#6b7a94"/><rect x="190" y="70" width="140" height="40" rx="9" fill="#141820" stroke="#c084fc"/><text x="260" y="95" fill="#e8edf5" font-weight="700">Cloud Lead / CCoE</text><line x1="260" y1="110" x2="260" y2="128" stroke="#6b7a94"/><line x1="55" y1="128" x2="465" y2="128" stroke="#6b7a94"/>';
+ var cols=["Architecture","Security","FinOps","Platform","Enablement"],cc=["#60a5fa","#f87171","#34d399","#2dd4bf","#fb923c"];
+ cols.forEach(function(c,i){var x=55+i*102.5;svg+='<line x1="'+x+'" y1="128" x2="'+x+'" y2="148" stroke="#6b7a94"/><rect x="'+(x-46)+'" y="148" width="92" height="40" rx="9" fill="#141820" stroke="'+cc[i]+'"/><text x="'+x+'" y="173" fill="#e8edf5">'+c+'</text>'});
+ document.getElementById("org-svg").innerHTML=svg+'</g>';
+ var md="# Cloud Centre of Excellence (CCoE) Charter\n\n**Organisation:** "+(v("org")||"—")+"  \n**Executive sponsor:** "+(v("sponsor")||"—")+"  \n**Date:** "+new Date().toISOString().slice(0,10)+"  \n**Version:** 1.0 (Draft)\n\n## 1. Purpose & mission\n\n"+v("mission")+"\n\n## 2. Operating model\n\n"+document.getElementById("model").options[document.getElementById("model").selectedIndex].text+"\n\n## 3. Scope — pillars\n\n"+P.map(function(p){return "- **"+p[1]+"** — "+p[2]}).join("\n")+"\n\n## 4. Team & roles\n\n| Role | FTE |\n|---|---|\n"+RL.map(function(r,i){return +st.roles[i]?"| "+r[0]+" | "+st.roles[i]+" |":""}).filter(Boolean).join("\n")+"\n| **Total** | **"+fte+"** |\n\n## 5. RACI\n\n| Activity | "+COL.join(" | ")+" |\n|---|"+COL.map(function(){return "---"}).join("|")+"|\n"+RACI.map(function(r){return "| "+r.join(" | ")+" |"}).join("\n")+"\n\n*R = Responsible, A = Accountable, C = Consulted, I = Informed*\n\n## 6. Governance & cadence\n\n- **Cloud governance forum:** "+v("cad")+"\n- **Architecture review board:** every new workload prior to production go-live\n- **Executive steering review:** quarterly, reviewing KPIs below\n- **Decision rights:** CCoE sets standards and guardrails; delivery teams own workload design within them; exceptions require ARB approval with a time-boxed waiver\n\n## 7. Funding model\n\n"+v("fund")+"\n\n## 8. KPIs\n\n"+K.map(function(k){return "- "+k[0]}).join("\n")+"\n\n## 9. 12-month roadmap\n\n| Quarter | Focus |\n|---|---|\n| Q1 | Charter approval, team staffing, landing zone and baseline guardrails |\n| Q2 | Service catalogue v1, tagging & FinOps reporting, first migration wave |\n| Q3 | Compliance automation (Security Hub / Config), skills programme |\n| Q4 | Self-service platform, maturity reassessment, charter review |\n\n## 10. Approval\n\n| Name | Role | Signature | Date |\n|---|---|---|---|\n| | Executive Sponsor | | |\n| | Cloud Lead | | |\n| | Head of Security | | |\n";
+ window.__md=md;document.getElementById("prev").textContent=md;MD.results.save("ccoe",{pillars:P.length,fte:fte});
+}
+document.addEventListener("change",function(e){var t=e.target;if(t.dataset.p)st.pil[t.dataset.p]=t.checked?1:0;if(t.dataset.k)st.kpi[t.dataset.k]=t.checked?1:0;if(t.dataset.r)st.roles[t.dataset.r]=t.value});
+document.addEventListener("input",calc);document.addEventListener("change",calc);
+MD.profile.bind({org:"#org"});
+var SS=MD.state("ccoe",function(){return {st:st,org:v("org"),sponsor:v("sponsor"),mission:v("mission"),model:v("model"),cad:v("cad"),fund:v("fund")}},function(d){st=d.st||st;["org","sponsor","mission","model","cad","fund"].forEach(function(k){if(d[k])document.getElementById(k).value=d[k]});[].forEach.call(document.querySelectorAll("[data-p]"),function(c){c.checked=!!st.pil[c.dataset.p]});[].forEach.call(document.querySelectorAll("[data-k]"),function(c){c.checked=!!st.kpi[c.dataset.k]});rolesUI()});
+document.getElementById("b-json").onclick=SS.exportJSON;document.getElementById("b-reset").onclick=function(){if(confirm("Clear saved charter?"))SS.clear()};document.getElementById("b-load").onchange=function(){if(this.files[0])SS.importJSON(this.files[0])};
+MD.exportBar("#exp",function(){return "ccoe-charter"},function(){return "Cloud Centre of Excellence Charter"},function(){return window.__md});
+rolesUI();calc();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+/* Sets data-theme before first paint (no flash). Preference: localStorage md.theme, else system. */
+(function(){try{var t=localStorage.getItem("md.theme");if(t==='"light"'||t==='"dark"'){t=JSON.parse(t)}else{t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","dark")}})();

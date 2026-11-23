@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="theme-init.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Work With Me — AWS Advisory Engagements — Mohammad Dassen</title>
 <meta name="description" content="Fixed-scope AWS advisory engagements in Saudi Arabia: 5-day Well-Architected Review, NCA/PDPL cloud gap assessment, and cloud governance workshop.">
@@ -40,23 +41,24 @@
 }
 </script>
 <link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
-<div class="hero"><span class="tag">Advisory Engagements</span><h1>Work With <span style='color:#f59e0b'>Me</span></h1><p>Three fixed-scope engagements for Saudi enterprises, universities and government entities moving to AWS.</p></div>
+<div class="hero"><span class="tag">Advisory Engagements</span><h1>Work With <span style='color:var(--gold)'>Me</span></h1><p>Three fixed-scope engagements for Saudi enterprises, universities and government entities moving to AWS.</p></div>
 <div class="wrap">
 
 <div class="card"><h2>Fixed-scope engagements for Saudi cloud teams</h2><p class="sub">20+ years in infrastructure · 4× AWS Professional · PMP · ITIL · TOGAF. Clear scope, clear deliverables, clear price range — no open-ended retainers to start.</p>
 <div class="grid3" id="offers"></div></div>
 <div class="card"><h2>How an engagement runs</h2><p class="sub">A predictable path from first conversation to board-ready deliverable.</p>
 <svg viewBox="0 0 1000 120" width="100%" role="img" aria-label="Engagement process: Discover, Assess, Recommend, Hand-over">
-<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f59e0b"/></marker></defs>
-<g font-family="Segoe UI" font-size="14" fill="#e8edf5">
-<rect x="10" y="25" width="200" height="70" rx="12" fill="#141820" stroke="#f59e0b"/><text x="110" y="55" text-anchor="middle" font-weight="700">1 · Discover</text><text x="110" y="76" text-anchor="middle" fill="#9aa3bd" font-size="12">30-min scoping call</text>
-<rect x="270" y="25" width="200" height="70" rx="12" fill="#141820" stroke="#60a5fa"/><text x="370" y="55" text-anchor="middle" font-weight="700">2 · Assess</text><text x="370" y="76" text-anchor="middle" fill="#9aa3bd" font-size="12">Workshops + evidence review</text>
-<rect x="530" y="25" width="200" height="70" rx="12" fill="#141820" stroke="#c084fc"/><text x="630" y="55" text-anchor="middle" font-weight="700">3 · Recommend</text><text x="630" y="76" text-anchor="middle" fill="#9aa3bd" font-size="12">Scored findings + roadmap</text>
-<rect x="790" y="25" width="200" height="70" rx="12" fill="#141820" stroke="#34d399"/><text x="890" y="55" text-anchor="middle" font-weight="700">4 · Hand over</text><text x="890" y="76" text-anchor="middle" fill="#9aa3bd" font-size="12">Exec readout + action plan</text>
-</g><g stroke="#f59e0b" stroke-width="2" marker-end="url(#ar)"><line x1="212" y1="60" x2="266" y2="60"/><line x1="472" y1="60" x2="526" y2="60"/><line x1="732" y1="60" x2="786" y2="60"/></g></svg></div>
+<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--gold)"/></marker></defs>
+<g font-family="Segoe UI" font-size="14" fill="var(--text)">
+<rect x="10" y="25" width="200" height="70" rx="12" fill="var(--s2)" stroke="var(--gold)"/><text x="110" y="55" text-anchor="middle" font-weight="700">1 · Discover</text><text x="110" y="76" text-anchor="middle" fill="var(--muted2)" font-size="12">30-min scoping call</text>
+<rect x="270" y="25" width="200" height="70" rx="12" fill="var(--s2)" stroke="var(--blue)"/><text x="370" y="55" text-anchor="middle" font-weight="700">2 · Assess</text><text x="370" y="76" text-anchor="middle" fill="var(--muted2)" font-size="12">Workshops + evidence review</text>
+<rect x="530" y="25" width="200" height="70" rx="12" fill="var(--s2)" stroke="var(--purple)"/><text x="630" y="55" text-anchor="middle" font-weight="700">3 · Recommend</text><text x="630" y="76" text-anchor="middle" fill="var(--muted2)" font-size="12">Scored findings + roadmap</text>
+<rect x="790" y="25" width="200" height="70" rx="12" fill="var(--s2)" stroke="var(--green)"/><text x="890" y="55" text-anchor="middle" font-weight="700">4 · Hand over</text><text x="890" y="76" text-anchor="middle" fill="var(--muted2)" font-size="12">Exec readout + action plan</text>
+</g><g stroke="var(--gold)" stroke-width="2" marker-end="url(#ar)"><line x1="212" y1="60" x2="266" y2="60"/><line x1="472" y1="60" x2="526" y2="60"/><line x1="732" y1="60" x2="786" y2="60"/></g></svg></div>
 <div class="card"><h2>Request an assessment</h2><p class="sub">Tell me about your environment. This opens an email draft on your device — nothing is stored or sent by this website.</p>
 <form id="lead" class="grid2">
 <div><label for="f-name">Your name</label><input id="f-name" required></div>
@@ -80,7 +82,7 @@ var OFFERS=[
  {k:"war",i:"🏗️",t:"5-Day Well-Architected Review",d:"Structured review across the six pillars for one critical workload.",b:["Pillar-scored findings (HRI/MRI)","Prioritised remediation backlog","Executive readout deck"],p:"From SAR 24,000"},
  {k:"nca",i:"🛡️",t:"NCA/PDPL Cloud Gap Assessment",d:"Control-by-control gap analysis against NCA ECC/CCC and PDPL for your AWS estate.",b:["Maturity score per control family","90-day remediation plan","Audit-ready evidence checklist"],p:"From SAR 33,000"},
  {k:"gov",i:"🌱",t:"Cloud Governance Workshop",d:"Two-day workshop to define landing zone, guardrails, FinOps and CCoE operating model.",b:["Governance framework document","SCP / guardrail starter pack","CCoE charter + RACI"],p:"From SAR 21,000"}];
-document.getElementById("offers").innerHTML=OFFERS.map(function(o){return '<div class="card" style="margin:0"><div style="font-size:1.8rem">'+o.i+'</div><h2 style="margin-top:6px">'+o.t+'</h2><p class="sub">'+o.d+'</p><ul style="margin:0 0 12px 18px;font-size:.82rem;color:#c8d0e0">'+o.b.map(function(x){return "<li>"+x+"</li>"}).join("")+'</ul><span class="pill gold">'+o.p+'</span> <span class="pill">excl. 15% VAT · indicative</span><div class="bar"><button class="btn sm" data-offer="'+o.k+'">Request this →</button></div></div>'}).join("");
+document.getElementById("offers").innerHTML=OFFERS.map(function(o){return '<div class="card" style="margin:0"><div style="font-size:1.8rem">'+o.i+'</div><h2 style="margin-top:6px">'+o.t+'</h2><p class="sub">'+o.d+'</p><ul style="margin:0 0 12px 18px;font-size:.82rem;color:var(--muted2)">'+o.b.map(function(x){return "<li>"+x+"</li>"}).join("")+'</ul><span class="pill gold">'+o.p+'</span> <span class="pill">excl. 15% VAT · indicative</span><div class="bar"><button class="btn sm" data-offer="'+o.k+'">Request this →</button></div></div>'}).join("");
 var sel=document.getElementById("f-offer");sel.innerHTML=OFFERS.map(function(o){return '<option value="'+o.k+'">'+o.t+'</option>'}).join("")+'<option value="other">Something else</option>';
 document.getElementById("offers").addEventListener("click",function(e){var b=e.target.closest("[data-offer]");if(!b)return;sel.value=b.dataset.offer;MD.track("offer-"+b.dataset.offer);document.getElementById("lead").scrollIntoView({behavior:"smooth"})});
 MD.profile.bind({org:"#f-org"});

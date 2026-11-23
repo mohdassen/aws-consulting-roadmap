@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="theme-init.js"></script>
   <meta name="google-site-verification" content="TpQs3HNLAWodOMCC6qg_DQgi5M9wysNPiOdqP6OCASo">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,211 +46,93 @@
   }
   </script>
   <!-- ═══════════════════════════ -->
-<link rel="stylesheet" href="site.css">
-<style>
-  .filter-bar {
-    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; align-items: center;
-  }
-  .filter-btn {
-    font-size: 0.65rem; padding: 5px 14px; border-radius: 20px; font-weight: 600;
-    background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted);
-    cursor: pointer; transition: all 0.2s;
-  }
-  .filter-btn.active, .filter-btn:hover {
-    background: rgba(192,132,252,0.1); border-color: rgba(192,132,252,0.3); color: var(--accent);
-  }
-  .filter-label { font-size: 0.62rem; color: var(--muted); margin-right: 4px; }
-  .cards-count  { font-size: 0.62rem; color: var(--muted); margin-left: auto; }
-</style>
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="home.css">
 </head>
 <body data-no-cta>
+<header class="nav"><div class="nav-in">
+  <a class="brand" href="index.html"><i>MD</i> Mohammad Dassen</a>
+  <nav class="nav-links" aria-label="Primary"><a href="#services">Services</a><a href="#tools">Tools</a><a href="#about">About</a><a href="#contact">Contact</a><a class="btn-x pri" href="work-with-me.html">Work With Me</a></nav>
+</div></header>
 
-<!-- TOPBAR (rendered by JS) -->
-<div id="topbar-mount"></div>
-
-<!-- HERO -->
-<div class="page-hero" id="hero-mount">
-  <div class="hero-eyebrow">☁️ AWS Cloud Architect &amp; Strategic Consultant</div>
-  <h1 class="hero-title">Mohammad <span>Dassen</span></h1>
-  <p class="hero-subtitle" id="hero-role"></p>
-  <div class="chip-row" id="hero-chips"></div>
-  <div class="stats-row" id="hero-stats"></div>
-</div>
-
-<!-- MAIN CONTENT -->
-<div class="site-section">
-  <div class="section-eye">Knowledge Hub</div>
-  <h2 class="section-head">AWS Architecture Resources</h2>
-  <p class="section-sub">A curated collection of interactive tools, roadmaps, compliance checklists, and curriculum guides — built to support my journey from senior IT infrastructure specialist to AWS Strategic Consulting Architect, and to serve as practical tools for enterprise cloud advisory engagements.</p>
-
-  <!-- FILTER BAR -->
-  <div class="filter-bar" id="filter-bar">
-    <span class="filter-label">Filter:</span>
-    <button class="filter-btn active" data-filter="all" onclick="filterCards('all',this)">All</button>
-    <button class="filter-btn" data-filter="Learning"   onclick="filterCards('Learning',this)">Learning</button>
-    <button class="filter-btn" data-filter="Tools"      onclick="filterCards('Tools',this)">Tools</button>
-    <button class="filter-btn" data-filter="Compliance" onclick="filterCards('Compliance',this)">Compliance</button>
-    <button class="filter-btn" data-filter="live"  onclick="filterCards('live',this)">✅ Live</button>
-    <button class="filter-btn" data-filter="soon"  onclick="filterCards('soon',this)">🔜 Coming Soon</button>
-    <span class="cards-count" id="cards-count"></span>
+<main>
+<div class="hero-h"><div class="wrap hero-grid">
+  <div>
+    <div class="eyebrow">AWS Cloud Architect · Riyadh</div>
+    <h1>Cloud governance &amp; migration advisory for <em>Saudi organisations</em></h1>
+    <p class="lead">Twenty years of enterprise infrastructure, now focused on helping universities, government entities and enterprises adopt AWS securely — aligned with NCA, PDPL and Vision 2030.</p>
+    <div class="cta-row"><a class="btn-x pri" href="work-with-me.html">Request an assessment →</a><a class="btn-x" href="#tools">Explore free tools</a></div>
+    <div class="creds"><span class="cred">4× AWS Professional</span><span class="cred">PMP</span><span class="cred">ITIL</span><span class="cred">TOGAF</span></div>
   </div>
-
-  <!-- CARDS -->
-  <div class="cards-grid" id="cards-mount"></div>
-</div>
-
-<hr class="site-divider">
-
-<!-- ABOUT -->
-<div class="site-section" id="about">
-  <div class="section-eye">About</div>
-  <h2 class="section-head">Background &amp; Expertise</h2>
-  <p class="section-sub">Senior IT Infrastructure Specialist with 20+ years of experience, transitioning toward cloud strategic advisory and consulting leadership in the Saudi market.</p>
-
-  <div class="clients-row" id="clients-mount"></div>
-
-  <div class="about-grid">
-    <div class="about-card">
-      <h3>🎯 Consulting Focus</h3>
-      <p>Specializing in cloud transformation advisory for Saudi government entities, universities, and enterprises. Active engagements at PNU and IMAMU covering data center migration, cloud adoption planning, and governance frameworks aligned with Vision 2030 and Digital Government Standard 5.13.2.</p>
-    </div>
-    <div class="about-card">
-      <h3>🏅 Skills &amp; Certifications</h3>
-      <ul class="skill-list">
-        <li><span class="skill-name">Cloud Architecture</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:90%"></div></div></li>
-        <li><span class="skill-name">IT Infrastructure (20+ yrs)</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:96%"></div></div></li>
-        <li><span class="skill-name">AWS Services</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:75%"></div></div></li>
-        <li><span class="skill-name">Executive Advisory</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:72%"></div></div></li>
-        <li><span class="skill-name">Cloud Governance &amp; FinOps</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:65%"></div></div></li>
-        <li><span class="skill-name">NCA · PDPL · NDMO</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:70%"></div></div></li>
-      </ul>
-    </div>
-    <div class="about-card" style="grid-column:1/-1;">
-      <h3>🗺️ AWS Mastery Journey</h3>
-      <div class="tl-wrap" id="timeline-mount"></div>
-    </div>
+  <div class="vis" aria-label="Sample NCA/PDPL assessment output">
+    <h4>Sample output · NCA/PDPL gap assessment</h4>
+    <svg viewBox="0 0 360 300" width="100%" role="img" aria-label="Sample radar chart of control-family maturity">
+      <g fill="none" stroke="var(--border2)">
+        <polygon points="180,40 292,100 292,200 180,260 68,200 68,100"/><polygon points="180,80 257,120 257,180 180,220 103,180 103,120"/><polygon points="180,120 222,140 222,160 180,180 138,160 138,140"/>
+        <line x1="180" y1="150" x2="180" y2="40"/><line x1="180" y1="150" x2="292" y2="100"/><line x1="180" y1="150" x2="292" y2="200"/><line x1="180" y1="150" x2="180" y2="260"/><line x1="180" y1="150" x2="68" y2="200"/><line x1="180" y1="150" x2="68" y2="100"/>
+      </g>
+      <polygon points="180,70 262,112 240,196 180,236 112,176 100,112" fill="var(--gold)" fill-opacity=".18" stroke="var(--gold)" stroke-width="2.5"/>
+      <g fill="var(--gold)"><circle cx="180" cy="70" r="4"/><circle cx="262" cy="112" r="4"/><circle cx="240" cy="196" r="4"/><circle cx="180" cy="236" r="4"/><circle cx="112" cy="176" r="4"/><circle cx="100" cy="112" r="4"/></g>
+      <g font-size="11" fill="var(--muted2)" text-anchor="middle" font-family="Segoe UI"><text x="180" y="30">Governance</text><text x="316" y="100">Identity</text><text x="316" y="212">Data</text><text x="180" y="280">Monitoring</text><text x="44" y="212">Resilience</text><text x="44" y="100">Cloud</text></g>
+    </svg>
+    <small>Illustrative sample — run the free tool to score your own environment</small>
   </div>
-</div>
+</div></div>
 
-<hr class="site-divider">
+<div class="strip"><div class="strip-in" id="stats"></div></div>
 
-<!-- CONTACT -->
-<div class="site-section" id="contact">
-  <div class="section-eye">Connect</div>
-  <h2 class="section-head">Get in Touch</h2>
-  <p class="section-sub" style="margin-bottom:20px;">Open to cloud advisory engagements, consulting partnerships, and strategic conversations about cloud transformation in Saudi Arabia.</p>
-  <div class="contact-row" id="contact-mount"></div>
-</div>
+<section id="services"><div class="wrap">
+  <div class="sec-eye">Advisory engagements</div><h2 class="sec-h">Three fixed-scope ways to work together</h2>
+  <p class="sec-s">Clear scope, clear deliverables and a clear price range — each engagement ends with a board-ready output and a prioritised action plan.</p>
+  <div class="svc">
+    <div class="svc-c"><span class="n">01</span><h3>5-Day Well-Architected Review</h3><p>Structured review of one critical workload across the six AWS pillars.</p><ul><li>Pillar-scored findings</li><li>Prioritised remediation backlog</li><li>Executive readout</li></ul><a class="btn-x" href="work-with-me.html">Details &amp; pricing →</a></div>
+    <div class="svc-c"><span class="n">02</span><h3>NCA / PDPL Cloud Gap Assessment</h3><p>Control-by-control gap analysis for your AWS estate with a 90-day plan.</p><ul><li>Maturity score by control family</li><li>Evidence checklist</li><li>Remediation roadmap</li></ul><a class="btn-x" href="work-with-me.html">Details &amp; pricing →</a></div>
+    <div class="svc-c"><span class="n">03</span><h3>Cloud Governance Workshop</h3><p>Define landing zone, guardrails, FinOps and the CCoE operating model.</p><ul><li>Governance framework document</li><li>SCP guardrail starter pack</li><li>CCoE charter and RACI</li></ul><a class="btn-x" href="work-with-me.html">Details &amp; pricing →</a></div>
+  </div>
+</div></section>
 
-<div class="site-footer" id="footer-mount"></div>
+<section id="tools" style="background:var(--surface);border-block:1px solid var(--border)"><div class="wrap">
+  <div class="sec-eye">Free tools</div><h2 class="sec-h">Interactive tools for cloud teams</h2>
+  <p class="sec-s">Everything runs in your browser — nothing is uploaded. Save progress, then export to Word or PDF.</p>
+  <div class="filters" id="filters"><button class="f on" data-f="all">All</button><button class="f" data-f="Tools">Tools</button><button class="f" data-f="Compliance">Compliance</button><button class="f" data-f="Learning">Learning</button><button class="f" data-f="soon">Coming soon</button><span class="count" id="count"></span></div>
+  <div class="grid" id="grid"></div>
+</div></section>
 
-<!-- Scripts -->
+<section id="about"><div class="wrap">
+  <div class="sec-eye">About</div><h2 class="sec-h">Background &amp; focus</h2>
+  <p class="sec-s">Senior IT Infrastructure Specialist with 20+ years of experience, moving into strategic cloud advisory and governance leadership in the Saudi market.</p>
+  <div class="about">
+    <div class="panel"><h3>Consulting focus</h3><p>Cloud transformation advisory for Saudi government entities, universities and enterprises — data centre migration, cloud adoption planning and governance frameworks aligned with Vision 2030.</p><div class="clients" id="clients"></div></div>
+    <div class="panel"><h3>AWS mastery journey</h3><div class="tl" id="tl"></div></div>
+  </div>
+</div></section>
+
+<section id="contact" style="padding-top:0"><div class="wrap"><div class="contact">
+  <div class="sec-eye">Contact</div><h2 class="sec-h">Let’s talk about your cloud roadmap</h2>
+  <p class="sec-s" style="margin-inline:auto">Open to advisory engagements, partnerships and strategic conversations about cloud transformation in Saudi Arabia.</p>
+  <div class="cta-row" id="contact-row"></div>
+</div></div></section>
+</main>
+<div class="foot" id="foot"></div>
+
 <script src="site-config.js"></script>
 <script>
-  const C = window.SITE_CONFIG;
-  let activeFilter = 'all';
-
-  /* ── TOPBAR ── */
-  const navLinks = [
-    { href:'index.html',              label:'Home',          active:true  },
-    { href:'aws-roadmap.html',        label:'AWS Roadmap',   active:false },
-    { href:'cloud-advisory.html',     label:'Cloud Advisory',active:false },
-    { href:'cloud-best-practices.html',label:'Best Practices',active:false},
-    { href:'nca-pdpl-compliance.html',label:'NCA & PDPL',    active:false },
-    { href:'tco-calculator.html',     label:'TCO Calculator',active:false },
-    { href:'work-with-me.html',       label:'Work With Me',  active:false },
-    { href:'#about',                  label:'About',         active:false },
-    { href:'#contact',                label:'Contact',       active:false },
-  ];
-  document.getElementById('topbar-mount').innerHTML = `
-    <nav class="site-topbar">
-      <div class="topbar-brand">☁️ MD Cloud</div>
-      <div class="topbar-nav">
-        ${navLinks.map(l=>`<a href="${l.href}" class="${l.active?'active':''}">${l.label}</a>`).join('')}
-      </div>
-      <a href="admin.html" class="topbar-admin" id="admin-nav-link">⚙️ Admin</a>
-    </nav>`;
-  // Admin link hidden from public nav by default — access admin.html directly via bookmark.
-  // Set SHOW_ADMIN_LINK to true below if you want it visible in the topbar.
-  const SHOW_ADMIN_LINK = false;
-  if (!SHOW_ADMIN_LINK) document.getElementById('admin-nav-link').style.display = 'none';
-
-  /* ── HERO ── */
-  document.getElementById('hero-role').textContent = C.owner.role;
-  document.getElementById('hero-chips').innerHTML = C.owner.chips.map(c=>`
-    <span class="chip chip-${c.color||'default'}">${c.label}</span>`).join('');
-  document.getElementById('hero-stats').innerHTML = C.owner.stats.map(s=>`
-    <div class="stat-item">
-      <div class="stat-num">${s.num}</div>
-      <div class="stat-label">${s.label}</div>
-    </div>`).join('');
-
-  /* ── CARDS ── */
-  function renderCards(filter) {
-    const cards = [...C.cards]
-      .sort((a,b) => a.order - b.order)
-      .filter(c => {
-        if (filter === 'all')  return true;
-        if (filter === 'live') return c.status === 'live';
-        if (filter === 'soon') return c.status === 'soon';
-        return c.topic === filter;
-      });
-
-    document.getElementById('cards-count').textContent = `${cards.filter(c=>c.status==='live').length} live · ${cards.filter(c=>c.status==='soon').length} coming soon`;
-
-    if (cards.length === 0) {
-      document.getElementById('cards-mount').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:0.8rem;">No resources in this category yet.</div>`;
-      return;
-    }
-
-    document.getElementById('cards-mount').innerHTML = cards.map(c => `
-      <a href="${c.status==='live'?c.url:'#'}"
-         class="card cc-${c.color} card-${c.status}"
-         ${c.status==='live'?'':'onclick="return false"'}>
-        ${c.isNew ? '<div class="card-new-badge">NEW</div>' : ''}
-        <div class="card-icon">${c.icon}</div>
-        <div class="card-type">${c.type}</div>
-        <div class="card-title">${c.title}</div>
-        <div class="card-desc">${c.desc}</div>
-        <div class="card-tags">${c.tags.map(t=>`<span class="card-tag">${t}</span>`).join('')}</div>
-        <div class="card-link">${c.status==='live'?'Open →':'Coming Soon'}</div>
-      </a>`).join('');
-  }
-
-  function filterCards(filter, btn) {
-    activeFilter = filter;
-    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    renderCards(filter);
-  }
-
-  renderCards('all');
-
-  /* ── CLIENTS ── */
-  document.getElementById('clients-mount').innerHTML = C.owner.clients.map(cl=>`
-    <div class="client-chip">${cl.name}<span>${cl.sub}</span></div>`).join('');
-
-  /* ── TIMELINE ── */
-  const tlColors = ['#f59e0b,#d97706','#3b82f6,#2563eb','#8b5cf6,#7c3aed','#10b981,#059669','#ef4444,#dc2626'];
-  document.getElementById('timeline-mount').innerHTML = C.roadmap.map((r,i)=>`
-    <div class="tl-item">
-      <div class="tl-dot" style="background:linear-gradient(135deg,${tlColors[i]||'#6b7a94,#475569'})">${r.dot}</div>
-      <div class="tl-body">
-        <div class="tl-phase">${r.phase}</div>
-        <div class="tl-title">${r.title}</div>
-        <div class="tl-cert">${r.cert}</div>
-      </div>
-    </div>`).join('');
-
-  /* ── CONTACT ── */
-  document.getElementById('contact-mount').innerHTML = `
-    <a href="${C.owner.linkedin}" target="_blank" class="btn-primary">🔗 Connect on LinkedIn</a>
-    <a href="mailto:${C.owner.email}" class="btn-ghost">✉️ Send Email</a>
-    <a href="https://aws.amazon.com/partners/" target="_blank" class="btn-ghost">☁️ AWS Partner Network</a>`;
-
-  /* ── FOOTER ── */
-  document.getElementById('footer-mount').innerHTML = `
-    <p>Built with purpose · <span>${C.owner.name}</span> · ${C.owner.title} · Riyadh, Saudi Arabia · Vision 2030 Aligned</p>`;
+var C=window.SITE_CONFIG;
+document.getElementById("stats").innerHTML=C.owner.stats.map(function(s){return '<div><b>'+s.num+'</b><span>'+s.label+'</span></div>'}).join("");
+var filter="all";
+function render(){
+  var cards=C.cards.slice().sort(function(a,b){return a.order-b.order}).filter(function(c){return filter==="all"||(filter==="soon"?c.status==="soon":c.topic===filter)});
+  var live=cards.filter(function(c){return c.status==="live"}).length;
+  document.getElementById("count").textContent=live+" live · "+(cards.length-live)+" coming soon";
+  document.getElementById("grid").innerHTML=cards.map(function(c){var tag=c.status==="live"?"a":"div";
+    return '<'+tag+(c.status==="live"?' href="'+c.url+'"':'')+' class="tc '+c.status+'">'+(c.isNew?'<span class="badge">NEW</span>':'')+'<div class="ic">'+c.icon+'</div><div class="ty">'+c.type+'</div><h3>'+c.title+'</h3><p>'+c.desc+'</p><div class="tags">'+c.tags.map(function(t){return '<span class="tag">'+t+'</span>'}).join("")+'</div><div class="go">'+(c.status==="live"?"Open tool →":"Coming soon")+'</div></'+tag+'>'}).join("")||'<p class="sec-s">No resources in this category yet.</p>';
+}
+document.getElementById("filters").addEventListener("click",function(e){var b=e.target.closest("[data-f]");if(!b)return;filter=b.dataset.f;[].forEach.call(document.querySelectorAll(".f"),function(x){x.classList.toggle("on",x===b)});render()});
+render();
+document.getElementById("clients").innerHTML=C.owner.clients.map(function(c){return '<div class="cl">'+c.name+'<span>'+c.sub+'</span></div>'}).join("");
+document.getElementById("tl").innerHTML=C.roadmap.map(function(r){return '<div class="tli"><i>'+r.dot+'</i><div><b>'+r.title+'</b><small>'+r.phase+' · '+r.cert+'</small></div></div>'}).join("");
+document.getElementById("contact-row").innerHTML='<a class="btn-x pri" href="work-with-me.html">Request an assessment →</a><a class="btn-x" href="'+C.owner.linkedin+'" target="_blank" rel="noopener">Connect on LinkedIn</a><a class="btn-x" href="mailto:'+C.owner.email+'">'+C.owner.email+'</a>';
+document.getElementById("foot").innerHTML='© '+new Date().getFullYear()+' <span>'+C.owner.name+'</span> · '+C.owner.title+' · Riyadh, Saudi Arabia';
 </script>
 <script src="md-core.js" defer></script>
 </body>

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="theme-init.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Well-Architected Review Template — AWS Consulting Deliverable</title>
   <!-- ═══ SEO & SOCIAL META ═══ -->
@@ -57,8 +58,8 @@
   --surface:  #111116;
   --surface2: #18181f;
   --surface3: #1e1e28;
-  --border:   rgba(255,255,255,0.06);
-  --border2:  rgba(255,255,255,0.11);
+  --border:   color-mix(in srgb,var(--text) 6.0%,transparent);
+  --border2:  color-mix(in srgb,var(--text) 11.0%,transparent);
   --text:     #ecedf2;
   --muted:    #6b6e85;
   --muted2:   #9093aa;
@@ -99,7 +100,7 @@ a { color: inherit; text-decoration: none; }
 
 /* ── HERO ── */
 .hero {
-  background: linear-gradient(160deg, #0c0c14 0%, #0e0e18 55%, #0a0a10 100%);
+  background: radial-gradient(900px 360px at 80% -20%, var(--hero-glow), transparent 70%), var(--surface);
   border-bottom: 1px solid var(--border); padding: 72px 32px 64px;
   text-align: center; position: relative; overflow: hidden;
 }
@@ -166,7 +167,7 @@ a { color: inherit; text-decoration: none; }
   cursor: pointer; font-size: 0.71rem; color: var(--muted2);
   border-left: 2px solid transparent; transition: all 0.15s;
 }
-.sb-item:hover { color: var(--text); background: rgba(255,255,255,0.025); }
+.sb-item:hover { color: var(--text); background: color-mix(in srgb,var(--text) 2.5%,transparent); }
 .sb-item.active { color: var(--gold); background: rgba(232,164,40,0.06); border-left-color: var(--gold); }
 .sb-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .sb-badge { margin-left: auto; font-size: 0.56rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
@@ -208,19 +209,19 @@ a { color: inherit; text-decoration: none; }
 .pc-risk { font-size: 0.6rem; font-weight: 700; margin-top: 7px; display: inline-block; padding: 2px 8px; border-radius: 4px; }
 
 /* Risk badge */
-.risk-high { background: rgba(248,113,113,0.12); color: #f87171; }
-.risk-med  { background: rgba(251,146,60,0.12);  color: #fb923c; }
-.risk-low  { background: rgba(52,211,153,0.12);  color: #34d399; }
+.risk-high { background: rgba(248,113,113,0.12); color:var(--red); }
+.risk-med  { background: rgba(251,146,60,0.12);  color:var(--orange); }
+.risk-low  { background: rgba(52,211,153,0.12);  color:var(--green); }
 .risk-none { background: rgba(107,110,133,0.15); color: var(--muted2); }
 
 /* Table */
 .tbl { width: 100%; border-collapse: collapse; font-size: 0.7rem; margin-bottom: 14px; }
-.tbl th { background: rgba(255,255,255,0.04); color: var(--muted); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+.tbl th { background: color-mix(in srgb,var(--text) 4.0%,transparent); color: var(--muted); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
 .tbl th:not(:first-child) { text-align: center; }
 .tbl td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; line-height: 1.5; }
 .tbl td:not(:first-child) { text-align: center; }
 .tbl tr:last-child td { border-bottom: none; }
-.tbl tr:hover td { background: rgba(255,255,255,0.018); }
+.tbl tr:hover td { background: color-mix(in srgb,var(--text) 1.8%,transparent); }
 
 /* Steps */
 .step { display: flex; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--border); }
@@ -237,10 +238,10 @@ a { color: inherit; text-decoration: none; }
 
 /* Alert */
 .alert { border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; font-size: 0.71rem; line-height: 1.65; display: flex; gap: 10px; }
-.a-gold  { background: rgba(232,164,40,0.07);  border: 1px solid rgba(232,164,40,0.2);  color: #f5c55a; }
-.a-green { background: rgba(52,211,153,0.07);  border: 1px solid rgba(52,211,153,0.2);  color: #34d399; }
-.a-blue  { background: rgba(96,165,250,0.07);  border: 1px solid rgba(96,165,250,0.2);  color: #60a5fa; }
-.a-red   { background: rgba(248,113,113,0.07); border: 1px solid rgba(248,113,113,0.2); color: #f87171; }
+.a-gold  { background: rgba(232,164,40,0.07);  border: 1px solid rgba(232,164,40,0.2);  color:var(--gold); }
+.a-green { background: rgba(52,211,153,0.07);  border: 1px solid rgba(52,211,153,0.2);  color:var(--green); }
+.a-blue  { background: rgba(96,165,250,0.07);  border: 1px solid rgba(96,165,250,0.2);  color:var(--blue); }
+.a-red   { background: rgba(248,113,113,0.07); border: 1px solid rgba(248,113,113,0.2); color:var(--red); }
 
 /* Checklist */
 .checklist { list-style: none; }
@@ -256,14 +257,14 @@ a { color: inherit; text-decoration: none; }
   flex-shrink: 0; display: flex; align-items: center; justify-content: center;
   font-size: 0.62rem; transition: all 0.2s; margin-top: 1px;
 }
-.chk-item.chked .chk-box { background: var(--gold); border-color: var(--gold); color: #09090d; font-weight: 800; }
+.chk-item.chked .chk-box { background: var(--gold); border-color: var(--gold); color:var(--on-gold); font-weight: 800; }
 .chk-item.chked > span { text-decoration: line-through; color: var(--muted); }
 
 /* Progress track */
 .prog-row { display: flex; align-items: center; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--border); }
 .prog-row:last-child { border-bottom: none; }
 .prog-label { font-size: 0.69rem; color: var(--text); min-width: 170px; }
-.prog-track { flex: 1; height: 5px; background: rgba(255,255,255,0.05); border-radius: 5px; overflow: hidden; }
+.prog-track { flex: 1; height: 5px; background: color-mix(in srgb,var(--text) 5.0%,transparent); border-radius: 5px; overflow: hidden; }
 .prog-fill  { height: 100%; border-radius: 5px; transition: width 0.7s ease; }
 .prog-val   { font-size: 0.63rem; color: var(--muted); min-width: 34px; text-align: right; font-family: Georgia, serif; }
 
@@ -280,7 +281,7 @@ a { color: inherit; text-decoration: none; }
 .rl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .rl-name { font-size: 0.71rem; color: var(--text); font-weight: 600; flex: 1; }
 .rl-score { font-size: 0.68rem; color: var(--muted2); font-family: Georgia, serif; }
-.rl-bar-wrap { width: 70px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+.rl-bar-wrap { width: 70px; height: 4px; background: color-mix(in srgb,var(--text) 5.0%,transparent); border-radius: 4px; overflow: hidden; }
 .rl-bar { height: 100%; border-radius: 4px; }
 
 /* ── HEAT MAP GRID ── */
@@ -291,10 +292,10 @@ a { color: inherit; text-decoration: none; }
 }
 .heat-cell:hover { transform: scale(1.06); }
 .heat-label { font-size: 0.55rem; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
-.h-critical { background: rgba(248,113,113,0.25); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
-.h-high     { background: rgba(251,146,60,0.2);  color: #fb923c; border: 1px solid rgba(251,146,60,0.25); }
-.h-med      { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
-.h-low      { background: rgba(52,211,153,0.1);  color: #34d399; border: 1px solid rgba(52,211,153,0.15); }
+.h-critical { background: rgba(248,113,113,0.25); color:var(--red); border: 1px solid rgba(248,113,113,0.3); }
+.h-high     { background: rgba(251,146,60,0.2);  color:var(--orange); border: 1px solid rgba(251,146,60,0.25); }
+.h-med      { background: rgba(251,191,36,0.15); color:var(--gold2); border: 1px solid rgba(251,191,36,0.2); }
+.h-low      { background: rgba(52,211,153,0.1);  color:var(--green); border: 1px solid rgba(52,211,153,0.15); }
 .h-none     { background: rgba(107,110,133,0.1); color: var(--muted2); border: 1px solid var(--border); }
 
 /* ── TEMPLATE EDITOR ── */
@@ -307,7 +308,7 @@ a { color: inherit; text-decoration: none; }
   display: flex; justify-content: space-between; align-items: center;
   cursor: pointer; transition: background 0.15s;
 }
-.ts-header:hover { background: rgba(255,255,255,0.02); }
+.ts-header:hover { background: color-mix(in srgb,var(--text) 2.0%,transparent); }
 .ts-title { font-size: 0.8rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
 .ts-meta  { font-size: 0.62rem; color: var(--muted); }
 .ts-body  { padding: 16px 18px; }
@@ -335,27 +336,27 @@ a { color: inherit; text-decoration: none; }
   padding: 5px 12px; border-radius: 6px; font-size: 0.62rem; font-weight: 700;
   cursor: pointer; border: 1px solid transparent; transition: all 0.15s;
 }
-.risk-opt.active-high { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.4); color: #f87171; }
-.risk-opt.active-med  { background: rgba(251,146,60,0.15);  border-color: rgba(251,146,60,0.4);  color: #fb923c; }
-.risk-opt.active-low  { background: rgba(52,211,153,0.15);  border-color: rgba(52,211,153,0.4);  color: #34d399; }
-.risk-opt:not([class*="active"]) { color: var(--muted2); border-color: var(--border2); background: rgba(255,255,255,0.03); }
+.risk-opt.active-high { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.4); color:var(--red); }
+.risk-opt.active-med  { background: rgba(251,146,60,0.15);  border-color: rgba(251,146,60,0.4);  color:var(--orange); }
+.risk-opt.active-low  { background: rgba(52,211,153,0.15);  border-color: rgba(52,211,153,0.4);  color:var(--green); }
+.risk-opt:not([class*="active"]) { color: var(--muted2); border-color: var(--border2); background: color-mix(in srgb,var(--text) 3.0%,transparent); }
 .risk-opt:hover { opacity: 0.8; }
 
 /* Buttons */
 .btn-primary {
   padding: 9px 20px; border-radius: 8px; font-size: 0.72rem; font-weight: 700;
-  background: linear-gradient(135deg, #d4891c, var(--gold)); color: #09090d;
+  background: linear-gradient(135deg, #d4891c, var(--gold)); color:var(--on-gold);
   border: none; cursor: pointer; transition: opacity 0.2s; font-family: inherit;
   display: inline-flex; align-items: center; gap: 7px;
 }
 .btn-primary:hover { opacity: 0.88; }
 .btn-ghost {
   padding: 9px 18px; border-radius: 8px; font-size: 0.72rem; font-weight: 700;
-  background: rgba(255,255,255,0.04); border: 1px solid var(--border2);
+  background: color-mix(in srgb,var(--text) 4.0%,transparent); border: 1px solid var(--border2);
   color: var(--text); cursor: pointer; font-family: inherit;
   display: inline-flex; align-items: center; gap: 7px; transition: all 0.2s;
 }
-.btn-ghost:hover { background: rgba(255,255,255,0.08); }
+.btn-ghost:hover { background: color-mix(in srgb,var(--text) 8.0%,transparent); }
 .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
 
 /* ── SCORE DASHBOARD ── */
@@ -383,6 +384,7 @@ footer span { color: var(--gold); }
   .hero h1 { font-size: 1.8rem; }
 }
 </style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
@@ -1136,15 +1138,15 @@ COST 4: No AWS Budgets configured — anomalous spend not alerted — Risk: MED"
             <rect x="260" y="195" width="210" height="165" fill="rgba(248,113,113,0.05)" rx="8"/>
 
             <!-- Quadrant borders -->
-            <line x1="50" y1="182" x2="470" y2="182" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-            <line x1="260" y1="20" x2="260" y2="362" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <line x1="50" y1="182" x2="470" y2="182" stroke="color-mix(in srgb,var(--text) 8.0%,transparent)" stroke-width="1"/>
+            <line x1="260" y1="20" x2="260" y2="362" stroke="color-mix(in srgb,var(--text) 8.0%,transparent)" stroke-width="1"/>
 
             <!-- Axes -->
-            <line x1="50" y1="362" x2="470" y2="362" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" marker-end="url(#arr)"/>
-            <line x1="50" y1="362" x2="50"  y2="20"  stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+            <line x1="50" y1="362" x2="470" y2="362" stroke="color-mix(in srgb,var(--text) 15.0%,transparent)" stroke-width="1.5" marker-end="url(#arr)"/>
+            <line x1="50" y1="362" x2="50"  y2="20"  stroke="color-mix(in srgb,var(--text) 15.0%,transparent)" stroke-width="1.5"/>
             <defs>
               <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-                <path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,255,255,0.3)"/>
+                <path d="M0,0 L6,3 L0,6 Z" fill="color-mix(in srgb,var(--text) 30.0%,transparent)"/>
               </marker>
             </defs>
 
@@ -1288,12 +1290,12 @@ function buildRadar() {
     const ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
     ring.setAttribute('cx',cx); ring.setAttribute('cy',cy);
     ring.setAttribute('r',cr); ring.setAttribute('fill','none');
-    ring.setAttribute('stroke','rgba(255,255,255,0.05)'); ring.setAttribute('stroke-width','1');
+    ring.setAttribute('stroke','color-mix(in srgb,var(--text) 5.0%,transparent)'); ring.setAttribute('stroke-width','1');
     ringsG.appendChild(ring);
     if (pct % 40 === 0) {
       const label = document.createElementNS('http://www.w3.org/2000/svg','text');
       label.setAttribute('x',cx+4); label.setAttribute('y',cy-cr+4);
-      label.setAttribute('fill','rgba(255,255,255,0.2)'); label.setAttribute('font-size','7');
+      label.setAttribute('fill','color-mix(in srgb,var(--text) 20.0%,transparent)'); label.setAttribute('font-size','7');
       label.textContent = pct+'%';
       ringsG.appendChild(label);
     }
@@ -1309,7 +1311,7 @@ function buildRadar() {
     const line = document.createElementNS('http://www.w3.org/2000/svg','line');
     line.setAttribute('x1',cx); line.setAttribute('y1',cy);
     line.setAttribute('x2',x); line.setAttribute('y2',y);
-    line.setAttribute('stroke','rgba(255,255,255,0.08)'); line.setAttribute('stroke-width','1');
+    line.setAttribute('stroke','color-mix(in srgb,var(--text) 8.0%,transparent)'); line.setAttribute('stroke-width','1');
     axesG.appendChild(line);
     const lx = cx + (r+20) * Math.cos(angle);
     const ly = cy + (r+20) * Math.sin(angle);

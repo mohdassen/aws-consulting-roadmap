@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="theme-init.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Site Admin — Mohammad Dassen Cloud Portfolio</title>
@@ -18,7 +19,7 @@
     cursor: pointer; font-size: 0.72rem; color: var(--muted);
     transition: all 0.15s; border-left: 2px solid transparent;
   }
-  .asb-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .asb-item:hover { color: var(--text); background: color-mix(in srgb,var(--text) 3.0%,transparent); }
   .asb-item.active { color: var(--accent); background: rgba(192,132,252,0.07); border-left-color: var(--accent); }
 
   /* MAIN */
@@ -32,16 +33,16 @@
 
   /* CARDS TABLE */
   .cards-table { width: 100%; border-collapse: collapse; font-size: 0.71rem; margin-bottom: 16px; }
-  .cards-table th { background: rgba(255,255,255,0.04); color: var(--muted); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .cards-table th { background: color-mix(in srgb,var(--text) 4.0%,transparent); color: var(--muted); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
   .cards-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
-  .cards-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .cards-table tr:hover td { background: color-mix(in srgb,var(--text) 2.0%,transparent); }
   .cards-table tr:last-child td { border-bottom: none; }
 
   /* BADGES */
   .badge { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 0.58rem; font-weight: 700; }
   .b-live { background: rgba(52,211,153,0.12); color: var(--green); }
   .b-soon { background: rgba(107,122,148,0.12); color: var(--muted); }
-  .b-new  { background: rgba(52,211,153,0.9); color: #0a0e1a; }
+  .b-new  { background: rgba(52,211,153,0.9); color:var(--on-gold); }
 
   /* COLOR DOT */
   .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-right: 5px; }
@@ -50,7 +51,7 @@
   .act-btn { padding: 4px 10px; border-radius: 5px; font-size: 0.62rem; font-weight: 700; cursor: pointer; border: none; font-family: inherit; transition: opacity 0.2s; }
   .act-edit   { background: rgba(129,140,248,0.15); color: var(--accent2); }
   .act-del    { background: rgba(248,113,113,0.12); color: var(--red); }
-  .act-up, .act-dn { background: rgba(255,255,255,0.06); color: var(--muted); }
+  .act-up, .act-dn { background: color-mix(in srgb,var(--text) 6.0%,transparent); color: var(--muted); }
   .act-btn:hover { opacity: 0.75; }
 
   /* FORM */
@@ -72,7 +73,7 @@
 
   /* TOGGLE */
   .toggle-wrap { display: flex; align-items: center; gap: 10px; }
-  .toggle { width: 36px; height: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; border: none; }
+  .toggle { width: 36px; height: 20px; background: color-mix(in srgb,var(--text) 10.0%,transparent); border-radius: 10px; cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; border: none; }
   .toggle.on { background: var(--green); }
   .toggle::after { content:''; position:absolute; width:14px; height:14px; background:#fff; border-radius:50%; top:3px; left:3px; transition: left 0.2s; }
   .toggle.on::after { left: 19px; }
@@ -98,7 +99,7 @@
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; display: none; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; width: 100%; max-width: 620px; max-height: 90vh; overflow-y: auto; position: relative; }
-  .modal-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-size: 0.8rem; padding: 4px 10px; cursor: pointer; }
+  .modal-close { position: absolute; top: 16px; right: 16px; background: color-mix(in srgb,var(--text) 6.0%,transparent); border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-size: 0.8rem; padding: 4px 10px; cursor: pointer; }
   .modal-title { font-family: Georgia,serif; font-size: 1.1rem; color: var(--text); margin-bottom: 20px; }
 
   /* ACTIONS ROW */
@@ -113,6 +114,7 @@
     .form-grid  { grid-template-columns: 1fr; }
   }
 </style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
@@ -139,7 +141,7 @@
     <a href="#" class="active">⚙️ Admin Panel</a>
   </div>
   <span id="save-indicator" class="save-indicator">✅ Saved</span>
-  <button onclick="lockAdmin()" style="margin-left:14px;font-size:0.62rem;padding:5px 12px;border-radius:6px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);color:#f87171;font-weight:700;cursor:pointer;white-space:nowrap;">🔒 Lock</button>
+  <button onclick="lockAdmin()" style="margin-left:14px;font-size:0.62rem;padding:5px 12px;border-radius:6px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);color:var(--red);font-weight:700;cursor:pointer;white-space:nowrap;">🔒 Lock</button>
 </nav>
 
 

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="theme-init.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cloud Center of Excellence (CCoE) Charter Builder — Mohammad Dassen</title>
 <meta name="description" content="Build a Cloud Center of Excellence charter: mission, pillars, team, RACI, governance cadence, funding model and KPIs. Export to Word or PDF.">
@@ -40,6 +41,7 @@
 }
 </script>
 <link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
@@ -79,9 +81,9 @@ var COL=["Executive Sponsor","Cloud Lead","Security","FinOps","Platform Team"];
 function calc(){
  var P=PIL.filter(function(p){return st.pil[p[0]]}),K=KP.filter(function(k,i){return st.kpi[i]}),fte=0;RL.forEach(function(r,i){fte+=+st.roles[i]||0});
  document.getElementById("sum").innerHTML='<div class="kpi"><b>'+P.length+'</b><span>Pillars</span></div><div class="kpi"><b>'+fte+'</b><span>Core FTE</span></div><div class="kpi"><b>'+K.length+'</b><span>KPIs</span></div>';
- var svg='<g font-family="Segoe UI" font-size="12" text-anchor="middle"><rect x="190" y="8" width="140" height="40" rx="9" fill="#141820" stroke="#f59e0b"/><text x="260" y="33" fill="#e8edf5" font-weight="700">Executive Sponsor</text><line x1="260" y1="48" x2="260" y2="70" stroke="#6b7a94"/><rect x="190" y="70" width="140" height="40" rx="9" fill="#141820" stroke="#c084fc"/><text x="260" y="95" fill="#e8edf5" font-weight="700">Cloud Lead / CCoE</text><line x1="260" y1="110" x2="260" y2="128" stroke="#6b7a94"/><line x1="55" y1="128" x2="465" y2="128" stroke="#6b7a94"/>';
- var cols=["Architecture","Security","FinOps","Platform","Enablement"],cc=["#60a5fa","#f87171","#34d399","#2dd4bf","#fb923c"];
- cols.forEach(function(c,i){var x=55+i*102.5;svg+='<line x1="'+x+'" y1="128" x2="'+x+'" y2="148" stroke="#6b7a94"/><rect x="'+(x-46)+'" y="148" width="92" height="40" rx="9" fill="#141820" stroke="'+cc[i]+'"/><text x="'+x+'" y="173" fill="#e8edf5">'+c+'</text>'});
+ var svg='<g font-family="Segoe UI" font-size="12" text-anchor="middle"><rect x="190" y="8" width="140" height="40" rx="9" fill="var(--s2)" stroke="var(--gold)"/><text x="260" y="33" fill="var(--text)" font-weight="700">Executive Sponsor</text><line x1="260" y1="48" x2="260" y2="70" stroke="var(--muted)"/><rect x="190" y="70" width="140" height="40" rx="9" fill="var(--s2)" stroke="var(--purple)"/><text x="260" y="95" fill="var(--text)" font-weight="700">Cloud Lead / CCoE</text><line x1="260" y1="110" x2="260" y2="128" stroke="var(--muted)"/><line x1="55" y1="128" x2="465" y2="128" stroke="var(--muted)"/>';
+ var cols=["Architecture","Security","FinOps","Platform","Enablement"],cc=["var(--blue)","var(--red)","var(--green)","var(--teal)","var(--orange)"];
+ cols.forEach(function(c,i){var x=55+i*102.5;svg+='<line x1="'+x+'" y1="128" x2="'+x+'" y2="148" stroke="var(--muted)"/><rect x="'+(x-46)+'" y="148" width="92" height="40" rx="9" fill="var(--s2)" stroke="'+cc[i]+'"/><text x="'+x+'" y="173" fill="var(--text)">'+c+'</text>'});
  document.getElementById("org-svg").innerHTML=svg+'</g>';
  var md="# Cloud Centre of Excellence (CCoE) Charter\n\n**Organisation:** "+(v("org")||"—")+"  \n**Executive sponsor:** "+(v("sponsor")||"—")+"  \n**Date:** "+new Date().toISOString().slice(0,10)+"  \n**Version:** 1.0 (Draft)\n\n## 1. Purpose & mission\n\n"+v("mission")+"\n\n## 2. Operating model\n\n"+document.getElementById("model").options[document.getElementById("model").selectedIndex].text+"\n\n## 3. Scope — pillars\n\n"+P.map(function(p){return "- **"+p[1]+"** — "+p[2]}).join("\n")+"\n\n## 4. Team & roles\n\n| Role | FTE |\n|---|---|\n"+RL.map(function(r,i){return +st.roles[i]?"| "+r[0]+" | "+st.roles[i]+" |":""}).filter(Boolean).join("\n")+"\n| **Total** | **"+fte+"** |\n\n## 5. RACI\n\n| Activity | "+COL.join(" | ")+" |\n|---|"+COL.map(function(){return "---"}).join("|")+"|\n"+RACI.map(function(r){return "| "+r.join(" | ")+" |"}).join("\n")+"\n\n*R = Responsible, A = Accountable, C = Consulted, I = Informed*\n\n## 6. Governance & cadence\n\n- **Cloud governance forum:** "+v("cad")+"\n- **Architecture review board:** every new workload prior to production go-live\n- **Executive steering review:** quarterly, reviewing KPIs below\n- **Decision rights:** CCoE sets standards and guardrails; delivery teams own workload design within them; exceptions require ARB approval with a time-boxed waiver\n\n## 7. Funding model\n\n"+v("fund")+"\n\n## 8. KPIs\n\n"+K.map(function(k){return "- "+k[0]}).join("\n")+"\n\n## 9. 12-month roadmap\n\n| Quarter | Focus |\n|---|---|\n| Q1 | Charter approval, team staffing, landing zone and baseline guardrails |\n| Q2 | Service catalogue v1, tagging & FinOps reporting, first migration wave |\n| Q3 | Compliance automation (Security Hub / Config), skills programme |\n| Q4 | Self-service platform, maturity reassessment, charter review |\n\n## 10. Approval\n\n| Name | Role | Signature | Date |\n|---|---|---|---|\n| | Executive Sponsor | | |\n| | Cloud Lead | | |\n| | Head of Security | | |\n";
  window.__md=md;document.getElementById("prev").textContent=md;MD.results.save("ccoe",{pillars:P.length,fte:fte});

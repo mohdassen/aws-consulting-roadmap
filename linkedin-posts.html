@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="theme-init.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LinkedIn Content Campaign — Mohammad Dassen</title>
 <style>
 :root{
   --bg:#07090f;--surface:#0e1219;--surface2:#141820;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --border:color-mix(in srgb,var(--text) 7.0%,transparent);--border2:color-mix(in srgb,var(--text) 12.0%,transparent);
   --text:#e8edf5;--muted:#6b7a94;
   --gold:#f59e0b;--green:#34d399;--blue:#60a5fa;
   --accent:#c084fc;--red:#f87171;--teal:#2dd4bf;
@@ -27,7 +28,7 @@ h1 span{color:var(--accent);font-style:italic;}
 /* POST CARD */
 .post-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px;}
 .post-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
-.post-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-weight:800;color:#0a0e1a;font-size:0.85rem;flex-shrink:0;}
+.post-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--on-gold);font-size:0.85rem;flex-shrink:0;}
 .post-meta{flex:1;}
 .post-name{font-size:0.8rem;font-weight:700;color:var(--text);}
 .post-role{font-size:0.65rem;color:var(--muted);}
@@ -48,9 +49,9 @@ h1 span{color:var(--accent);font-style:italic;}
 .post-footer{padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
 .metric{font-size:0.65rem;color:var(--muted);display:flex;align-items:center;gap:5px;}
 .metric span{color:var(--text);font-weight:700;}
-.copy-btn{margin-left:auto;padding:7px 16px;border-radius:7px;font-size:0.68rem;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,var(--accent),var(--blue));color:#0a0e1a;transition:opacity 0.2s;}
+.copy-btn{margin-left:auto;padding:7px 16px;border-radius:7px;font-size:0.68rem;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,var(--accent),var(--blue));color:var(--on-gold);transition:opacity 0.2s;}
 .copy-btn:hover{opacity:0.85;}
-.copy-btn.copied{background:var(--green);color:#0a0e1a;}
+.copy-btn.copied{background:var(--green);color:var(--on-gold);}
 
 /* STRATEGY NOTES */
 .strategy-note{background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 10px 10px 0;padding:12px 16px;margin-top:10px;font-size:0.7rem;color:var(--muted);line-height:1.65;}
@@ -70,6 +71,7 @@ h1 span{color:var(--accent);font-style:italic;}
 
 hr{border:none;border-top:1px solid var(--border);margin:28px 0;}
 </style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 

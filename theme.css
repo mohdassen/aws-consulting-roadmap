@@ -1,0 +1,36 @@
+/* ═══════════════════════════════════════════════════════════
+   MD Cloud — Executive design system (light / dark)
+   Loaded last on every page; overrides legacy tokens.
+   ═══════════════════════════════════════════════════════════ */
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0a1020;--surface:#101829;--surface2:#162036;--s2:#162036;--s3:#1d2a45;
+  --border:rgba(160,185,230,.11);--border2:rgba(160,185,230,.20);
+  --text:#eaf0fb;--muted:#8794b0;--muted2:#aab5cd;
+  --accent:#e5b04a;--accent2:#8aa4ff;--gold:#e5b04a;--gold2:#f2c76e;
+  --green:#3ecf9a;--blue:#6ea8fe;--purple:#b79cf5;--red:#f27d7d;--orange:#f0985a;--teal:#38cfc0;
+  --on-gold:#0a1020;--shadow:0 1px 2px rgba(0,0,0,.35),0 8px 28px rgba(0,0,0,.28);--hero-glow:rgba(229,176,74,.10);
+}
+html[data-theme="light"]{
+  color-scheme:light;
+  --bg:#f5f7fb;--surface:#ffffff;--surface2:#eef1f7;--s2:#eef1f7;--s3:#e3e8f1;
+  --border:rgba(15,32,70,.10);--border2:rgba(15,32,70,.18);
+  --text:#0f1b33;--muted:#5a6783;--muted2:#3f4c68;
+  --accent:#9a5b0a;--accent2:#3b57d9;--gold:#9a5b0a;--gold2:#b45309;
+  --green:#047857;--blue:#1d4ed8;--purple:#6d28d9;--red:#b91c1c;--orange:#c2410c;--teal:#0f766e;
+  --on-gold:#ffffff;--shadow:0 1px 2px rgba(15,32,70,.06),0 8px 24px rgba(15,32,70,.07);--hero-glow:rgba(154,91,10,.07);
+}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.hero-title,.section-head{font-family:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;letter-spacing:-.01em}
+::selection{background:var(--gold);color:var(--on-gold)}
+:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+html{scrollbar-color:var(--s3) var(--bg)}
+/* legacy chrome */
+.back-bar,.site-topbar{background:color-mix(in srgb,var(--surface) 88%,transparent)!important;backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--border)!important}
+.back-bar a{color:var(--muted2)!important}.back-bar a:hover{color:var(--accent)!important}
+footer,.site-footer{color:var(--muted)}
+/* theme toggle */
+.md-theme{position:fixed;right:18px;bottom:18px;z-index:9998;width:42px;height:42px;border-radius:50%;border:1px solid var(--border2);background:var(--surface);color:var(--text);box-shadow:var(--shadow);cursor:pointer;font-size:18px;display:grid;place-items:center;transition:transform .15s}
+.md-theme:hover{transform:scale(1.07)}
+@media print{.md-theme{display:none}html[data-theme]{--bg:#fff}}

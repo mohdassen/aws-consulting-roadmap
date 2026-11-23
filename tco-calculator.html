@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="theme-init.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cloud TCO Calculator — AWS vs On-Premises (SAR) | Mohammad Dassen</title>
   <!-- ═══ SEO & SOCIAL META ═══ -->
@@ -46,7 +47,7 @@
 <style>
   :root {
     --bg:#07090f; --surface:#0e1219; --surface2:#141820;
-    --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12);
+    --border:color-mix(in srgb,var(--text) 7.0%,transparent); --border2:color-mix(in srgb,var(--text) 12.0%,transparent);
     --text:#e8edf5; --muted:#6b7a94;
     --green:#34d399; --red:#f87171; --gold:#f59e0b;
     --blue:#60a5fa; --accent:#c084fc; --accent2:#818cf8;
@@ -56,7 +57,7 @@
   body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
 
   /* HEADER */
-  .header{background:linear-gradient(135deg,#070a08,#0d1210,#0a180e);border-bottom:1px solid var(--border);padding:36px 24px 28px;text-align:center;position:relative;overflow:hidden;}
+  .header{background:radial-gradient(900px 360px at 80% -20%,var(--hero-glow),transparent 70%),var(--surface);border-bottom:1px solid var(--border);padding:36px 24px 28px;text-align:center;position:relative;overflow:hidden;}
   .header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(52,211,153,0.08) 0%,transparent 65%);}
   .header-badge{display:inline-block;font-size:0.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--green);font-weight:700;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);padding:4px 14px;border-radius:20px;margin-bottom:14px;}
   .header h1{font-family:Georgia,serif;font-size:1.8rem;color:var(--text);margin-bottom:8px;line-height:1.2;}
@@ -108,12 +109,12 @@
 
   /* COMPARISON TABLE */
   .comp-table{width:100%;border-collapse:collapse;font-size:0.72rem;margin-top:8px;}
-  .comp-table th{background:rgba(255,255,255,0.04);color:var(--muted);font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;padding:8px 14px;text-align:left;border-bottom:1px solid var(--border);}
+  .comp-table th{background:color-mix(in srgb,var(--text) 4.0%,transparent);color:var(--muted);font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;padding:8px 14px;text-align:left;border-bottom:1px solid var(--border);}
   .comp-table th:not(:first-child){text-align:right;}
   .comp-table td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
   .comp-table td:not(:first-child){text-align:right;font-family:Georgia,serif;}
-  .comp-table tr:last-child td{border-bottom:none;font-weight:700;background:rgba(255,255,255,0.02);}
-  .comp-table tr:hover td{background:rgba(255,255,255,0.02);}
+  .comp-table tr:last-child td{border-bottom:none;font-weight:700;background:color-mix(in srgb,var(--text) 2.0%,transparent);}
+  .comp-table tr:hover td{background:color-mix(in srgb,var(--text) 2.0%,transparent);}
   .td-onprem{color:var(--red);}
   .td-aws{color:var(--green);}
   .td-save{color:var(--gold);}
@@ -124,9 +125,9 @@
   .bar-chart{display:flex;flex-direction:column;gap:10px;}
   .bc-row{display:flex;align-items:center;gap:12px;}
   .bc-label{font-size:0.68rem;color:var(--text);min-width:160px;text-align:right;}
-  .bc-track{flex:1;height:22px;background:rgba(255,255,255,0.04);border-radius:6px;overflow:hidden;position:relative;}
+  .bc-track{flex:1;height:22px;background:color-mix(in srgb,var(--text) 4.0%,transparent);border-radius:6px;overflow:hidden;position:relative;}
   .bc-fill{height:100%;border-radius:6px;transition:width 0.6s ease;display:flex;align-items:center;padding-left:8px;}
-  .bc-fill span{font-size:0.62rem;font-weight:700;color:rgba(255,255,255,0.9);white-space:nowrap;}
+  .bc-fill span{font-size:0.62rem;font-weight:700;color:color-mix(in srgb,var(--text) 90.0%,transparent);white-space:nowrap;}
   .bc-onprem{background:linear-gradient(90deg,#dc2626,#f87171);}
   .bc-aws{background:linear-gradient(90deg,#059669,#34d399);}
 
@@ -140,12 +141,12 @@
   /* ALERT */
   .alert{border-radius:10px;padding:11px 15px;margin-bottom:14px;font-size:0.7rem;line-height:1.6;display:flex;gap:9px;}
   .a-green{background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.2);color:var(--green);}
-  .a-gold{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);color:#fbbf24;}
+  .a-gold{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);color:var(--gold2);}
   .a-blue{background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.2);color:var(--blue);}
 
   /* TOGGLE */
   .toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-  .toggle{width:36px;height:20px;background:rgba(255,255,255,0.1);border-radius:10px;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;}
+  .toggle{width:36px;height:20px;background:color-mix(in srgb,var(--text) 10.0%,transparent);border-radius:10px;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;}
   .toggle.on{background:var(--green);}
   .toggle::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left 0.2s;}
   .toggle.on::after{left:19px;}
@@ -162,7 +163,7 @@
   .divider{border:none;border-top:1px solid var(--border);margin:16px 0;}
 
   /* PRINT */
-  .print-btn{padding:10px 20px;border-radius:8px;font-size:0.72rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#0a0e1a;transition:opacity 0.2s;float:right;margin-bottom:16px;}
+  .print-btn{padding:10px 20px;border-radius:8px;font-size:0.72rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;background:linear-gradient(135deg,var(--accent2),var(--accent));color:var(--on-gold);transition:opacity 0.2s;float:right;margin-bottom:16px;}
   .print-btn:hover{opacity:0.85;}
 
   footer{border-top:1px solid var(--border);text-align:center;padding:18px;font-size:0.62rem;color:var(--muted);clear:both;}
@@ -174,15 +175,16 @@
     .qual-grid{grid-template-columns:1fr;}
   }
 </style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <style>
-.md-backbar{background:#0e1219;border-bottom:1px solid rgba(255,255,255,0.07);padding:0 20px;position:sticky;top:0;z-index:999;display:flex;align-items:center;height:46px;font-family:'Segoe UI',system-ui,sans-serif;}
-.md-backbar a{display:flex;align-items:center;gap:7px;font-size:0.72rem;font-weight:600;color:#6b7a94;text-decoration:none;transition:color 0.2s;}
-.md-backbar a:hover{color:#c084fc;}
+.md-backbar{background:var(--surface);border-bottom:1px solid color-mix(in srgb,var(--text) 7.0%,transparent);padding:0 20px;position:sticky;top:0;z-index:999;display:flex;align-items:center;height:46px;font-family:'Segoe UI',system-ui,sans-serif;}
+.md-backbar a{display:flex;align-items:center;gap:7px;font-size:0.72rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.md-backbar a:hover{color:var(--purple);}
 .md-backbar a:hover .md-arrow{transform:translateX(-3px);}
 .md-arrow{font-size:0.9rem;display:inline-block;transition:transform 0.2s;}
-.md-backbar .md-sitename{margin-left:auto;font-size:0.62rem;color:#6b7a94;opacity:0.55;}
+.md-backbar .md-sitename{margin-left:auto;font-size:0.62rem;color:var(--muted);opacity:0.55;}
 </style>
 <div class="md-backbar">
   <a href="index.html"><span class="md-arrow">←</span> Back to Home</a>
@@ -407,7 +409,7 @@
           </div>
         </div>
         <br>
-        <button onclick="calculate(); switchTab('result')" style="padding:10px 24px;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;background:linear-gradient(135deg,#059669,#34d399);color:#0a0e1a;width:100%;letter-spacing:0.5px;">
+        <button onclick="calculate(); switchTab('result')" style="padding:10px 24px;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;background:linear-gradient(135deg,#059669,#34d399);color:var(--on-gold);width:100%;letter-spacing:0.5px;">
           ⚡ Calculate TCO & View Analysis →
         </button>
       </div>

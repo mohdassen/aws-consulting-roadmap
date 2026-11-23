@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="theme-init.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cloud Advisory — Strategic Consulting Mastery | Mohammad Dassen</title>
   <!-- ═══ SEO & SOCIAL META ═══ -->
@@ -48,8 +49,8 @@
     --bg: #07090f;
     --surface: #0e1219;
     --surface2: #141820;
-    --border: rgba(255,255,255,0.07);
-    --border2: rgba(255,255,255,0.12);
+    --border: color-mix(in srgb,var(--text) 7.0%,transparent);
+    --border2: color-mix(in srgb,var(--text) 12.0%,transparent);
     --text: #e8edf5;
     --muted: #6b7a94;
     --accent: #c084fc;
@@ -67,7 +68,7 @@
 
   /* ── Header ── */
   .header {
-    background: linear-gradient(135deg, #0e0812 0%, #0d1018 50%, #0a0e18 100%);
+    background: radial-gradient(900px 360px at 80% -20%, var(--hero-glow), transparent 70%), var(--surface);
     border-bottom: 1px solid var(--border);
     padding: 32px 24px 28px;
     text-align: center;
@@ -95,7 +96,7 @@
   }
   .progress-bar-wrap { max-width: 440px; margin: 0 auto; }
   .progress-label { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--muted); margin-bottom: 6px; }
-  .progress-track { height: 5px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
+  .progress-track { height: 5px; background: color-mix(in srgb,var(--text) 6.0%,transparent); border-radius: 10px; overflow: hidden; }
   .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 10px; transition: width 0.5s ease; }
 
   /* ── Nav Tabs ── */
@@ -124,16 +125,16 @@
     cursor: pointer; transition: all 0.15s; border-left: 2px solid transparent;
     font-size: 0.75rem; color: var(--muted);
   }
-  .sidebar-item:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+  .sidebar-item:hover { background: color-mix(in srgb,var(--text) 3.0%,transparent); color: var(--text); }
   .sidebar-item.active { background: rgba(192,132,252,0.07); color: var(--accent); border-left-color: var(--accent); }
   .sidebar-item.done { color: var(--green); }
-  .sidebar-item.done .si-num { background: var(--green); color: #0a0e1a; }
+  .sidebar-item.done .si-num { background: var(--green); color:var(--on-gold); }
   .si-num {
-    width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.06);
+    width: 22px; height: 22px; border-radius: 50%; background: color-mix(in srgb,var(--text) 6.0%,transparent);
     display: flex; align-items: center; justify-content: center; font-size: 0.6rem;
     font-weight: 700; flex-shrink: 0;
   }
-  .si-num.active-num { background: var(--accent); color: #0a0e1a; }
+  .si-num.active-num { background: var(--accent); color:var(--on-gold); }
 
   /* ── Content Panels ── */
   .panel { display: none; }
@@ -147,7 +148,7 @@
   .module-meta { display: flex; gap: 12px; flex-wrap: wrap; }
   .meta-chip {
     font-size: 0.62rem; padding: 3px 10px; border-radius: 20px; font-weight: 600;
-    background: rgba(255,255,255,0.05); border: 1px solid var(--border2); color: var(--muted);
+    background: color-mix(in srgb,var(--text) 5.0%,transparent); border: 1px solid var(--border2); color: var(--muted);
   }
 
   /* ── Cards ── */
@@ -185,7 +186,7 @@
   .pillar-title { font-size: 0.8rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
   .pillar-desc { font-size: 0.7rem; color: var(--muted); line-height: 1.6; }
   .pillar-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-  .pillar-tag { font-size: 0.6rem; padding: 2px 8px; border-radius: 5px; background: rgba(255,255,255,0.05); color: var(--muted); }
+  .pillar-tag { font-size: 0.6rem; padding: 2px 8px; border-radius: 5px; background: color-mix(in srgb,var(--text) 5.0%,transparent); color: var(--muted); }
 
   /* ── Steps ── */
   .step-list { counter-reset: steps; }
@@ -241,10 +242,10 @@
 
   /* ── Table ── */
   .data-table { width: 100%; border-collapse: collapse; font-size: 0.71rem; margin-bottom: 16px; }
-  .data-table th { background: rgba(255,255,255,0.04); color: var(--muted); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .data-table th { background: color-mix(in srgb,var(--text) 4.0%,transparent); color: var(--muted); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
   .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
   .data-table tr:last-child td { border-bottom: none; }
-  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .data-table tr:hover td { background: color-mix(in srgb,var(--text) 2.0%,transparent); }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 0.6rem; font-weight: 700; }
   .badge-green { background: rgba(52,211,153,0.12); color: var(--green); }
   .badge-gold { background: rgba(245,158,11,0.12); color: var(--gold); }
@@ -269,7 +270,7 @@
   .scenario-desc { font-size: 0.73rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
   .scenario-tasks { list-style: none; }
   .scenario-tasks li {
-    font-size: 0.71rem; color: var(--muted); padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.71rem; color: var(--muted); padding: 6px 0; border-bottom: 1px solid color-mix(in srgb,var(--text) 4.0%,transparent);
     display: flex; gap: 8px; align-items: flex-start;
   }
   .scenario-tasks li::before { content: '→'; color: var(--accent); flex-shrink: 0; }
@@ -280,7 +281,7 @@
   }
   .del-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
   .del-title { font-size: 0.8rem; font-weight: 700; color: var(--text); }
-  .del-type { font-size: 0.6rem; color: var(--muted); background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 5px; }
+  .del-type { font-size: 0.6rem; color: var(--muted); background: color-mix(in srgb,var(--text) 5.0%,transparent); padding: 3px 8px; border-radius: 5px; }
   .del-structure { font-size: 0.7rem; color: var(--muted); line-height: 1.7; }
   .del-structure strong { color: var(--text); }
 
@@ -293,10 +294,10 @@
     padding: 9px 18px; border-radius: 8px; font-size: 0.72rem; font-weight: 700; cursor: pointer;
     border: none; transition: all 0.2s; font-family: var(--font-body); letter-spacing: 0.3px;
   }
-  .btn-primary { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #0a0e1a; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent2), var(--accent)); color:var(--on-gold); }
   .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-  .btn-ghost { background: rgba(255,255,255,0.05); border: 1px solid var(--border2); color: var(--text); }
-  .btn-ghost:hover { background: rgba(255,255,255,0.09); }
+  .btn-ghost { background: color-mix(in srgb,var(--text) 5.0%,transparent); border: 1px solid var(--border2); color: var(--text); }
+  .btn-ghost:hover { background: color-mix(in srgb,var(--text) 9.0%,transparent); }
 
   /* ── Checklist ── */
   .checklist { list-style: none; }
@@ -312,7 +313,7 @@
     flex-shrink: 0; display: flex; align-items: center; justify-content: center;
     font-size: 0.65rem; transition: all 0.2s;
   }
-  .checklist li.checked .check-box { background: var(--green); border-color: var(--green); color: #0a0e1a; }
+  .checklist li.checked .check-box { background: var(--green); border-color: var(--green); color:var(--on-gold); }
   .checklist li.checked span { text-decoration: line-through; color: var(--muted); }
 
   /* ── Alert ── */
@@ -320,7 +321,7 @@
     border-radius: 10px; padding: 12px 16px; margin-bottom: 14px;
     font-size: 0.72rem; line-height: 1.6; display: flex; gap: 10px; align-items: flex-start;
   }
-  .alert-gold { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: #fbbf24; }
+  .alert-gold { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color:var(--gold2); }
   .alert-green { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); color: var(--green); }
   .alert-blue { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); color: var(--blue); }
 
@@ -333,15 +334,16 @@
     .concept-grid, .waf-grid { grid-template-columns: 1fr; }
   }
 </style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <style>
-.md-backbar{background:#0e1219;border-bottom:1px solid rgba(255,255,255,0.07);padding:0 20px;position:sticky;top:0;z-index:999;display:flex;align-items:center;height:46px;font-family:'Segoe UI',system-ui,sans-serif;}
-.md-backbar a{display:flex;align-items:center;gap:7px;font-size:0.72rem;font-weight:600;color:#6b7a94;text-decoration:none;transition:color 0.2s;}
-.md-backbar a:hover{color:#c084fc;}
+.md-backbar{background:var(--surface);border-bottom:1px solid color-mix(in srgb,var(--text) 7.0%,transparent);padding:0 20px;position:sticky;top:0;z-index:999;display:flex;align-items:center;height:46px;font-family:'Segoe UI',system-ui,sans-serif;}
+.md-backbar a{display:flex;align-items:center;gap:7px;font-size:0.72rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.md-backbar a:hover{color:var(--purple);}
 .md-backbar a:hover .md-arrow{transform:translateX(-3px);}
 .md-arrow{font-size:0.9rem;display:inline-block;transition:transform 0.2s;}
-.md-backbar .md-sitename{margin-left:auto;font-size:0.62rem;color:#6b7a94;opacity:0.55;}
+.md-backbar .md-sitename{margin-left:auto;font-size:0.62rem;color:var(--muted);opacity:0.55;}
 </style>
 <div class="md-backbar">
   <a href="index.html"><span class="md-arrow">←</span> Back to Home</a>
@@ -522,32 +524,32 @@
         <div class="waf-grid">
           <div class="waf-card" style="border-color:rgba(245,158,11,0.3); background:rgba(245,158,11,0.05);">
             <div class="waf-icon">⚡</div>
-            <div class="waf-name" style="color:#fbbf24;">Operational Excellence</div>
+            <div class="waf-name" style="color:var(--gold2);">Operational Excellence</div>
             <div class="waf-q" style="color:#92400e8a; color: #a16207;">"Can you run, monitor, and improve your systems effectively?"</div>
           </div>
           <div class="waf-card" style="border-color:rgba(248,113,113,0.3); background:rgba(248,113,113,0.05);">
             <div class="waf-icon">🔐</div>
-            <div class="waf-name" style="color:#f87171;">Security</div>
+            <div class="waf-name" style="color:var(--red);">Security</div>
             <div class="waf-q" style="color:#991b1b; color: #b91c1c;">"Can you protect data, systems, and assets?"</div>
           </div>
           <div class="waf-card" style="border-color:rgba(96,165,250,0.3); background:rgba(96,165,250,0.05);">
             <div class="waf-icon">🔄</div>
-            <div class="waf-name" style="color:#60a5fa;">Reliability</div>
+            <div class="waf-name" style="color:var(--blue);">Reliability</div>
             <div class="waf-q" style="color:#1e40af; color: #2563eb;">"Can you recover from failures and meet demand?"</div>
           </div>
           <div class="waf-card" style="border-color:rgba(52,211,153,0.3); background:rgba(52,211,153,0.05);">
             <div class="waf-icon">📈</div>
-            <div class="waf-name" style="color:#34d399;">Performance Efficiency</div>
+            <div class="waf-name" style="color:var(--green);">Performance Efficiency</div>
             <div class="waf-q" style="color:#065f46; color: #047857;">"Are you using resources efficiently as requirements change?"</div>
           </div>
           <div class="waf-card" style="border-color:rgba(192,132,252,0.3); background:rgba(192,132,252,0.05);">
             <div class="waf-icon">💰</div>
-            <div class="waf-name" style="color:#c084fc;">Cost Optimization</div>
+            <div class="waf-name" style="color:var(--purple);">Cost Optimization</div>
             <div class="waf-q" style="color:#6b21a8; color: #7c3aed;">"Are you spending money on the right things at the right amount?"</div>
           </div>
           <div class="waf-card" style="border-color:rgba(167,243,208,0.3); background:rgba(167,243,208,0.04);">
             <div class="waf-icon">🌱</div>
-            <div class="waf-name" style="color:#6ee7b7;">Sustainability</div>
+            <div class="waf-name" style="color:var(--green);">Sustainability</div>
             <div class="waf-q" style="color:#065f46; color: #059669;">"Are you minimizing environmental impact of your cloud workloads?"</div>
           </div>
         </div>
@@ -662,12 +664,12 @@
           <div class="fw-box fw-blue">💰<br>Financial<br>Management (FinOps)</div>
           <div class="fw-box fw-gold">⚙️<br>Operational<br>Excellence</div>
           <div class="fw-box fw-red">📊<br>Resource &amp;<br>Asset Management</div>
-          <div class="fw-box" style="border: 1px solid rgba(255,255,255,0.1); color: var(--muted);">🎯<br>Strategy &amp;<br>Alignment</div>
+          <div class="fw-box" style="border: 1px solid color-mix(in srgb,var(--text) 10.0%,transparent); color: var(--muted);">🎯<br>Strategy &amp;<br>Alignment</div>
         </div>
       </div>
 
       <div class="pillar" style="border-left: 3px solid #34d399;">
-        <div class="pillar-num" style="background:rgba(52,211,153,0.15); color:#34d399;">1</div>
+        <div class="pillar-num" style="background:rgba(52,211,153,0.15); color:var(--green);">1</div>
         <div class="pillar-content">
           <div class="pillar-title">Security & Compliance Governance</div>
           <div class="pillar-desc">Define who can access what, under what conditions, and with what controls. In Saudi Arabia this includes NCA (National Cybersecurity Authority) compliance, PDPL (Personal Data Protection Law), and CSP cloud security controls. AWS tools: AWS Organizations SCPs, AWS Config Rules, AWS Security Hub, IAM Access Analyzer.</div>
@@ -675,7 +677,7 @@
         </div>
       </div>
       <div class="pillar" style="border-left: 3px solid #60a5fa;">
-        <div class="pillar-num" style="background:rgba(96,165,250,0.15); color:#60a5fa;">2</div>
+        <div class="pillar-num" style="background:rgba(96,165,250,0.15); color:var(--blue);">2</div>
         <div class="pillar-content">
           <div class="pillar-title">FinOps — Cloud Financial Management</div>
           <div class="pillar-desc">FinOps is a cultural and operational practice for shared financial accountability in cloud. Learn the FinOps Framework (finops.org): Inform → Optimize → Operate. AWS tools: AWS Cost Explorer, AWS Budgets, Cost Anomaly Detection, Savings Plans, Reserved Instances. A consultant who saves a client SAR 2M per year earns a percentage of that — this is extremely lucrative work.</div>
@@ -683,7 +685,7 @@
         </div>
       </div>
       <div class="pillar" style="border-left: 3px solid #f59e0b;">
-        <div class="pillar-num" style="background:rgba(245,158,11,0.15); color:#f59e0b;">3</div>
+        <div class="pillar-num" style="background:rgba(245,158,11,0.15); color:var(--gold);">3</div>
         <div class="pillar-content">
           <div class="pillar-title">AWS Control Tower & Landing Zone</div>
           <div class="pillar-desc">For enterprise clients with multiple AWS accounts, Control Tower provides a pre-configured governance foundation. Landing Zones standardize the multi-account environment. As a consultant, you design, deploy, and advise on Landing Zone configurations — this is high-value, high-complexity work. Learn: Account Vending Machine, Guardrails (preventive + detective), Log Archive, Audit accounts.</div>
@@ -691,7 +693,7 @@
         </div>
       </div>
       <div class="pillar" style="border-left: 3px solid #c084fc;">
-        <div class="pillar-num" style="background:rgba(192,132,252,0.15); color:#c084fc;">4</div>
+        <div class="pillar-num" style="background:rgba(192,132,252,0.15); color:var(--purple);">4</div>
         <div class="pillar-content">
           <div class="pillar-title">Tagging Strategies & Resource Management</div>
           <div class="pillar-desc">A proper tagging strategy is the foundation of every other governance practice — without it, you cannot allocate costs, enforce policies, or manage resources at scale. Define: mandatory tags (Environment, CostCenter, Owner, Project, Compliance), enforcement mechanisms (SCPs, AWS Config), and reporting dashboards.</div>
@@ -811,21 +813,21 @@
       <div class="card">
         <div class="card-title"><span class="icon">🔢</span> The 3-Layer TCO Framework</div>
         <div class="pillar" style="border-left:3px solid #f59e0b; margin-bottom:8px;">
-          <div class="pillar-num" style="background:rgba(245,158,11,0.15); color:#f59e0b;">L1</div>
+          <div class="pillar-num" style="background:rgba(245,158,11,0.15); color:var(--gold);">L1</div>
           <div class="pillar-content">
             <div class="pillar-title">Direct Infrastructure Costs</div>
             <div class="pillar-desc">Hardware (servers, storage, networking), software licensing, data center lease/build costs, power and cooling, network connectivity. These are the visible costs most organizations track. Map each on-premises cost to its cloud equivalent.</div>
           </div>
         </div>
         <div class="pillar" style="border-left:3px solid #60a5fa; margin-bottom:8px;">
-          <div class="pillar-num" style="background:rgba(96,165,250,0.15); color:#60a5fa;">L2</div>
+          <div class="pillar-num" style="background:rgba(96,165,250,0.15); color:var(--blue);">L2</div>
           <div class="pillar-content">
             <div class="pillar-title">Operational & Hidden Costs</div>
             <div class="pillar-desc">Staff time for maintenance and patching, unplanned downtime costs (revenue loss per hour × MTTR), security incident response costs, compliance audit costs, hardware refresh cycles every 3–5 years. These are often 2–3x larger than direct costs and are the most powerful part of the TCO argument.</div>
           </div>
         </div>
         <div class="pillar" style="border-left:3px solid #c084fc;">
-          <div class="pillar-num" style="background:rgba(192,132,252,0.15); color:#c084fc;">L3</div>
+          <div class="pillar-num" style="background:rgba(192,132,252,0.15); color:var(--purple);">L3</div>
           <div class="pillar-content">
             <div class="pillar-title">Business Value & Opportunity Cost</div>
             <div class="pillar-desc">Speed-to-market improvement (new features deployed in days vs. months), ability to scale for peak demand without over-provisioning, access to AI/ML and advanced services, competitive agility. This layer justifies premium pricing for your advisory work.</div>

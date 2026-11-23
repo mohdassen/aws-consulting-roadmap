@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="theme-init.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Migration Readiness (6R) Assessment — Mohammad Dassen</title>
 <meta name="description" content="Classify your application portfolio into the 6Rs (Retire, Retain, Repurchase, Rehost, Replatform, Refactor), get a wave plan, and export a client-ready migration readiness report.">
@@ -40,6 +41,7 @@
 }
 </script>
 <link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <div class="back-bar"><a href="index.html" id="back-link">← Back to Home</a><span class="site-id">Mohammad Dassen · AWS Cloud Advisory</span></div>
@@ -59,7 +61,7 @@
 <script src="md-core.js"></script>
 <script>
 
-var S6={retire:{n:"Retire",c:"#94a3b8",d:"Decommission — no business value or duplicate."},retain:{n:"Retain",c:"#f87171",d:"Keep on-premises for now (residency, latency or regulatory constraint)."},repurchase:{n:"Repurchase",c:"#fb923c",d:"Move to SaaS / commercial alternative."},rehost:{n:"Rehost",c:"#60a5fa",d:"Lift-and-shift to EC2 (e.g. AWS MGN)."},replatform:{n:"Replatform",c:"#34d399",d:"Lift-and-optimise: managed DB/containers with minimal code change."},refactor:{n:"Refactor",c:"#c084fc",d:"Re-architect to cloud-native for agility and scale."}};
+var S6={retire:{n:"Retire",c:"#94a3b8",d:"Decommission — no business value or duplicate."},retain:{n:"Retain",c:"var(--red)",d:"Keep on-premises for now (residency, latency or regulatory constraint)."},repurchase:{n:"Repurchase",c:"var(--orange)",d:"Move to SaaS / commercial alternative."},rehost:{n:"Rehost",c:"var(--blue)",d:"Lift-and-shift to EC2 (e.g. AWS MGN)."},replatform:{n:"Replatform",c:"var(--green)",d:"Lift-and-optimise: managed DB/containers with minimal code change."},refactor:{n:"Refactor",c:"var(--purple)",d:"Re-architect to cloud-native for agility and scale."}};
 var FL=[["unused","Unused / duplicate"],["saas","SaaS equivalent available"],["resid","Residency / latency / regulatory block"],["eos","End-of-support OS/app"],["db","Database can be managed (RDS/Aurora)"],["scale","Needs elasticity / modernisation"],["lic","Licence constraint (Oracle/SQL)"]];
 var W=[];
 function rec(w){var f=w.flags||{};
@@ -82,10 +84,10 @@ function calc(){
  document.getElementById("kpis").innerHTML='<div class="kpi"><b>'+tot+'</b><span>Workloads</span></div><div class="kpi"><b>'+mig+'</b><span>To migrate</span></div><div class="kpi"><b>'+(cnt.rehost+cnt.replatform)+'</b><span>Rehost / Replatform</span></div><div class="kpi"><b>'+(cnt.refactor+cnt.repurchase)+'</b><span>Refactor / Repurchase</span></div>';
  // donut
  var cx=110,cy=120,r=80,sw=34,a0=-Math.PI/2,svg="",C=2*Math.PI*r,off=0;
- if(!tot)svg='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#1a1f2e" stroke-width="'+sw+'"/>';
+ if(!tot)svg='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="var(--s3)" stroke-width="'+sw+'"/>';
  Object.keys(S6).forEach(function(k){if(!cnt[k])return;var len=cnt[k]/tot*C;svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+S6[k].c+'" stroke-width="'+sw+'" stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';off+=len});
- svg+='<text x="'+cx+'" y="'+(cy+6)+'" text-anchor="middle" font-size="24" font-weight="700" fill="#e8edf5">'+tot+'</text>';
- var y=40;Object.keys(S6).forEach(function(k){svg+='<rect x="225" y="'+(y-10)+'" width="12" height="12" rx="3" fill="'+S6[k].c+'"/><text x="243" y="'+y+'" font-size="12" fill="#c8d0e0">'+S6[k].n+' · '+cnt[k]+'</text>';y+=24});
+ svg+='<text x="'+cx+'" y="'+(cy+6)+'" text-anchor="middle" font-size="24" font-weight="700" fill="var(--text)">'+tot+'</text>';
+ var y=40;Object.keys(S6).forEach(function(k){svg+='<rect x="225" y="'+(y-10)+'" width="12" height="12" rx="3" fill="'+S6[k].c+'"/><text x="243" y="'+y+'" font-size="12" fill="var(--muted2)">'+S6[k].n+' · '+cnt[k]+'</text>';y+=24});
  document.getElementById("donut").innerHTML=svg;
  document.getElementById("legend").innerHTML=Object.keys(S6).map(function(k){return '<div class="hbar"><span class="n" style="color:'+S6[k].c+';font-weight:700">'+S6[k].n+'</span><span class="tr"><span class="fl" style="display:block;width:'+(tot?cnt[k]/tot*100:0)+'%;background:'+S6[k].c+'"></span></span><span class="v">'+cnt[k]+'</span></div><div style="font-size:.7rem;color:var(--muted);margin:-3px 0 4px 200px">'+S6[k].d+'</div>'}).join("");
  var titles=["Not migrating (retire / retain)","Wave 1 · Foundation & quick wins","Wave 2 · Core business systems","Wave 3 · Critical & complex"];

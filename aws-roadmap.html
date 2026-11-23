@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="theme-init.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AWS Solutions Architect 18-Month Mastery Roadmap — Mohammad Dassen</title>
   <!-- ═══ SEO & SOCIAL META ═══ -->
@@ -45,16 +46,16 @@
   <!-- ═══════════════════════════ -->
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-  body { background: #0a0e1a; color: #e2e8f0; padding: 28px 20px; max-width: 900px; margin: auto; }
+  body { background:var(--bg); color:var(--text); padding: 28px 20px; max-width: 900px; margin: auto; }
 
-  h1 { text-align: center; font-size: 1.5rem; color: #f8fafc; margin-bottom: 4px; letter-spacing: 1px; }
-  .subtitle { text-align: center; font-size: 0.75rem; color: #64748b; margin-bottom: 28px; letter-spacing: 2px; text-transform: uppercase; }
+  h1 { text-align: center; font-size: 1.5rem; color: var(--text); margin-bottom: 4px; letter-spacing: 1px; }
+  .subtitle { text-align: center; font-size: 0.75rem; color:var(--muted); margin-bottom: 28px; letter-spacing: 2px; text-transform: uppercase; }
 
   .domains { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 28px; }
-  .domain { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); border-radius: 12px; padding: 14px 10px; text-align: center; }
+  .domain { background: color-mix(in srgb,var(--text) 4.0%,transparent); border: 1px solid color-mix(in srgb,var(--text) 9.0%,transparent); border-radius: 12px; padding: 14px 10px; text-align: center; }
   .domain-icon { font-size: 1.5rem; margin-bottom: 6px; }
-  .domain-name { font-size: 0.62rem; color: #64748b; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
-  .domain-subs { font-size: 0.68rem; color: #94a3b8; margin-top: 3px; }
+  .domain-name { font-size: 0.62rem; color:var(--muted); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+  .domain-subs { font-size: 0.68rem; color:var(--muted2); margin-top: 3px; }
 
   .section-label { font-size: 0.65rem; color: #475569; text-transform: uppercase; letter-spacing: 2.5px; margin: 0 0 18px; text-align: center; }
 
@@ -64,70 +65,71 @@
 
   .phase { display: flex; align-items: flex-start; margin-bottom: 22px; }
   .phase-icon { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: 1.4rem; flex-shrink: 0; z-index: 1; border: 2px solid rgba(255,255,255,0.12); box-shadow: 0 0 20px rgba(0,0,0,0.4); }
-  .phase-content { margin-left: 18px; flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    font-size: 1.4rem; flex-shrink: 0; z-index: 1; border: 2px solid color-mix(in srgb,var(--text) 12.0%,transparent); box-shadow: 0 0 20px rgba(0,0,0,0.4); }
+  .phase-content { margin-left: 18px; flex: 1; background: color-mix(in srgb,var(--text) 3.0%,transparent); border: 1px solid color-mix(in srgb,var(--text) 8.0%,transparent);
     border-radius: 14px; padding: 16px 18px; }
   .phase-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
   .phase-title { font-size: 0.97rem; font-weight: 700; }
   .phase-badge { font-size: 0.63rem; padding: 3px 11px; border-radius: 20px; font-weight: 700; letter-spacing: 0.5px; }
-  .phase-desc { font-size: 0.74rem; color: #94a3b8; margin-bottom: 12px; line-height: 1.6; }
+  .phase-desc { font-size: 0.74rem; color:var(--muted2); margin-bottom: 12px; line-height: 1.6; }
   .skills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-  .skill { font-size: 0.66rem; padding: 3px 10px; border-radius: 6px; background: rgba(255,255,255,0.07);
-    color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1); }
+  .skill { font-size: 0.66rem; padding: 3px 10px; border-radius: 6px; background: color-mix(in srgb,var(--text) 7.0%,transparent);
+    color:var(--muted2); border: 1px solid color-mix(in srgb,var(--text) 10.0%,transparent); }
   .cert-row { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; }
   .cert-badge { padding: 4px 12px; border-radius: 8px; font-weight: 700; font-size: 0.68rem; }
 
   /* Phase color themes */
   .p1 .phase-icon { background: linear-gradient(135deg,#f59e0b,#d97706); }
-  .p1 .phase-title { color: #fbbf24; }
-  .p1 .phase-badge { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
-  .p1 .cert-badge { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+  .p1 .phase-title { color:var(--gold2); }
+  .p1 .phase-badge { background: rgba(245,158,11,0.12); color:var(--gold2); border: 1px solid rgba(245,158,11,0.3); }
+  .p1 .cert-badge { background: rgba(245,158,11,0.12); color:var(--gold2); border: 1px solid rgba(245,158,11,0.3); }
 
   .p2 .phase-icon { background: linear-gradient(135deg,#3b82f6,#2563eb); }
-  .p2 .phase-title { color: #60a5fa; }
-  .p2 .phase-badge { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
-  .p2 .cert-badge { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+  .p2 .phase-title { color:var(--blue); }
+  .p2 .phase-badge { background: rgba(59,130,246,0.12); color:var(--blue); border: 1px solid rgba(59,130,246,0.3); }
+  .p2 .cert-badge { background: rgba(59,130,246,0.12); color:var(--blue); border: 1px solid rgba(59,130,246,0.3); }
 
   .p3 .phase-icon { background: linear-gradient(135deg,#8b5cf6,#7c3aed); }
-  .p3 .phase-title { color: #a78bfa; }
-  .p3 .phase-badge { background: rgba(139,92,246,0.12); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
-  .p3 .cert-badge { background: rgba(139,92,246,0.12); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+  .p3 .phase-title { color:var(--purple); }
+  .p3 .phase-badge { background: rgba(139,92,246,0.12); color:var(--purple); border: 1px solid rgba(139,92,246,0.3); }
+  .p3 .cert-badge { background: rgba(139,92,246,0.12); color:var(--purple); border: 1px solid rgba(139,92,246,0.3); }
 
   .p4 .phase-icon { background: linear-gradient(135deg,#10b981,#059669); }
-  .p4 .phase-title { color: #34d399; }
-  .p4 .phase-badge { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
-  .p4 .cert-badge { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+  .p4 .phase-title { color:var(--green); }
+  .p4 .phase-badge { background: rgba(16,185,129,0.12); color:var(--green); border: 1px solid rgba(16,185,129,0.3); }
+  .p4 .cert-badge { background: rgba(16,185,129,0.12); color:var(--green); border: 1px solid rgba(16,185,129,0.3); }
 
   .p5 .phase-icon { background: linear-gradient(135deg,#ef4444,#dc2626); }
-  .p5 .phase-title { color: #f87171; }
-  .p5 .phase-badge { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
-  .p5 .cert-badge { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+  .p5 .phase-title { color:var(--red); }
+  .p5 .phase-badge { background: rgba(239,68,68,0.12); color:var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .p5 .cert-badge { background: rgba(239,68,68,0.12); color:var(--red); border: 1px solid rgba(239,68,68,0.3); }
 
-  .resources { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px; margin-top: 28px; }
-  .resources h3 { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
+  .resources { background: color-mix(in srgb,var(--text) 3.0%,transparent); border: 1px solid color-mix(in srgb,var(--text) 8.0%,transparent); border-radius: 14px; padding: 18px; margin-top: 28px; }
+  .resources h3 { font-size: 0.8rem; color:var(--muted2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
   .res-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .res-item { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 12px; border: 1px solid rgba(255,255,255,0.07); }
-  .res-type { font-size: 0.6rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-  .res-name { font-size: 0.75rem; color: #e2e8f0; font-weight: 600; }
-  .res-desc { font-size: 0.67rem; color: #64748b; margin-top: 3px; }
+  .res-item { background: color-mix(in srgb,var(--text) 4.0%,transparent); border-radius: 10px; padding: 12px; border: 1px solid color-mix(in srgb,var(--text) 7.0%,transparent); }
+  .res-type { font-size: 0.6rem; color:var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .res-name { font-size: 0.75rem; color:var(--text); font-weight: 600; }
+  .res-desc { font-size: 0.67rem; color:var(--muted); margin-top: 3px; }
 
-  .timeline-bar { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px; margin-top: 28px; }
-  .timeline-bar h3 { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
+  .timeline-bar { background: color-mix(in srgb,var(--text) 3.0%,transparent); border: 1px solid color-mix(in srgb,var(--text) 8.0%,transparent); border-radius: 14px; padding: 18px; margin-top: 28px; }
+  .timeline-bar h3 { font-size: 0.8rem; color:var(--muted2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
   .bar-track { display: flex; gap: 2px; height: 28px; border-radius: 8px; overflow: hidden; }
-  .bar-seg { display: flex; align-items: center; justify-content: center; font-size: 0.58rem; font-weight: 700; color: rgba(255,255,255,0.85); letter-spacing: 0.5px; }
+  .bar-seg { display: flex; align-items: center; justify-content: center; font-size: 0.58rem; font-weight: 700; color: color-mix(in srgb,var(--text) 85.0%,transparent); letter-spacing: 0.5px; }
   .bar-labels { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
-  .bar-label { display: flex; align-items: center; gap: 5px; font-size: 0.67rem; color: #94a3b8; }
+  .bar-label { display: flex; align-items: center; gap: 5px; font-size: 0.67rem; color:var(--muted2); }
   .bar-dot { width: 10px; height: 10px; border-radius: 3px; }
 </style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <style>
-.md-backbar{background:#0e1219;border-bottom:1px solid rgba(255,255,255,0.07);padding:0 20px;position:sticky;top:0;z-index:999;display:flex;align-items:center;height:46px;font-family:'Segoe UI',system-ui,sans-serif;}
-.md-backbar a{display:flex;align-items:center;gap:7px;font-size:0.72rem;font-weight:600;color:#6b7a94;text-decoration:none;transition:color 0.2s;}
-.md-backbar a:hover{color:#c084fc;}
+.md-backbar{background:var(--surface);border-bottom:1px solid color-mix(in srgb,var(--text) 7.0%,transparent);padding:0 20px;position:sticky;top:0;z-index:999;display:flex;align-items:center;height:46px;font-family:'Segoe UI',system-ui,sans-serif;}
+.md-backbar a{display:flex;align-items:center;gap:7px;font-size:0.72rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.md-backbar a:hover{color:var(--purple);}
 .md-backbar a:hover .md-arrow{transform:translateX(-3px);}
 .md-arrow{font-size:0.9rem;display:inline-block;transition:transform 0.2s;}
-.md-backbar .md-sitename{margin-left:auto;font-size:0.62rem;color:#6b7a94;opacity:0.55;}
+.md-backbar .md-sitename{margin-left:auto;font-size:0.62rem;color:var(--muted);opacity:0.55;}
 </style>
 <div class="md-backbar">
   <a href="index.html"><span class="md-arrow">←</span> Back to Home</a>

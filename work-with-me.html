@@ -59,7 +59,7 @@
 <rect x="530" y="25" width="200" height="70" rx="12" fill="var(--s2)" stroke="var(--purple)"/><text x="630" y="55" text-anchor="middle" font-weight="700">3 · Recommend</text><text x="630" y="76" text-anchor="middle" fill="var(--muted2)" font-size="12">Scored findings + roadmap</text>
 <rect x="790" y="25" width="200" height="70" rx="12" fill="var(--s2)" stroke="var(--green)"/><text x="890" y="55" text-anchor="middle" font-weight="700">4 · Hand over</text><text x="890" y="76" text-anchor="middle" fill="var(--muted2)" font-size="12">Exec readout + action plan</text>
 </g><g stroke="var(--gold)" stroke-width="2" marker-end="url(#ar)"><line x1="212" y1="60" x2="266" y2="60"/><line x1="472" y1="60" x2="526" y2="60"/><line x1="732" y1="60" x2="786" y2="60"/></g></svg></div>
-<div class="card"><h2>Request an assessment</h2><p class="sub">Tell me about your environment. This opens an email draft on your device — nothing is stored or sent by this website.</p>
+<div class="card"><h2>Request an assessment</h2><p class="sub">Tell me about your environment. Tell me about your environment and I will reply within two working days.</p>
 <form id="lead" class="grid2">
 <div><label for="f-name">Your name</label><input id="f-name" required></div>
 <div><label for="f-org">Organisation</label><input id="f-org"></div>
@@ -68,8 +68,8 @@
 <div><label for="f-offer">Interested in</label><select id="f-offer"></select></div>
 <div><label for="f-when">Target start</label><select id="f-when"><option>Within 30 days</option><option>This quarter</option><option>Next quarter</option><option>Exploring</option></select></div>
 <div style="grid-column:1/-1"><label for="f-note">Context (AWS accounts, regulators, deadlines)</label><textarea id="f-note"></textarea></div>
-<div style="grid-column:1/-1" class="bar"><button class="btn gold" type="submit">✉ Prepare email request</button><a class="btn" id="li" target="_blank" rel="noopener">in Connect on LinkedIn</a><a class="btn" id="cal" target="_blank" rel="noopener" style="display:none">📅 Book a call</a></div>
-</form></div>
+<input type="text" id="f-hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip-path:inset(50%);pointer-events:none"><div style="grid-column:1/-1" class="bar"><button class="btn gold" type="submit">✉ Send request</button><a class="btn" id="li" target="_blank" rel="noopener">in Connect on LinkedIn</a><a class="btn" id="cal" target="_blank" rel="noopener" style="display:none">📅 Book a call</a></div>
+<p id="lead-status" role="status" style="font-size:.85rem;margin-top:8px;color:var(--muted2)"></p></form></div>
 <div class="card"><h2>Free self-assessment tools</h2><p class="sub">Start with the tools — their exported results make the engagement faster and cheaper.</p>
 <div class="bar"><a class="btn" href="readiness-scorecard.html">📋 Readiness Scorecard</a><a class="btn" href="roi-estimator.html">📈 ROI Estimator</a><a class="btn" href="nca-gap-assessment.html">🛡 NCA/PDPL Gap Assessment</a><a class="btn" href="migration-readiness.html">🚚 Migration Readiness (6R)</a><a class="btn" href="cloud-governance.html">🌱 Governance Builder</a><a class="btn" href="scp-generator.html">🔒 SCP + Terraform</a><a class="btn" href="ccoe-charter.html">🏛 CCoE Charter</a><a class="btn" href="proposal-sow.html">📄 Proposal / SOW</a></div></div>
 
@@ -89,12 +89,13 @@ MD.profile.bind({org:"#f-org"});
 document.getElementById("li").href=MD.cfg.linkedin;
 if(MD.cfg.calendly){var c=document.getElementById("cal");c.href=MD.cfg.calendly;c.style.display=""}
 document.getElementById("lead").addEventListener("submit",function(e){e.preventDefault();
- var v=function(id){return document.getElementById(id).value};
- var of=sel.options[sel.selectedIndex].text;
- var body="Name: "+v("f-name")+"\nOrganisation: "+v("f-org")+"\nRole: "+v("f-role")+"\nEmail: "+v("f-email")+"\nInterested in: "+of+"\nTarget start: "+v("f-when")+"\n\nContext:\n"+v("f-note");
- MD.profile.save({org:v("f-org"),contact:v("f-name")});MD.track("lead-submit");
- location.href=MD.mailto("Assessment request — "+of,body)});
-
+ var v=function(id){return document.getElementById(id).value},st=document.getElementById("lead-status"),of=sel.options[sel.selectedIndex].text;
+ if(!/^\S+@\S+\.\S+$/.test(v("f-email"))){st.textContent="Please enter a valid email address.";st.style.color="var(--red)";return}
+ st.textContent="Sending…";st.style.color="";MD.profile.save({org:v("f-org"),contact:v("f-name")});
+ MD.sendLead({name:v("f-name"),org:v("f-org"),role:v("f-role"),email:v("f-email"),offer:of,when:v("f-when"),note:v("f-note"),hp:v("f-hp")}).then(function(r){
+  if(r.via==="mailto"){st.textContent="Your email app should open with the request.";}
+  else if(r.ok){st.textContent="Thank you — your request was received. I will reply within two working days.";st.style.color="var(--green)";document.getElementById("lead").reset()}
+  else{st.textContent="Could not send. Please email "+MD.cfg.email+" directly.";st.style.color="var(--red)"}})});
 </script>
 </body>
 </html>

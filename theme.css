@@ -34,3 +34,16 @@ footer,.site-footer{color:var(--muted)}
 .md-theme{position:fixed;right:18px;bottom:18px;z-index:9998;width:42px;height:42px;border-radius:50%;border:1px solid var(--border2);background:var(--surface);color:var(--text);box-shadow:var(--shadow);cursor:pointer;font-size:18px;display:grid;place-items:center;transition:transform .15s}
 .md-theme:hover{transform:scale(1.07)}
 @media print{.md-theme{display:none}html[data-theme]{--bg:#fff}}
+
+.md-lang{right:68px;font-size:14px;font-weight:800;font-family:'Segoe UI',Tahoma,sans-serif}
+[dir="rtl"] .md-lang{right:68px}
+/* Arabic typography & RTL */
+html[lang="ar"] body,html[lang="ar"] input,html[lang="ar"] select,html[lang="ar"] textarea,html[lang="ar"] button{font-family:'Segoe UI',Tahoma,'Noto Naskh Arabic','Arial',sans-serif}
+html[lang="ar"] h1,html[lang="ar"] h2,html[lang="ar"] h3,html[lang="ar"] h4,html[lang="ar"] .brand{font-family:'Segoe UI',Tahoma,'Noto Naskh Arabic',sans-serif;font-weight:700;letter-spacing:0}
+html[lang="ar"] *{letter-spacing:0!important;text-transform:none!important}
+html[lang="ar"] .eyebrow,html[lang="ar"] .sec-eye{font-size:.85rem}
+[dir="rtl"] svg{direction:ltr}
+[dir="rtl"] ul[style],[dir="rtl"] ol[style]{margin-left:0!important;margin-right:18px}
+[dir="rtl"] .md-toast{left:50%}
+[dir="rtl"] code,[dir="rtl"] .preview,[dir="rtl"] pre{direction:ltr;text-align:left}
+[dir="rtl"] input[type=email],[dir="rtl"] input[type=url],[dir="rtl"] input[type=number],[dir="rtl"] input[type=date]{direction:ltr;text-align:right}

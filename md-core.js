@@ -4,6 +4,7 @@
     email: "moh.dassen@gmail.com",
     linkedin: "https://www.linkedin.com/in/mohdassen/",
     newsletter: "",                         // optional: email-service subscribe endpoint (e.g. Buttondown embed URL)
+    formEndpoint: "",                        // optional: Formspree-style endpoint (https://formspree.io/f/xxxx)
     calendly: "",                            // optional booking link
     goatcounter: "mohdassen",                       // optional: your GoatCounter code, e.g. "mohdassen"
     site: "https://mohdassen.github.io/aws-consulting-roadmap/"
@@ -133,6 +134,18 @@
   MD.track = function (ev) { try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: "event/" + ev, title: ev, event: true }); } catch (e) {} };
   if (CFG.goatcounter) { var s = document.createElement("script"); s.async = true; s.src = "https://gc.zgo.at/count.js"; s.setAttribute("data-goatcounter", "https://" + CFG.goatcounter + ".goatcounter.com/count"); document.head.appendChild(s); }
 
+  /* ---------- lead delivery: hosted form if configured, else email draft ---------- */
+  MD.sendLead = function (p) { // p: {name,org,role,email,offer,when,note,hp}
+    if (p.hp) return Promise.resolve({ ok: true, via: "bot" });
+    var subject = "Assessment request — " + (p.offer || "General"), body = "Name: " + p.name + "\nOrganisation: " + p.org + "\nRole: " + p.role + "\nEmail: " + p.email + "\nInterested in: " + p.offer + "\nTarget start: " + p.when + "\n\nContext:\n" + p.note;
+    MD.track("lead-submit");
+    if (CFG.formEndpoint) {
+      return fetch(CFG.formEndpoint, { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify({ name: p.name, organisation: p.org, role: p.role, email: p.email, _replyto: p.email, interest: p.offer, start: p.when, message: p.note, _subject: subject }) })
+        .then(function (r) { return { ok: r.ok, via: "form" }; }).catch(function () { return { ok: false, via: "form" }; });
+    }
+    location.href = MD.mailto(subject, body); return Promise.resolve({ ok: true, via: "mailto" });
+  };
+
   /* ---------- CTA strip ---------- */
   /* self-contained styles so pages without tools.css still render toast/CTA */
   var st=document.createElement("style");st.textContent=".md-toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);background:var(--s3,#1a1f2e);color:var(--text,#e8edf5);border:1px solid var(--gold,#f59e0b);padding:8px 16px;border-radius:99px;font:600 .78rem 'Segoe UI',sans-serif;opacity:0;transition:.25s;z-index:9999;pointer-events:none}.md-toast.on{opacity:1;transform:translate(-50%,0)}.md-cta{max-width:1100px;margin:10px auto 30px;padding:20px 24px;border:1px solid var(--border2,rgba(245,158,11,.3));border-radius:16px;background:var(--surface,#0e1219);box-shadow:var(--shadow,none);display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:space-between;font-family:'Segoe UI',sans-serif;color:var(--text,#e8edf5)}.md-cta b{display:block;font-family:Georgia,serif;font-size:1.05rem}.md-cta span{font-size:.82rem;color:var(--muted2,#9aa3bd)}.md-cta .btn{display:inline-flex;background:var(--gold,#f59e0b);color:var(--on-gold,#1a1200);padding:9px 16px;border-radius:8px;font-weight:700;font-size:.82rem;text-decoration:none}@media print{.md-cta{display:none}}";document.head.appendChild(st);
@@ -150,5 +163,6 @@
     function sync(){b.textContent=document.documentElement.getAttribute("data-theme")==="light"?"🌙":"☀️"}
     b.onclick=function(){var n=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";document.documentElement.setAttribute("data-theme",n);set("theme",n);sync()};sync();document.body.appendChild(b)}
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", themeBtn); else themeBtn();
+  if (!document.body.hasAttribute("data-i18n-off")) { var i18 = document.createElement("script"); i18.src = "md-i18n.js"; document.head.appendChild(i18); }
   MD.track("pageview-" + (location.pathname.split("/").pop() || "index"));
 })();

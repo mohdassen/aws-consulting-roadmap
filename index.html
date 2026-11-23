@@ -52,7 +52,7 @@
 <body data-no-cta>
 <header class="nav"><div class="nav-in">
   <a class="brand" href="index.html"><i>MD</i> Mohammad Dassen</a>
-  <nav class="nav-links" aria-label="Primary"><a href="#services">Services</a><a href="#tools">Tools</a><a href="#about">About</a><a href="#contact">Contact</a><a class="btn-x pri" href="work-with-me.html">Work With Me</a></nav>
+  <nav class="nav-links" aria-label="Primary"><a href="#journeys">Start here</a><a href="#services">Services</a><a href="#tools">Tools</a><a href="#about">About</a><a href="#contact">Contact</a><a class="btn-x pri" href="work-with-me.html">Work With Me</a></nav>
 </div></header>
 
 <main>
@@ -81,6 +81,12 @@
 
 <div class="strip"><div class="strip-in" id="stats"></div></div>
 
+<section id="journeys"><div class="wrap">
+  <div class="sec-eye">Start here</div><h2 class="sec-h">Three journeys, one clear next step</h2>
+  <p class="sec-s">Not sure where to begin? Pick the question you are trying to answer — each journey groups the right tools in order.</p>
+  <div class="svc" id="journeys-grid"></div>
+</div></section>
+
 <section id="services"><div class="wrap">
   <div class="sec-eye">Advisory engagements</div><h2 class="sec-h">Three fixed-scope ways to work together</h2>
   <p class="sec-s">Clear scope, clear deliverables and a clear price range — each engagement ends with a board-ready output and a prioritised action plan.</p>
@@ -94,7 +100,7 @@
 <section id="tools" style="background:var(--surface);border-block:1px solid var(--border)"><div class="wrap">
   <div class="sec-eye">Free tools</div><h2 class="sec-h">Interactive tools for cloud teams</h2>
   <p class="sec-s">Everything runs in your browser — nothing is uploaded. Save progress, then export to Word or PDF.</p>
-  <div class="filters" id="filters"><button class="f on" data-f="all">All</button><button class="f" data-f="Tools">Tools</button><button class="f" data-f="Compliance">Compliance</button><button class="f" data-f="Learning">Learning</button><button class="f" data-f="soon">Coming soon</button><span class="count" id="count"></span></div>
+  <div class="filters" id="filters"><button class="f on" data-f="all">All</button><button class="f" data-f="j:assess">Assess</button><button class="f" data-f="j:design">Design</button><button class="f" data-f="j:justify">Justify</button><button class="f" data-f="Tools">Tools</button><button class="f" data-f="Compliance">Compliance</button><button class="f" data-f="Learning">Learning</button><button class="f" data-f="soon">Coming soon</button><span class="count" id="count"></span></div>
   <div class="grid" id="grid"></div>
 </div></section>
 
@@ -111,6 +117,13 @@
   <div class="sec-eye">Contact</div><h2 class="sec-h">Let’s talk about your cloud roadmap</h2>
   <p class="sec-s" style="margin-inline:auto">Open to advisory engagements, partnerships and strategic conversations about cloud transformation in Saudi Arabia.</p>
   <div class="cta-row" id="contact-row"></div>
+  <form id="hform" class="hform" novalidate>
+    <input type="text" id="h-hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip-path:inset(50%);pointer-events:none">
+    <div class="hf-grid"><input id="h-name" placeholder="Your name" required><input id="h-email" type="email" placeholder="Email" required><input id="h-org" placeholder="Organisation"><select id="h-offer"><option>5-Day Well-Architected Review</option><option>NCA/PDPL Cloud Gap Assessment</option><option>Cloud Governance Workshop</option><option>Something else</option></select></div>
+    <textarea id="h-note" placeholder="Briefly describe your environment or goal"></textarea>
+    <button class="btn-x pri" type="submit">Send request →</button>
+    <p class="hf-status" id="h-status" role="status"></p>
+  </form>
 </div></div></section>
 </main>
 <div class="foot" id="foot"></div>
@@ -120,8 +133,13 @@
 var C=window.SITE_CONFIG;
 document.getElementById("stats").innerHTML=C.owner.stats.map(function(s){return '<div><b>'+s.num+'</b><span>'+s.label+'</span></div>'}).join("");
 var filter="all";
+var J=[{k:"assess",i:"🧭",n:"Assess",q:"Where do we stand?",d:"Score your readiness, risk and compliance before you spend a riyal.",ids:["readiness","war-scan","nca-gap","migration-6r","nca-pdpl-compliance"],cta:["readiness","Start with the Readiness Scorecard"]},
+ {k:"design",i:"📐",n:"Design",q:"What should the target look like?",d:"Design the landing zone, guardrails, DR and operating model — then export the code.",ids:["landing-zone","scp-generator","nca-mapper","dr-planner","ccoe-charter","governance-builder"],cta:["landing-zone","Open the Landing Zone Designer"]},
+ {k:"justify",i:"💼",n:"Justify",q:"How do we make the business case?",d:"Model cost, regions and return, then turn the answer into a proposal.",ids:["tco-calculator","cost-compare","roi","proposal-sow"],cta:["tco-calculator","Open the TCO Calculator"]}];
+function byId(id){return C.cards.filter(function(c){return c.id===id})[0]}
+document.getElementById("journeys-grid").innerHTML=J.map(function(j,n){return '<div class="svc-c"><span class="n">0'+(n+1)+' · '+j.n.toUpperCase()+'</span><h3>'+j.i+' '+j.q+'</h3><p>'+j.d+'</p><ul class="jl">'+j.ids.map(function(id){var c=byId(id);return c?'<li><a href="'+c.url+'">'+c.title.replace(/ \(EN\/AR\)| \(SAR\)/g,"")+'</a></li>':""}).join("")+'</ul><a class="btn-x pri" href="'+byId(j.cta[0]).url+'">'+j.cta[1]+' →</a></div>'}).join("");
 function render(){
-  var cards=C.cards.slice().sort(function(a,b){return a.order-b.order}).filter(function(c){return filter==="all"||(filter==="soon"?c.status==="soon":c.topic===filter)});
+  var cards=C.cards.slice().sort(function(a,b){return a.order-b.order}).filter(function(c){if(filter==="all")return true;if(filter.indexOf("j:")===0){var jj=J.filter(function(x){return x.k===filter.slice(2)})[0];return jj.ids.indexOf(c.id)>-1}return filter==="soon"?c.status==="soon":c.topic===filter});
   var live=cards.filter(function(c){return c.status==="live"}).length;
   document.getElementById("count").textContent=live+" live · "+(cards.length-live)+" coming soon";
   document.getElementById("grid").innerHTML=cards.map(function(c){var tag=c.status==="live"?"a":"div";
@@ -132,6 +150,15 @@ render();
 document.getElementById("clients").innerHTML=C.owner.clients.map(function(c){return '<div class="cl">'+c.name+'<span>'+c.sub+'</span></div>'}).join("");
 document.getElementById("tl").innerHTML=C.roadmap.map(function(r){return '<div class="tli"><i>'+r.dot+'</i><div><b>'+r.title+'</b><small>'+r.phase+' · '+r.cert+'</small></div></div>'}).join("");
 document.getElementById("contact-row").innerHTML='<a class="btn-x pri" href="work-with-me.html">Request an assessment →</a><a class="btn-x" href="'+C.owner.linkedin+'" target="_blank" rel="noopener">Connect on LinkedIn</a><a class="btn-x" href="mailto:'+C.owner.email+'">'+C.owner.email+'</a>';
+window.addEventListener("load",function(){
+ if(window.MD&&MD.cfg.calendly){var r=document.getElementById("contact-row");r.insertAdjacentHTML("afterbegin",'<a class="btn-x pri" href="'+MD.cfg.calendly+'" target="_blank" rel="noopener">📅 Book a call</a>')}
+ document.getElementById("hform").addEventListener("submit",function(e){e.preventDefault();var v=function(i){return document.getElementById(i).value.trim()},st=document.getElementById("h-status");
+  if(!v("h-name")||!/^\S+@\S+\.\S+$/.test(v("h-email"))){st.textContent="Please enter your name and a valid email.";st.className="hf-status err";return}
+  st.textContent="Sending…";st.className="hf-status";
+  MD.sendLead({name:v("h-name"),org:v("h-org"),role:"",email:v("h-email"),offer:document.getElementById("h-offer").value,when:"",note:v("h-note"),hp:v("h-hp")}).then(function(r){
+   if(r.via==="mailto"){st.textContent="Your email app should open with the request. If not, write to "+C.owner.email+".";st.className="hf-status"}
+   else if(r.ok){st.textContent="Thank you — your request was received. I will reply within two working days.";st.className="hf-status ok";document.getElementById("hform").reset()}
+   else{st.textContent="Could not send. Please email "+C.owner.email+" directly.";st.className="hf-status err"}})})});
 document.getElementById("foot").innerHTML='© '+new Date().getFullYear()+' <span>'+C.owner.name+'</span> · '+C.owner.title+' · Riyadh, Saudi Arabia';
 </script>
 <script src="md-core.js" defer></script>

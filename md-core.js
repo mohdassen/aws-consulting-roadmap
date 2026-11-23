@@ -4,7 +4,7 @@
     email: "moh.dassen@gmail.com",
     linkedin: "https://www.linkedin.com/in/mohdassen/",
     calendly: "",                            // optional booking link
-    goatcounter: "",                         // optional: your GoatCounter code, e.g. "mohdassen"
+    goatcounter: "mohdassen",                       // optional: your GoatCounter code, e.g. "mohdassen"
     site: "https://mohdassen.github.io/aws-consulting-roadmap/"
   };
   var K = "md.";
